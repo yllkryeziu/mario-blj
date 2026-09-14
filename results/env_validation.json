@@ -1,0 +1,29 @@
+{
+  "minimum_escape_speed": 154.0,
+  "runs": [
+    {
+      "approach": "down",
+      "air_magnitude": 1.0,
+      "return": 17.4388,
+      "frames": 1113,
+      "peak_backward_velocity": -1543.88,
+      "curriculum_stage": 4,
+      "warps": 37,
+      "final_height": 5074.0,
+      "success": true,
+      "highest_reached": 5074.0
+    },
+    {
+      "approach": "up",
+      "air_magnitude": 1.0,
+      "return": 1.2226,
+      "frames": 6000,
+      "peak_backward_velocity": -22.26,
+      "curriculum_stage": 4,
+      "warps": 0,
+      "final_height": 2291.5,
+      "success": false,
+      "highest_reached": 3414.0
+    }
+  ]
+}

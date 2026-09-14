@@ -1,0 +1,3574 @@
+{
+ "success": true,
+ "stride": 5,
+ "states": [
+  {
+   "frame": 0,
+   "position": [
+    -200.0,
+    3200.0,
+    3004.0
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    2.0
+   ],
+   "forward_velocity": 2.0,
+   "face_angle": 0.0,
+   "action": 6436
+  },
+  {
+   "frame": 5,
+   "position": [
+    -200.0,
+    3174.0,
+    3009.0
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "forward_velocity": 0.0,
+   "face_angle": 0.0,
+   "action": 4901
+  },
+  {
+   "frame": 10,
+   "position": [
+    -200.0,
+    3174.0,
+    3009.0
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "forward_velocity": 0.0,
+   "face_angle": 0.0,
+   "action": 4901
+  },
+  {
+   "frame": 15,
+   "position": [
+    -200.0,
+    3174.0,
+    3009.0
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "forward_velocity": 0.0,
+   "face_angle": 0.0,
+   "action": 4901
+  },
+  {
+   "frame": 20,
+   "position": [
+    -200.0,
+    3174.0,
+    3017.914
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    8.914
+   ],
+   "forward_velocity": 8.914,
+   "face_angle": 0.0,
+   "action": 67109952
+  },
+  {
+   "frame": 25,
+   "position": [
+    -200.0,
+    3174.0,
+    3075.467
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    13.175
+   ],
+   "forward_velocity": 13.1746,
+   "face_angle": 0.0,
+   "action": 67109952
+  },
+  {
+   "frame": 30,
+   "position": [
+    -200.0,
+    3174.0,
+    3152.881
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    16.962
+   ],
+   "forward_velocity": 16.9624,
+   "face_angle": 0.0,
+   "action": 67109952
+  },
+  {
+   "frame": 35,
+   "position": [
+    -200.0,
+    3174.0,
+    3247.954
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    20.33
+   ],
+   "forward_velocity": 20.3297,
+   "face_angle": 0.0,
+   "action": 67109952
+  },
+  {
+   "frame": 40,
+   "position": [
+    -200.0,
+    3282.0,
+    3375.224
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    24.265
+   ],
+   "forward_velocity": 24.2649,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 45,
+   "position": [
+    -200.0,
+    3372.0,
+    3468.798
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    15.015
+   ],
+   "forward_velocity": 15.0149,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 50,
+   "position": [
+    -200.0,
+    3412.0,
+    3516.122
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    5.765
+   ],
+   "forward_velocity": 5.7649,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 55,
+   "position": [
+    -200.0,
+    3402.0,
+    3518.166
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -2.65
+   ],
+   "forward_velocity": -2.65,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 60,
+   "position": [
+    -200.0,
+    3342.0,
+    3487.666
+   ],
+   "velocity": [
+    0.0,
+    -18.0,
+    -8.4
+   ],
+   "forward_velocity": -8.4,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 65,
+   "position": [
+    -200.0,
+    3232.0,
+    3428.416
+   ],
+   "velocity": [
+    0.0,
+    -28.0,
+    -14.15
+   ],
+   "forward_velocity": -14.15,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 70,
+   "position": [
+    -200.0,
+    3232.0,
+    3344.283
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -19.541
+   ],
+   "forward_velocity": -19.5415,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 75,
+   "position": [
+    -200.0,
+    3342.0,
+    3259.326
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -15.291
+   ],
+   "forward_velocity": -15.2915,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 80,
+   "position": [
+    -200.0,
+    3402.0,
+    3183.619
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -15.041
+   ],
+   "forward_velocity": -15.0415,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 85,
+   "position": [
+    -200.0,
+    3412.0,
+    3109.162
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -14.791
+   ],
+   "forward_velocity": -14.7915,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 90,
+   "position": [
+    -200.0,
+    3372.0,
+    3033.955
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -14.541
+   ],
+   "forward_velocity": -14.5415,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 95,
+   "position": [
+    -200.0,
+    3282.0,
+    2957.998
+   ],
+   "velocity": [
+    0.0,
+    -24.0,
+    -14.291
+   ],
+   "forward_velocity": -14.2915,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 100,
+   "position": [
+    -200.0,
+    3174.0,
+    2882.44
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -14.891
+   ],
+   "forward_velocity": -14.5937,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 105,
+   "position": [
+    -200.0,
+    3304.0,
+    2785.738
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -17.64
+   ],
+   "forward_velocity": -17.6405,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 110,
+   "position": [
+    -200.0,
+    3384.0,
+    2708.286
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -15.39
+   ],
+   "forward_velocity": -15.3905,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 115,
+   "position": [
+    -200.0,
+    3414.0,
+    2632.084
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -15.14
+   ],
+   "forward_velocity": -15.1405,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 120,
+   "position": [
+    -200.0,
+    3394.0,
+    2557.132
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -14.89
+   ],
+   "forward_velocity": -14.8905,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 125,
+   "position": [
+    -200.0,
+    3324.0,
+    2483.43
+   ],
+   "velocity": [
+    0.0,
+    -20.0,
+    -14.64
+   ],
+   "forward_velocity": -14.6405,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 130,
+   "position": [
+    -200.0,
+    3251.0,
+    2424.76
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -15.24
+   ],
+   "forward_velocity": -14.9357,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 135,
+   "position": [
+    -200.0,
+    3381.0,
+    2325.492
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -18.153
+   ],
+   "forward_velocity": -18.1535,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 140,
+   "position": [
+    -200.0,
+    3461.0,
+    2245.475
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -15.903
+   ],
+   "forward_velocity": -15.9035,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 145,
+   "position": [
+    -200.0,
+    3491.0,
+    2170.707
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -15.653
+   ],
+   "forward_velocity": -15.6535,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 150,
+   "position": [
+    -200.0,
+    3471.0,
+    2095.189
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -15.403
+   ],
+   "forward_velocity": -15.4035,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 155,
+   "position": [
+    -200.0,
+    3456.0,
+    2033.0
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -20.155
+   ],
+   "forward_velocity": -20.1552,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 160,
+   "position": [
+    -200.0,
+    3564.0,
+    1902.832
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    -26.228
+   ],
+   "forward_velocity": -26.2282,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 165,
+   "position": [
+    -200.0,
+    3654.0,
+    1784.441
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    -21.978
+   ],
+   "forward_velocity": -21.9782,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 170,
+   "position": [
+    -200.0,
+    3694.0,
+    1687.3
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    -17.728
+   ],
+   "forward_velocity": -17.7282,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 175,
+   "position": [
+    -200.0,
+    3684.0,
+    1609.408
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -15.478
+   ],
+   "forward_velocity": -15.4782,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 180,
+   "position": [
+    -200.0,
+    3744.0,
+    1529.303
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -20.692
+   ],
+   "forward_velocity": -20.6923,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 185,
+   "position": [
+    -200.0,
+    3854.0,
+    1438.591
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -16.442
+   ],
+   "forward_velocity": -16.4423,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 190,
+   "position": [
+    -200.0,
+    3914.0,
+    1363.13
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -14.192
+   ],
+   "forward_velocity": -14.1923,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 195,
+   "position": [
+    -200.0,
+    3924.0,
+    1286.918
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.942
+   ],
+   "forward_velocity": -15.9423,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 200,
+   "position": [
+    -200.0,
+    3884.0,
+    1211.957
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -15.692
+   ],
+   "forward_velocity": -15.6923,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 205,
+   "position": [
+    -200.0,
+    3950.0,
+    1126.251
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -21.438
+   ],
+   "forward_velocity": -21.4384,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 210,
+   "position": [
+    -200.0,
+    3845.0,
+    1441.81
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -17.188
+   ],
+   "forward_velocity": -17.1884,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 215,
+   "position": [
+    -200.0,
+    3895.0,
+    1364.618
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -14.938
+   ],
+   "forward_velocity": -14.9384,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 220,
+   "position": [
+    -200.0,
+    3895.0,
+    1290.676
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -14.688
+   ],
+   "forward_velocity": -14.6884,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 225,
+   "position": [
+    -200.0,
+    3845.0,
+    1215.984
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -14.438
+   ],
+   "forward_velocity": -14.4384,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 230,
+   "position": [
+    -200.0,
+    3974.0,
+    1127.057
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    -19.983
+   ],
+   "forward_velocity": -19.9826,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 235,
+   "position": [
+    -200.0,
+    3859.0,
+    1449.893
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    -15.733
+   ],
+   "forward_velocity": -15.7326,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 240,
+   "position": [
+    -200.0,
+    3899.0,
+    1375.98
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    -15.483
+   ],
+   "forward_velocity": -15.4826,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 245,
+   "position": [
+    -200.0,
+    3889.0,
+    1301.318
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -15.233
+   ],
+   "forward_velocity": -15.2326,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 250,
+   "position": [
+    -200.0,
+    3840.0,
+    1233.396
+   ],
+   "velocity": [
+    0.0,
+    -18.0,
+    -14.983
+   ],
+   "forward_velocity": -14.9826,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 255,
+   "position": [
+    -200.0,
+    3970.0,
+    1133.777
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -18.224
+   ],
+   "forward_velocity": -18.2238,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 260,
+   "position": [
+    -200.0,
+    4050.0,
+    1053.408
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -15.974
+   ],
+   "forward_velocity": -15.9738,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 265,
+   "position": [
+    -200.0,
+    3875.0,
+    1388.289
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -15.724
+   ],
+   "forward_velocity": -15.7238,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 270,
+   "position": [
+    -200.0,
+    3855.0,
+    1314.42
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -15.474
+   ],
+   "forward_velocity": -15.4738,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 275,
+   "position": [
+    -200.0,
+    3870.0,
+    1241.801
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -20.261
+   ],
+   "forward_velocity": -20.2608,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 280,
+   "position": [
+    -200.0,
+    3990.0,
+    1153.247
+   ],
+   "velocity": [
+    0.0,
+    18.0,
+    -16.011
+   ],
+   "forward_velocity": -16.0107,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 285,
+   "position": [
+    -200.0,
+    4060.0,
+    1077.943
+   ],
+   "velocity": [
+    0.0,
+    8.0,
+    -15.761
+   ],
+   "forward_velocity": -15.7607,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 290,
+   "position": [
+    -200.0,
+    3875.0,
+    1413.889
+   ],
+   "velocity": [
+    0.0,
+    -2.0,
+    -15.511
+   ],
+   "forward_velocity": -15.5107,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 295,
+   "position": [
+    -200.0,
+    3845.0,
+    1339.086
+   ],
+   "velocity": [
+    0.0,
+    -12.0,
+    -15.261
+   ],
+   "forward_velocity": -15.2607,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 300,
+   "position": [
+    -200.0,
+    3872.0,
+    1260.177
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -20.366
+   ],
+   "forward_velocity": -20.3661,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 305,
+   "position": [
+    -200.0,
+    3982.0,
+    1171.096
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -16.116
+   ],
+   "forward_velocity": -16.1161,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 310,
+   "position": [
+    -200.0,
+    4042.0,
+    1095.265
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -15.866
+   ],
+   "forward_velocity": -15.8661,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 315,
+   "position": [
+    -200.0,
+    3847.0,
+    1430.685
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.616
+   ],
+   "forward_velocity": -15.6161,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 320,
+   "position": [
+    -200.0,
+    3807.0,
+    1355.354
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -15.366
+   ],
+   "forward_velocity": -15.3661,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 325,
+   "position": [
+    -200.0,
+    3873.0,
+    1271.524
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -20.949
+   ],
+   "forward_velocity": -20.9492,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 330,
+   "position": [
+    -200.0,
+    3973.0,
+    1179.529
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -16.699
+   ],
+   "forward_velocity": -16.6992,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 335,
+   "position": [
+    -200.0,
+    4023.0,
+    1104.783
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -14.449
+   ],
+   "forward_velocity": -14.4492,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 340,
+   "position": [
+    -200.0,
+    3818.0,
+    1439.287
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -14.199
+   ],
+   "forward_velocity": -14.1992,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 345,
+   "position": [
+    -200.0,
+    3789.0,
+    1365.0
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -15.949
+   ],
+   "forward_velocity": -15.9491,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 350,
+   "position": [
+    -200.0,
+    3897.0,
+    1263.77
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    -20.045
+   ],
+   "forward_velocity": -20.0452,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 355,
+   "position": [
+    -200.0,
+    3987.0,
+    1176.294
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    -15.795
+   ],
+   "forward_velocity": -15.7952,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 360,
+   "position": [
+    -200.0,
+    4027.0,
+    1102.068
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    -15.545
+   ],
+   "forward_velocity": -15.5452,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 365,
+   "position": [
+    -200.0,
+    3812.0,
+    1437.092
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -15.295
+   ],
+   "forward_velocity": -15.2952,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 370,
+   "position": [
+    -200.0,
+    3763.0,
+    1368.888
+   ],
+   "velocity": [
+    0.0,
+    -18.0,
+    -15.045
+   ],
+   "forward_velocity": -15.0452,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 375,
+   "position": [
+    -200.0,
+    3873.0,
+    1252.606
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -29.375
+   ],
+   "forward_velocity": -29.3752,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 380,
+   "position": [
+    -200.0,
+    3973.0,
+    1118.48
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -25.125
+   ],
+   "forward_velocity": -25.1252,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 385,
+   "position": [
+    -200.0,
+    3818.0,
+    1415.604
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -20.875
+   ],
+   "forward_velocity": -20.8752,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 390,
+   "position": [
+    -200.0,
+    3818.0,
+    1323.978
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -16.625
+   ],
+   "forward_velocity": -16.6252,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 395,
+   "position": [
+    -200.0,
+    3898.0,
+    1231.901
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -20.64
+   ],
+   "forward_velocity": -20.6396,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 400,
+   "position": [
+    -200.0,
+    3998.0,
+    1141.453
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -16.39
+   ],
+   "forward_velocity": -16.3896,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 405,
+   "position": [
+    -200.0,
+    4048.0,
+    1066.255
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -14.14
+   ],
+   "forward_velocity": -14.1396,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 410,
+   "position": [
+    -200.0,
+    3843.0,
+    1400.307
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -15.89
+   ],
+   "forward_velocity": -15.8896,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 415,
+   "position": [
+    -200.0,
+    3793.0,
+    1325.608
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -15.64
+   ],
+   "forward_velocity": -15.6396,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 420,
+   "position": [
+    -200.0,
+    3872.0,
+    1232.492
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -29.662
+   ],
+   "forward_velocity": -29.6616,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 425,
+   "position": [
+    -200.0,
+    3982.0,
+    1096.935
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -25.412
+   ],
+   "forward_velocity": -25.4116,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 430,
+   "position": [
+    -200.0,
+    3837.0,
+    1392.627
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -21.162
+   ],
+   "forward_velocity": -21.1616,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 435,
+   "position": [
+    -200.0,
+    3847.0,
+    1299.569
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -16.912
+   ],
+   "forward_velocity": -16.9116,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 440,
+   "position": [
+    -200.0,
+    3898.0,
+    1224.171
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -19.842
+   ],
+   "forward_velocity": -19.8423,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 445,
+   "position": [
+    -200.0,
+    4008.0,
+    1137.709
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -15.592
+   ],
+   "forward_velocity": -15.5923,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 450,
+   "position": [
+    -200.0,
+    4068.0,
+    1062.498
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -15.342
+   ],
+   "forward_velocity": -15.3423,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 455,
+   "position": [
+    -200.0,
+    3873.0,
+    1396.536
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.092
+   ],
+   "forward_velocity": -15.0923,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 460,
+   "position": [
+    -200.0,
+    3833.0,
+    1321.824
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -14.842
+   ],
+   "forward_velocity": -14.8423,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 465,
+   "position": [
+    -200.0,
+    3898.0,
+    1235.22
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -20.163
+   ],
+   "forward_velocity": -20.1635,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 470,
+   "position": [
+    -200.0,
+    3998.0,
+    1147.153
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -15.913
+   ],
+   "forward_velocity": -15.9135,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 475,
+   "position": [
+    -200.0,
+    4048.0,
+    1072.336
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -15.663
+   ],
+   "forward_velocity": -15.6635,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 480,
+   "position": [
+    -200.0,
+    3843.0,
+    1406.768
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -15.413
+   ],
+   "forward_velocity": -15.4135,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 485,
+   "position": [
+    -200.0,
+    3793.0,
+    1332.451
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -15.163
+   ],
+   "forward_velocity": -15.1635,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 490,
+   "position": [
+    -200.0,
+    3872.0,
+    1234.714
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -28.612
+   ],
+   "forward_velocity": -28.6117,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 495,
+   "position": [
+    -200.0,
+    3982.0,
+    1104.405
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -24.362
+   ],
+   "forward_velocity": -24.3617,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 500,
+   "position": [
+    -200.0,
+    3837.0,
+    1405.346
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -20.112
+   ],
+   "forward_velocity": -20.1117,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 505,
+   "position": [
+    -200.0,
+    3847.0,
+    1317.538
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.862
+   ],
+   "forward_velocity": -15.8617,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 510,
+   "position": [
+    -200.0,
+    3840.0,
+    1247.745
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -14.462
+   ],
+   "forward_velocity": -14.1725,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 515,
+   "position": [
+    -200.0,
+    3970.0,
+    1154.201
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -17.009
+   ],
+   "forward_velocity": -17.0087,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 520,
+   "position": [
+    -200.0,
+    4050.0,
+    1077.907
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -14.759
+   ],
+   "forward_velocity": -14.7587,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 525,
+   "position": [
+    -200.0,
+    3875.0,
+    1412.863
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -14.509
+   ],
+   "forward_velocity": -14.5087,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 530,
+   "position": [
+    -200.0,
+    3855.0,
+    1337.07
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -14.259
+   ],
+   "forward_velocity": -14.2587,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 535,
+   "position": [
+    -200.0,
+    3844.0,
+    1262.527
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -21.438
+   ],
+   "forward_velocity": -21.4381,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 540,
+   "position": [
+    -200.0,
+    3964.0,
+    1168.086
+   ],
+   "velocity": [
+    0.0,
+    18.0,
+    -17.188
+   ],
+   "forward_velocity": -17.1881,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 545,
+   "position": [
+    -200.0,
+    4034.0,
+    1090.896
+   ],
+   "velocity": [
+    0.0,
+    8.0,
+    -14.938
+   ],
+   "forward_velocity": -14.9381,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 550,
+   "position": [
+    -200.0,
+    3849.0,
+    1426.955
+   ],
+   "velocity": [
+    0.0,
+    -2.0,
+    -14.688
+   ],
+   "forward_velocity": -14.6881,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 555,
+   "position": [
+    -200.0,
+    3819.0,
+    1352.265
+   ],
+   "velocity": [
+    0.0,
+    -12.0,
+    -14.438
+   ],
+   "forward_velocity": -14.4381,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 560,
+   "position": [
+    -200.0,
+    3814.0,
+    1291.018
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -22.982
+   ],
+   "forward_velocity": -22.5225,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 565,
+   "position": [
+    -200.0,
+    3944.0,
+    1134.849
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -29.534
+   ],
+   "forward_velocity": -29.5338,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 570,
+   "position": [
+    -200.0,
+    3819.0,
+    1409.93
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -25.284
+   ],
+   "forward_velocity": -25.2837,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 575,
+   "position": [
+    -200.0,
+    3849.0,
+    1296.261
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -21.034
+   ],
+   "forward_velocity": -21.0337,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 580,
+   "position": [
+    -200.0,
+    3866.0,
+    1211.809
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -17.634
+   ],
+   "forward_velocity": -17.2811,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 585,
+   "position": [
+    -200.0,
+    3996.0,
+    1094.951
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -21.672
+   ],
+   "forward_velocity": -21.6716,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 590,
+   "position": [
+    -200.0,
+    3871.0,
+    1409.343
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -17.422
+   ],
+   "forward_velocity": -17.4216,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 595,
+   "position": [
+    -200.0,
+    3901.0,
+    1332.985
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -15.172
+   ],
+   "forward_velocity": -15.1716,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 600,
+   "position": [
+    -200.0,
+    3881.0,
+    1257.877
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -14.922
+   ],
+   "forward_velocity": -14.9216,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 605,
+   "position": [
+    -200.0,
+    3896.0,
+    1188.567
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -22.432
+   ],
+   "forward_velocity": -22.4324,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 610,
+   "position": [
+    -200.0,
+    4016.0,
+    1089.155
+   ],
+   "velocity": [
+    0.0,
+    18.0,
+    -18.182
+   ],
+   "forward_velocity": -18.1824,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 615,
+   "position": [
+    -200.0,
+    3881.0,
+    1418.993
+   ],
+   "velocity": [
+    0.0,
+    8.0,
+    -15.932
+   ],
+   "forward_velocity": -15.9324,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 620,
+   "position": [
+    -200.0,
+    3901.0,
+    1344.081
+   ],
+   "velocity": [
+    0.0,
+    -2.0,
+    -15.682
+   ],
+   "forward_velocity": -15.6824,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 625,
+   "position": [
+    -200.0,
+    3871.0,
+    1268.419
+   ],
+   "velocity": [
+    0.0,
+    -12.0,
+    -15.432
+   ],
+   "forward_velocity": -15.4324,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 630,
+   "position": [
+    -200.0,
+    3898.0,
+    1188.566
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -20.624
+   ],
+   "forward_velocity": -20.6236,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 635,
+   "position": [
+    -200.0,
+    4008.0,
+    1098.198
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -16.374
+   ],
+   "forward_velocity": -16.3736,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 640,
+   "position": [
+    -200.0,
+    3863.0,
+    1433.08
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -14.124
+   ],
+   "forward_velocity": -14.1236,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 645,
+   "position": [
+    -200.0,
+    3873.0,
+    1357.213
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.874
+   ],
+   "forward_velocity": -15.8736,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 650,
+   "position": [
+    -200.0,
+    3833.0,
+    1282.595
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -15.624
+   ],
+   "forward_velocity": -15.6236,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 655,
+   "position": [
+    -200.0,
+    3924.0,
+    1197.285
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -21.335
+   ],
+   "forward_velocity": -21.3354,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 660,
+   "position": [
+    -200.0,
+    4024.0,
+    1103.358
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -17.085
+   ],
+   "forward_velocity": -17.0854,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 665,
+   "position": [
+    -200.0,
+    3869.0,
+    1436.681
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -14.835
+   ],
+   "forward_velocity": -14.8353,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 670,
+   "position": [
+    -200.0,
+    3869.0,
+    1361.254
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -14.585
+   ],
+   "forward_velocity": -14.5853,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 675,
+   "position": [
+    -200.0,
+    3819.0,
+    1287.078
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -14.335
+   ],
+   "forward_velocity": -14.3353,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 680,
+   "position": [
+    -200.0,
+    3898.0,
+    1176.932
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -31.196
+   ],
+   "forward_velocity": -31.1957,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 685,
+   "position": [
+    -200.0,
+    4008.0,
+    1033.703
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -26.946
+   ],
+   "forward_velocity": -26.9457,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 690,
+   "position": [
+    -200.0,
+    3863.0,
+    1321.725
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -22.696
+   ],
+   "forward_velocity": -22.6957,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 695,
+   "position": [
+    -200.0,
+    3873.0,
+    1220.996
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -18.446
+   ],
+   "forward_velocity": -18.4457,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 700,
+   "position": [
+    -200.0,
+    3891.0,
+    1136.691
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -23.766
+   ],
+   "forward_velocity": -23.2908,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 705,
+   "position": [
+    -200.0,
+    3816.0,
+    1384.76
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -30.686
+   ],
+   "forward_velocity": -30.6862,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 710,
+   "position": [
+    -200.0,
+    3896.0,
+    1244.079
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -26.436
+   ],
+   "forward_velocity": -26.4362,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 715,
+   "position": [
+    -200.0,
+    3926.0,
+    1124.648
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -22.186
+   ],
+   "forward_velocity": -22.1862,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 720,
+   "position": [
+    -200.0,
+    3738.0,
+    1449.706
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -18.786
+   ],
+   "forward_velocity": -18.4105,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 725,
+   "position": [
+    -200.0,
+    3868.0,
+    1324.377
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -23.366
+   ],
+   "forward_velocity": -23.3658,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 730,
+   "position": [
+    -200.0,
+    3948.0,
+    1220.298
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -19.116
+   ],
+   "forward_velocity": -19.1158,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 735,
+   "position": [
+    -200.0,
+    3978.0,
+    1137.469
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -14.866
+   ],
+   "forward_velocity": -14.8658,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 740,
+   "position": [
+    -200.0,
+    3958.0,
+    1063.89
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -14.616
+   ],
+   "forward_velocity": -14.6158,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 745,
+   "position": [
+    -200.0,
+    3822.0,
+    1388.646
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -19.824
+   ],
+   "forward_velocity": -19.8237,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 750,
+   "position": [
+    -200.0,
+    3922.0,
+    1302.277
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -15.574
+   ],
+   "forward_velocity": -15.5737,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 755,
+   "position": [
+    -200.0,
+    3972.0,
+    1227.159
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -15.324
+   ],
+   "forward_velocity": -15.3236,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 760,
+   "position": [
+    -200.0,
+    3972.0,
+    1151.291
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -15.074
+   ],
+   "forward_velocity": -15.0736,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 765,
+   "position": [
+    -200.0,
+    3922.0,
+    1076.673
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -14.824
+   ],
+   "forward_velocity": -14.8236,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 770,
+   "position": [
+    -200.0,
+    3796.0,
+    1379.495
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -32.272
+   ],
+   "forward_velocity": -32.2724,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 775,
+   "position": [
+    -200.0,
+    3906.0,
+    1230.883
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -28.022
+   ],
+   "forward_velocity": -28.0224,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 780,
+   "position": [
+    -200.0,
+    3966.0,
+    1103.521
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -23.772
+   ],
+   "forward_velocity": -23.7724,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 785,
+   "position": [
+    -200.0,
+    3771.0,
+    1407.409
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -19.522
+   ],
+   "forward_velocity": -19.5224,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 790,
+   "position": [
+    -200.0,
+    3847.0,
+    1307.7
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -24.499
+   ],
+   "forward_velocity": -24.4989,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 795,
+   "position": [
+    -200.0,
+    3957.0,
+    1197.955
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -20.249
+   ],
+   "forward_velocity": -20.2489,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 800,
+   "position": [
+    -200.0,
+    4017.0,
+    1109.46
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -15.999
+   ],
+   "forward_velocity": -15.9989,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 805,
+   "position": [
+    -200.0,
+    3822.0,
+    1444.216
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.749
+   ],
+   "forward_velocity": -15.7489,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 810,
+   "position": [
+    -200.0,
+    3782.0,
+    1370.221
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -15.499
+   ],
+   "forward_velocity": -15.4989,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 815,
+   "position": [
+    -200.0,
+    3873.0,
+    1292.408
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -18.984
+   ],
+   "forward_velocity": -18.9839,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 820,
+   "position": [
+    -200.0,
+    3973.0,
+    1210.239
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -14.734
+   ],
+   "forward_velocity": -14.7339,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 825,
+   "position": [
+    -200.0,
+    4023.0,
+    1135.319
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -14.484
+   ],
+   "forward_velocity": -14.4839,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 830,
+   "position": [
+    -200.0,
+    4023.0,
+    1059.65
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -14.234
+   ],
+   "forward_velocity": -14.2339,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 835,
+   "position": [
+    -200.0,
+    3768.0,
+    1393.23
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -15.984
+   ],
+   "forward_velocity": -15.9839,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 840,
+   "position": [
+    -200.0,
+    3871.0,
+    1303.36
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    -19.301
+   ],
+   "forward_velocity": -19.3008,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 845,
+   "position": [
+    -200.0,
+    3961.0,
+    1219.606
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    -15.051
+   ],
+   "forward_velocity": -15.0508,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 850,
+   "position": [
+    -200.0,
+    4001.0,
+    1145.102
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    -14.801
+   ],
+   "forward_velocity": -14.8008,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 855,
+   "position": [
+    -200.0,
+    3991.0,
+    1069.849
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -14.551
+   ],
+   "forward_velocity": -14.5508,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 860,
+   "position": [
+    -200.0,
+    3763.0,
+    1416.57
+   ],
+   "velocity": [
+    0.0,
+    -18.0,
+    -14.301
+   ],
+   "forward_velocity": -14.3008,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 865,
+   "position": [
+    -200.0,
+    3893.0,
+    1322.064
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -17.201
+   ],
+   "forward_velocity": -17.2012,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 870,
+   "position": [
+    -200.0,
+    3973.0,
+    1244.808
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -14.951
+   ],
+   "forward_velocity": -14.9512,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 875,
+   "position": [
+    -200.0,
+    4003.0,
+    1170.803
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -14.701
+   ],
+   "forward_velocity": -14.7012,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 880,
+   "position": [
+    -200.0,
+    3983.0,
+    1096.047
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -14.451
+   ],
+   "forward_velocity": -14.4512,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 885,
+   "position": [
+    -200.0,
+    3768.0,
+    1434.304
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -21.727
+   ],
+   "forward_velocity": -21.7268,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 890,
+   "position": [
+    -200.0,
+    3888.0,
+    1338.42
+   ],
+   "velocity": [
+    0.0,
+    18.0,
+    -17.477
+   ],
+   "forward_velocity": -17.4768,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 895,
+   "position": [
+    -200.0,
+    3958.0,
+    1261.786
+   ],
+   "velocity": [
+    0.0,
+    8.0,
+    -15.227
+   ],
+   "forward_velocity": -15.2268,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 900,
+   "position": [
+    -200.0,
+    3978.0,
+    1186.403
+   ],
+   "velocity": [
+    0.0,
+    -2.0,
+    -14.977
+   ],
+   "forward_velocity": -14.9768,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 905,
+   "position": [
+    -200.0,
+    3948.0,
+    1112.269
+   ],
+   "velocity": [
+    0.0,
+    -12.0,
+    -14.727
+   ],
+   "forward_velocity": -14.7268,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 910,
+   "position": [
+    -200.0,
+    3738.0,
+    1448.55
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -20.415
+   ],
+   "forward_velocity": -20.0068,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 915,
+   "position": [
+    -200.0,
+    3868.0,
+    1311.249
+   ],
+   "velocity": [
+    0.0,
+    20.0,
+    -25.76
+   ],
+   "forward_velocity": -25.7602,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 920,
+   "position": [
+    -200.0,
+    3948.0,
+    1195.198
+   ],
+   "velocity": [
+    0.0,
+    10.0,
+    -21.51
+   ],
+   "forward_velocity": -21.5102,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 925,
+   "position": [
+    -200.0,
+    3978.0,
+    1100.396
+   ],
+   "velocity": [
+    0.0,
+    0.0,
+    -17.26
+   ],
+   "forward_velocity": -17.2602,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 930,
+   "position": [
+    -200.0,
+    3753.0,
+    1432.845
+   ],
+   "velocity": [
+    0.0,
+    -10.0,
+    -15.01
+   ],
+   "forward_velocity": -15.0102,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 935,
+   "position": [
+    -200.0,
+    3847.0,
+    1352.204
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -20.415
+   ],
+   "forward_velocity": -20.4153,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 940,
+   "position": [
+    -200.0,
+    3947.0,
+    1262.877
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -16.165
+   ],
+   "forward_velocity": -16.1653,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 945,
+   "position": [
+    -200.0,
+    3997.0,
+    1186.801
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -15.915
+   ],
+   "forward_velocity": -15.9153,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 950,
+   "position": [
+    -200.0,
+    3997.0,
+    1111.974
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -15.665
+   ],
+   "forward_velocity": -15.6653,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 955,
+   "position": [
+    -200.0,
+    3742.0,
+    1446.397
+   ],
+   "velocity": [
+    0.0,
+    -16.0,
+    -15.415
+   ],
+   "forward_velocity": -15.4153,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 960,
+   "position": [
+    -200.0,
+    3846.0,
+    1363.864
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    -18.448
+   ],
+   "forward_velocity": -18.448,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 965,
+   "position": [
+    -200.0,
+    3936.0,
+    1284.374
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    -14.198
+   ],
+   "forward_velocity": -14.198,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 970,
+   "position": [
+    -200.0,
+    3976.0,
+    1208.134
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    -15.948
+   ],
+   "forward_velocity": -15.948,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 975,
+   "position": [
+    -200.0,
+    3966.0,
+    1133.144
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -15.698
+   ],
+   "forward_velocity": -15.698,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 980,
+   "position": [
+    -200.0,
+    3917.0,
+    1065.128
+   ],
+   "velocity": [
+    0.0,
+    -18.0,
+    -15.448
+   ],
+   "forward_velocity": -15.448,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 985,
+   "position": [
+    -200.0,
+    3822.0,
+    1353.886
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -30.263
+   ],
+   "forward_velocity": -30.2633,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 990,
+   "position": [
+    -200.0,
+    3922.0,
+    1215.319
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -26.013
+   ],
+   "forward_velocity": -26.0133,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 995,
+   "position": [
+    -200.0,
+    3972.0,
+    1098.003
+   ],
+   "velocity": [
+    0.0,
+    4.0,
+    -21.763
+   ],
+   "forward_velocity": -21.7633,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1000,
+   "position": [
+    -200.0,
+    3767.0,
+    1411.937
+   ],
+   "velocity": [
+    0.0,
+    -6.0,
+    -17.513
+   ],
+   "forward_velocity": -17.5133,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1005,
+   "position": [
+    -200.0,
+    3814.0,
+    1315.966
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -33.908
+   ],
+   "forward_velocity": -33.9083,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 1010,
+   "position": [
+    -200.0,
+    3891.0,
+    1139.827
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -71.173
+   ],
+   "forward_velocity": -69.7495,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 1015,
+   "position": [
+    -200.0,
+    3866.0,
+    1211.0
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -222.146
+   ],
+   "forward_velocity": -222.1461,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 1020,
+   "position": [
+    -200.0,
+    4070.0,
+    802.0
+   ],
+   "velocity": [
+    -0.0,
+    0.0,
+    -477.936
+   ],
+   "forward_velocity": -468.3773,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 1025,
+   "position": [
+    -200.0,
+    4352.0,
+    238.0
+   ],
+   "velocity": [
+    0.0,
+    -2.0,
+    -1543.884
+   ],
+   "forward_velocity": -1543.8842,
+   "face_angle": 0.0,
+   "action": 1145
+  },
+  {
+   "frame": 1030,
+   "position": [
+    -200.0,
+    4460.0,
+    230.05
+   ],
+   "velocity": [
+    0.0,
+    22.0,
+    -3.8
+   ],
+   "forward_velocity": -3.8,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1035,
+   "position": [
+    -200.0,
+    4550.0,
+    193.8
+   ],
+   "velocity": [
+    0.0,
+    12.0,
+    -9.55
+   ],
+   "forward_velocity": -9.55,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1040,
+   "position": [
+    -200.0,
+    4590.0,
+    128.8
+   ],
+   "velocity": [
+    0.0,
+    2.0,
+    -15.3
+   ],
+   "forward_velocity": -15.3,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1045,
+   "position": [
+    -200.0,
+    4580.0,
+    53.05
+   ],
+   "velocity": [
+    0.0,
+    -8.0,
+    -15.05
+   ],
+   "forward_velocity": -15.05,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1050,
+   "position": [
+    -200.0,
+    4520.0,
+    -21.45
+   ],
+   "velocity": [
+    0.0,
+    -18.0,
+    -14.8
+   ],
+   "forward_velocity": -14.8,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1055,
+   "position": [
+    -200.0,
+    4536.0,
+    -90.41
+   ],
+   "velocity": [
+    0.0,
+    28.0,
+    -20.097
+   ],
+   "forward_velocity": -20.0975,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1060,
+   "position": [
+    -200.0,
+    4656.0,
+    -178.147
+   ],
+   "velocity": [
+    0.0,
+    18.0,
+    -15.847
+   ],
+   "forward_velocity": -15.8475,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1065,
+   "position": [
+    -200.0,
+    4726.0,
+    -252.635
+   ],
+   "velocity": [
+    0.0,
+    8.0,
+    -15.597
+   ],
+   "forward_velocity": -15.5975,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1070,
+   "position": [
+    -200.0,
+    4746.0,
+    -327.872
+   ],
+   "velocity": [
+    0.0,
+    -2.0,
+    -15.347
+   ],
+   "forward_velocity": -15.3475,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1075,
+   "position": [
+    -200.0,
+    4716.0,
+    -403.86
+   ],
+   "velocity": [
+    0.0,
+    -12.0,
+    -15.097
+   ],
+   "forward_velocity": -15.0975,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1080,
+   "position": [
+    -200.0,
+    4743.0,
+    -481.871
+   ],
+   "velocity": [
+    0.0,
+    26.0,
+    -20.121
+   ],
+   "forward_velocity": -20.1212,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1085,
+   "position": [
+    -200.0,
+    4853.0,
+    -569.727
+   ],
+   "velocity": [
+    0.0,
+    16.0,
+    -15.871
+   ],
+   "forward_velocity": -15.8712,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1090,
+   "position": [
+    -200.0,
+    4913.0,
+    -644.333
+   ],
+   "velocity": [
+    0.0,
+    6.0,
+    -15.621
+   ],
+   "forward_velocity": -15.6212,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1095,
+   "position": [
+    -200.0,
+    4923.0,
+    -719.689
+   ],
+   "velocity": [
+    0.0,
+    -4.0,
+    -15.371
+   ],
+   "forward_velocity": -15.3712,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1100,
+   "position": [
+    -200.0,
+    4883.0,
+    -795.795
+   ],
+   "velocity": [
+    0.0,
+    -14.0,
+    -15.121
+   ],
+   "forward_velocity": -15.1212,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1105,
+   "position": [
+    -200.0,
+    4948.0,
+    -882.072
+   ],
+   "velocity": [
+    0.0,
+    24.0,
+    -20.582
+   ],
+   "forward_velocity": -20.5818,
+   "face_angle": 0.0,
+   "action": 50333832
+  },
+  {
+   "frame": 1110,
+   "position": [
+    -200.0,
+    5048.0,
+    -972.231
+   ],
+   "velocity": [
+    0.0,
+    14.0,
+    -16.332
+   ],
+   "forward_velocity": -16.3318,
+   "face_angle": 0.0,
+   "action": 50333832
+  }
+ ]
+}
