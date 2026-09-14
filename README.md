@@ -131,6 +131,36 @@ The next step is to stop searching blind and replay a documented BLJ input seque
 setup fails here, libsm64 is the wrong substrate, since it carries Mario and surfaces but no level
 geometry or object behaviour, and the work should move to a full `sm64-port` build.
 
+## The recurrence, and why the amplifier is confirmed
+
+Seeding at -30 produces a first re-launch at exactly **-45**, which is 1.5 x -30. The amplifier
+works in libsm64; that is not in doubt.
+
+Per cycle the chain is `v' = 1.5 v + k d`, for k air frames at decay d. Its fixed point
+`v* = -2 k d` is **unstable**, since the multiplier 1.5 exceeds 1. So below the threshold the speed
+should run away and above it decay. For k = 20 and d = 1.70 that predicts a threshold near -68.
+
+The prediction is untested rather than refuted. Above roughly |v| = 45 the chain stops
+re-triggering: Mario never enters `ACT_LONG_JUMP_LAND` at all. The likely cause is that at high
+speed he covers enough ground per frame to miss the floor, so no landing registers on an isolated
+uniform ramp. In the real game the staircase keeps him in contact.
+
+## sm64-port status
+
+A full `sm64-port` build was attempted to replay a documented TAS and settle whether libsm64 is
+faithful. Asset extraction succeeds and most of the game compiles. Three macOS issues were hit and
+two remain:
+
+- build output directories are not created by the Makefile; pre-mirroring all 953 of them fixes it
+- `bcopy` and `bzero` collide with macOS fortified builtins, fixed by undefining them in
+  `include/PR/os_libc.h`
+- **open**: `SDL2/SDL.h` is not on the include path under Homebrew
+- **open**: clang rejects `--defsym` when assembling the sound sequences, which needs a GNU
+  assembler
+
+Linux is sm64-port's documented platform and none of these would appear there, so the next attempt
+belongs on the cluster, which is also where training would run.
+
 ## Setup
 
     ./scripts/setup.sh
