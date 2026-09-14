@@ -98,6 +98,27 @@ chain grows only when
 
     0.5 * |forwardVel|  >  decay_rate * air_frames
 
+## Direction calibration, measured not assumed
+
+| facing | forwardVel | travels |
+| --- | ---: | --- |
+| 0 | +20 | +Z |
+| 0 | -20 | -Z |
+| pi | +20 | -Z |
+| pi | -20 | +Z |
+
+Air decay per frame, seeded at `forwardVel = -20`, by stick relative to facing: aligned +5.70,
+perpendicular +4.70, opposed +1.70. Decay is minimised when the stick points along the direction of
+travel, and travel must point into rising ground for a short air time. On a uniform ramp those two
+requirements fix each other, which is the whole difficulty.
+
+## Real level geometry
+
+`src/env/collision.py` imports `collision.inc.c` from the decompilation into libsm64 surfaces.
+Castle area 3 parses to 1399 triangles with the expected surface types, and contains ~30 degree
+slopes (`normal.y = 0.869`), confirming that synthetic ramps already match real geometry. Geometry
+was therefore not the blocker.
+
 ## Not yet reproduced
 
 A runaway BLJ. On every synthetic geometry tried, the stick direction that minimises air decay
