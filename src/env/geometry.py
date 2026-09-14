@@ -2,14 +2,17 @@ import math
 
 from src.env.native import SURFACE_DEFAULT, TERRAIN_STONE, Surface
 
+SURFACE_TYPE = SURFACE_DEFAULT
+TERRAIN_TYPE = TERRAIN_STONE
+
 Point = tuple[float, float, float]
 
 
 def _triangle(a: Point, b: Point, c: Point) -> Surface:
     surface = Surface()
-    surface.type = SURFACE_DEFAULT
+    surface.type = SURFACE_TYPE
     surface.force = 0
-    surface.terrain = TERRAIN_STONE
+    surface.terrain = TERRAIN_TYPE
     for index, point in enumerate((a, b, c)):
         for axis in range(3):
             surface.vertices[index][axis] = int(round(point[axis]))
@@ -46,7 +49,8 @@ def ramp(length: float, width: float, angle_degrees: float,
 
 
 def staircase(steps: int, rise: float, run: float, width: float,
-              base_height: float = 0.0, origin_z: float = 0.0) -> list[Surface]:
+              base_height: float = 0.0, origin_z: float = 0.0,
+              risers: bool = False) -> list[Surface]:
     half = width / 2.0
     surfaces: list[Surface] = []
     for index in range(steps):
@@ -54,13 +58,19 @@ def staircase(steps: int, rise: float, run: float, width: float,
         z0 = origin_z + run * index
         z1 = z0 + run
         surfaces += _floor_quad((-half, y, z0), (half, y, z0), (half, y, z1), (-half, y, z1))
-        surfaces += [
-            _triangle((-half, y - rise, z0), (half, y - rise, z0), (half, y, z0)),
-            _triangle((-half, y - rise, z0), (half, y, z0), (-half, y, z0)),
-        ]
+        if risers:
+            surfaces += [
+                _triangle((-half, y - rise, z0), (half, y - rise, z0), (half, y, z0)),
+                _triangle((-half, y - rise, z0), (half, y, z0), (-half, y, z0)),
+            ]
     return surfaces
 
 
 def slope_course(angle_degrees: float, length: float = 4000.0,
                  width: float = 1200.0) -> list[Surface]:
     return ground_plane() + ramp(length, width, angle_degrees)
+
+
+def set_surface_material(surface_type: int, terrain: int) -> None:
+    global SURFACE_TYPE, TERRAIN_TYPE
+    SURFACE_TYPE, TERRAIN_TYPE = surface_type, terrain

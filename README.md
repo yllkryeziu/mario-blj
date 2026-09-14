@@ -52,24 +52,68 @@ a full `sm64-port` build.
 
 ## Verified so far
 
-- libsm64 builds clean as a universal binary on macOS
+- libsm64 builds clean as a universal binary
 - every ctypes struct layout matches the C header, checked field by field against `offsetof`
-- generated floor normals all point up; ramp heights match `length * tan(angle)` exactly
+- ROM converted from v64 to z64 and hash-verified (sha1 `9bef1128...`, the canonical US release)
+- Mario walks, runs, crouch-slides and long jumps under scripted input
+- generated floor normals point up; ramp heights match `length * tan(angle)` exactly
 
-## Not yet verified
+## The mechanism, located in source
 
-Whether the BLJ actually reproduces in libsm64. `scripts/verify_blj.py` sweeps slope angle, jump
-re-press delay and stick direction, looking for a scripted input chain where `|forwardVelocity|`
-grows across cycles. That is the go/no-go, and it needs a ROM.
+Three annotated sites in the decompilation carry the whole bug.
 
-One thing to watch: long jump entry is gated on `m->forwardVel > 10.0f` in `act_crouch_slide`, so
-whether the chain sustains once velocity goes negative is exactly the empirical question.
+`mario.c`, the amplifier. The clamp is one-sided, so negative speed multiplies without bound:
+
+```c
+//! (BLJ's) This properly handles long jumps from getting forward speed with
+//  too much velocity, but misses backwards longs allowing high negative speeds.
+if ((m->forwardVel *= 1.5f) > 48.0f) { m->forwardVel = 48.0f; }
+```
+
+`mario_actions_airborne.c`, the asymmetric air drag:
+
+```c
+//! Uncapped air speed. Net positive when moving forward.
+if (m->forwardVel > dragThreshold) { m->forwardVel -= 1.0f; }
+if (m->forwardVel < -16.0f)        { m->forwardVel += 2.0f; }
+```
+
+`mario_actions_moving.c`, Nintendo's own fix, compiled out under `VERSION_US`. Rebuilding with
+`-DVERSION_SH` makes the BLJ impossible, which is a ground-truth negative control shipped by the
+original developers rather than one invented here:
+
+```c
+#ifdef VERSION_SH
+    // BLJ (Backwards Long Jump) speed build up fix, crushing SimpleFlips's dreams since July 1997
+    if (m->forwardVel < 0.0f) { m->forwardVel = 0.0f; }
+#endif
+```
+
+## Measured dynamics
+
+Gain per re-jump is `0.5 * |forwardVel|` from the `*= 1.5`. Loss is air decay toward an attractor at
+exactly -16: below it the `+= 2.0` damping dominates, above it the stick does. Measured air decay
+ranges from +1.70 to +5.70 per frame depending on stick direction relative to Mario's facing, so the
+chain grows only when
+
+    0.5 * |forwardVel|  >  decay_rate * air_frames
+
+## Not yet reproduced
+
+A runaway BLJ. On every synthetic geometry tried, the stick direction that minimises air decay
+(+1.70/frame) also sends Mario downhill, giving a 31-frame air time, while the direction giving a
+5-frame air time maximises decay (+5.70/frame). The two requirements are coupled through the ramp,
+and neither setting satisfies the growth condition. Flat ground, treads-only staircases, slippery
+slopes and walls were all tried; slippery surfaces make Mario slide instead of holding the chain.
+
+The next step is to stop searching blind and replay a documented BLJ input sequence. If a known-good
+setup fails here, libsm64 is the wrong substrate, since it carries Mario and surfaces but no level
+geometry or object behaviour, and the work should move to a full `sm64-port` build.
 
 ## Setup
 
     ./scripts/setup.sh
-    # place a Super Mario 64 US ROM at roms/baserom.us.z64
+    # place a Super Mario 64 US ROM at roms/baserom.us.z64 (v64 input is converted automatically)
     PYTHONPATH=. python3 scripts/verify_blj.py
 
-libsm64 reads Mario's animation and texture data from the ROM at runtime, so one is required even
-though the library itself builds without it. No ROM is distributed here.
+No ROM is distributed here.

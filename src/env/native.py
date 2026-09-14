@@ -39,7 +39,14 @@ def action_name(action: int) -> str:
     return ACTION_NAMES.get(action, f"0x{action:08X}")
 
 SURFACE_DEFAULT = 0x0000
+SURFACE_VERY_SLIPPERY = 0x0013
+SURFACE_SLIPPERY = 0x0014
+SURFACE_NOT_SLIPPERY = 0x0015
+SURFACE_ICE = 0x002E
+
+TERRAIN_GRASS = 0x0000
 TERRAIN_STONE = 0x0001
+TERRAIN_SLIDE = 0x0006
 
 
 class MarioInputs(ctypes.Structure):
