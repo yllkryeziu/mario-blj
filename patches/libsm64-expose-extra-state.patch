@@ -1,0 +1,115 @@
+diff --git a/Makefile b/Makefile
+index a6dae58..3186991 100644
+--- a/Makefile
++++ b/Makefile
+@@ -30,7 +30,7 @@ C_IMPORTED := src/decomp/mario/geo.inc.c src/decomp/mario/model.inc.c
+ H_IMPORTED := $(C_IMPORTED:.c=.h)
+ IMPORTED   := $(C_IMPORTED) $(H_IMPORTED)
+ 
+-C_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(C_IMPORTED)
++C_FILES := $(sort $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(C_IMPORTED))
+ ifdef MACOS_BUILD
+   O_FILES_x86_64 := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=_x86_64.o))
+   O_FILES_arm64  := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=_arm64.o))
+diff --git a/src/libsm64.c b/src/libsm64.c
+index b7db0b1..6259e01 100644
+--- a/src/libsm64.c
++++ b/src/libsm64.c
+@@ -268,6 +268,49 @@ SM64_LIB_FN void sm64_mario_tick( int32_t marioId, const struct SM64MarioInputs
+     outState->invincTimer = gMarioState->invincTimer;
+ }
+ 
++SM64_LIB_FN void sm64_mario_extra_state( int32_t marioId, struct SM64MarioExtraState *outState )
++{
++    if( marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL )
++    {
++        DEBUG_PRINT("Tried to read non-existant Mario with ID: %u", marioId);
++        return;
++    }
++
++    global_state_bind( ((struct MarioInstance *)s_mario_instance_pool.objects[ marioId ])->globalState );
++
++    struct SM64SurfaceCollisionData *floor = gMarioState->floor;
++    outState->hasFloor = floor != NULL;
++    outState->floorType = floor != NULL ? floor->type : -1;
++    outState->floorTerrain = floor != NULL ? floor->terrain : -1;
++    outState->floorNormalY = floor != NULL ? floor->normal.y : 0.0f;
++    outState->hasWall = gMarioState->wall != NULL;
++    outState->floorHeight = gMarioState->floorHeight;
++    outState->ceilHeight = gMarioState->ceilHeight;
++    outState->peakHeight = gMarioState->peakHeight;
++    outState->slideVelX = gMarioState->slideVelX;
++    outState->slideVelZ = gMarioState->slideVelZ;
++    outState->intendedMag = gMarioState->intendedMag;
++    outState->intendedYaw = gMarioState->intendedYaw;
++    outState->input = gMarioState->input;
++    outState->action = gMarioState->action;
++    outState->prevAction = gMarioState->prevAction;
++    outState->actionState = gMarioState->actionState;
++    outState->actionTimer = gMarioState->actionTimer;
++    outState->actionArg = gMarioState->actionArg;
++    outState->hurtCounter = gMarioState->hurtCounter;
++    outState->squishTimer = gMarioState->squishTimer;
++
++    struct GraphNodeObject *gfx = &gMarioState->marioObj->header.gfx;
++    for( int i = 0; i < 3; ++i )
++    {
++        outState->gfxPosition[i] = gfx->pos[i];
++        outState->gfxAngle[i] = gfx->angle[i];
++        outState->torsoAngle[i] = gMarioState->marioBodyState->torsoAngle[i];
++    }
++    outState->faceAnglePitch = gMarioState->faceAngle[0];
++    outState->faceAngleRoll = gMarioState->faceAngle[2];
++}
++
+ SM64_LIB_FN void sm64_mario_delete( int32_t marioId )
+ {
+     if( marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL )
+diff --git a/src/libsm64.h b/src/libsm64.h
+index 1f6c5e4..b4f7b60 100644
+--- a/src/libsm64.h
++++ b/src/libsm64.h
+@@ -68,6 +68,35 @@ struct SM64MarioState
+     int16_t invincTimer;
+ };
+ 
++struct SM64MarioExtraState
++{
++    int32_t floorType;
++    int32_t floorTerrain;
++    float floorHeight;
++    float floorNormalY;
++    float ceilHeight;
++    float peakHeight;
++    float slideVelX;
++    float slideVelZ;
++    float intendedMag;
++    int32_t intendedYaw;
++    int32_t input;
++    int32_t action;
++    int32_t prevAction;
++    int32_t actionState;
++    int32_t actionTimer;
++    int32_t actionArg;
++    int32_t hurtCounter;
++    int32_t squishTimer;
++    int32_t hasWall;
++    int32_t hasFloor;
++    float gfxPosition[3];
++    int32_t gfxAngle[3];
++    int32_t faceAnglePitch;
++    int32_t faceAngleRoll;
++    int32_t torsoAngle[3];
++};
++
+ struct SM64MarioGeometryBuffers
+ {
+     float *position;
+@@ -156,6 +185,7 @@ extern SM64_LIB_FN uint32_t sm64_audio_tick( uint32_t numQueuedSamples, uint32_t
+ extern SM64_LIB_FN void sm64_static_surfaces_load( const struct SM64Surface *surfaceArray, uint32_t numSurfaces );
+ 
+ extern SM64_LIB_FN int32_t sm64_mario_create( float x, float y, float z );
++extern SM64_LIB_FN void sm64_mario_extra_state( int32_t marioId, struct SM64MarioExtraState *outState );
+ extern SM64_LIB_FN void sm64_mario_tick( int32_t marioId, const struct SM64MarioInputs *inputs, struct SM64MarioState *outState, struct SM64MarioGeometryBuffers *outBuffers );
+ extern SM64_LIB_FN void sm64_mario_delete( int32_t marioId );
+ 

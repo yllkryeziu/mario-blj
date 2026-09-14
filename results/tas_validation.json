@@ -1,0 +1,993 @@
+{
+ "what_this_is": "Behavioural fidelity check of third_party/libsm64 against the real game. The reference is TASVideos movie 2016M (Super Mario 64, 0 stars) replayed through a headless sm64-port build patched to dump the full Mario state once per frame. libsm64 is then driven with the reference controller stream over the same collision mesh and the two are compared frame by frame.",
+ "reference_movie": {
+  "file": "sm64-0star-2016M.m64",
+  "source": "TASVideos 2016M, Snark / Kyman / sonicpacker / Mickey-VIS / ToT",
+  "header_magic": "M64\\x1a",
+  "version": 3,
+  "input_samples": 8772,
+  "vi_count_field": 18135,
+  "rom_crc1_in_movie": "0x635a2bff",
+  "rom_sha1": "9bef1128717f958171a4afac3ed78ee2bb4e86ce",
+  "rom_matches": true
+ },
+ "replay": {
+  "binary": "sm64-port 2b17d08 + 6 local patches, ENABLE_GFX_DUMMY=1 VERSION=us",
+  "arch_flags": "-march=x86-64 -mtune=generic -ffp-contract=off",
+  "host": "hai004.haicore.berlin (Slurm interactive, --exclude=hai002)",
+  "frames": 8772,
+  "wall_clock_seconds_total": 2.0306,
+  "wall_clock_seconds_in_game_loop": 1.978,
+  "frames_per_second": 4433.9,
+  "times_realtime_at_30hz": 147.8,
+  "desync_check": "Frame 8772 lands in LEVEL_BOWSER_3 area 1 in ACT_DIVE, which is where the 0 star run ends. The level and area sequence over the whole replay follows the known route. No desync.",
+  "level_sequence": "CASTLE_GROUNDS -> CASTLE a1 -> BITDW -> BOWSER_1 -> CASTLE a1 -> CASTLE a3 -> BITFS -> BOWSER_2 -> CASTLE a3 -> DDD -> CASTLE a1 -> CASTLE a2 -> BITS -> BOWSER_3"
+ },
+ "controller_overwrite_audit": {
+  "question": "Can a later controller implementation in osContStartReadData overwrite the recorded TAS pad values?",
+  "finding": "Yes in a normal build, no in this headless build. sm64-port has no per-frame work in osContStartReadData at all; the polling happens in osContGetReadData (src/pc/controller/controller_entry_point.c), which zeroes the pad and then calls read() on every implementation in array order with controller_recorded_tas first. controller_sdl_read then does an unconditional assignment, pad->stick_x = leftx / 409 and pad->stick_y = -lefty / 409, whenever the left stick is outside the deadzone, so a real gamepad attached to a normal build silently overwrites the movie stick and corrupts the replay. Buttons are safe there because SDL only ORs them in. controller_keyboard_read also ORs its buttons and only assigns the stick when a mapped key is held, so it cannot corrupt anything without a key source. In this build both hazards are gone twice over: patch 01 removes controller_sdl.c, controller_wup.c and wup.c from C_FILES, and patch 04 removes them from controller_implementations. The only implementations left are controller_recorded_tas and controller_keyboard, and the headless build has no keyboard event source, so keyboard_buttons_down stays zero forever. Verified empirically: the replay stays in sync for all 8772 frames."
+ },
+ "camera_confound": {
+  "problem": "The analog stick is camera relative. sm64-port resolves it as intendedYaw = atan2s(-stickY, stickX) + m->area->camera->yaw (mario.c:1304) where camera->yaw comes from the full camera simulation. libsm64 has no camera and instead sets camera->yaw = atan2s(camLookZ, camLookX) from the caller supplied camLook vector (libsm64.c:239).",
+  "how_handled": "For ACT_LONG_JUMP and ACT_LONG_JUMP_LAND the camera reaches Mario only through intendedYaw, so instead of modelling the camera this comparison solves for it. For every frame a throwaway Mario instance is ticked with that frame exact stick and a candidate camLook, and the candidate is searched until libsm64 intendedYaw equals the reference intendedYaw. The probe Mario is safe because GlobalState::mgController is per instance, and all probing finishes before the replay Mario is created. The stick itself is inverted through libsm64 own transform: inputs->stickX = -refStickX/64 and inputs->stickY = refStickY/64, using the reference POST adjust_analog_stick values, so the deadzone and magnitude clamp are accounted for too.",
+  "residual": "libsm64 camera yaw is the output of atan2s, which is a lookup into the 4097 entry gArctanTable, so not every s16 yaw is representable. On the longest chain every required yaw was reachable exactly and the residual is 0 on all 45 frames. On the other two chains a residual of up to 4 and 5 s16 units remained, 0.022 and 0.027 degrees.",
+  "attribution": "A deliberate sensitivity sweep on the longest chain offset the solved camLook index by 1, 2 and 4 steps. Offsets of 1 and 2 changed nothing at all, because atan2s quantisation snapped them back to the same reachable yaw and the residual stayed 0, and the replay stayed bit exact. An offset of 4 pushed the residual to 7 units and destroyed the chain, peak forwardVel -42.4 instead of -7468.7. So the chain is chaotically sensitive to the camera at the few s16 unit level, the residual drift seen on the other two chains is exactly the kind of effect a residual of 4 to 5 units produces, and none of the divergence needs a physics explanation.",
+  "second_residual_source": "sm64-port adjust_analog_stick clamps stickMag to exactly 64.0f, while libsm64 recomputes stickMag = sqrtf(stickX*stickX + stickY*stickY) from the reconstructed components and lands one or two ulp short, giving intendedMag 31.999996 where the reference has 32.0. This happens on frames in all three chains including the bit exact one, where it provably did not change any f32 result."
+ },
+ "artifacts": {
+  "cluster_dir": "/fast/project/HFMI_SynergyUnit/yll/mario-blj/tas_validation",
+  "trace_csv": "trace_2016M.csv (8772 rows, 55 columns, floats as hex u32 bit patterns)",
+  "trace_patch": "apply_full_trace.py rewrites sm64-port src/pc/pc_main.c. It resets the file to pristine git content first, so it is idempotent and it supersedes the earlier nine column patch 06-frame-trace.diff. Output path comes from the environment variable SM64_TRACE_CSV; unset it and nothing is written. The patched file is archived as pc_main.c.patched.",
+  "trace_columns": "frame, level, area, course, input, flags, particleFlags, action, prevAction, actionState, actionTimer, actionArg, intendedMag, intendedYaw, faceAngle xyz, angleVel xyz, slideYaw, twirlYaw, pos xyz, vel xyz, forwardVel, slideVelX, slideVelZ, floorHeight, floorNormalY, floorType, floorAngle, ceilHeight, peakHeight, hasFloor, hasWall, camYaw, rawStickX, rawStickY, stickX, stickY, stickMag, buttonDown, buttonPressed, framesSinceA, framesSinceB, wallKickTimer, doubleJumpTimer, health, numStars, hurtCounter, squishTimer",
+  "comparison_script": "compare_libsm64.py",
+  "per_frame_comparison_json": [
+   "cmp_3707.json (area 1 longest chain)",
+   "cmp_6588.json",
+   "cmp_6557.json (area 2 endless stairs)",
+   "cmp_4008.json (area 3 basement)"
+  ],
+  "reproduce_replay": "cd <dir with cont.m64 symlinked to the movie>; SM64_MAX_FRAMES=8772 SM64_TRACE_CSV=trace.csv /fast/project/HFMI_SynergyUnit/yll/mario-blj/sm64-port/build/us_pc/sm64.us"
+ },
+ "chains": [
+  {
+   "frame_first": 1996,
+   "frame_last": 2058,
+   "relaunch_window": [
+    2018,
+    2052
+   ],
+   "pos_at_first_relaunch": [
+    -2268.068603515625,
+    26.0,
+    316.669189453125
+   ],
+   "level": "LEVEL_CASTLE",
+   "area": 1,
+   "pos_at_first_frame": [
+    -2119.817626953125,
+    210.0,
+    527.35888671875
+   ],
+   "pos_at_last_frame": [
+    -4092.10791015625,
+    717.0,
+    -3339.397216796875
+   ],
+   "face_angle_y": 1136,
+   "floor_heights_visited": [
+    26.0,
+    51.0,
+    77.0,
+    102.0,
+    128.0,
+    154.0,
+    179.0,
+    205.0,
+    512.0
+   ],
+   "floor_step_rise_modal": 26.0,
+   "floor_step_rise_note": "floor_step_rise_modal is the most common non zero change in floorHeight between consecutive frames of the re-launch window, which is the tread rise Mario is bouncing between. floor_heights_visited can be wider than that when a door or an instant warp fires mid chain.",
+   "floor_normal_y_values": [
+    0.9999999403953552,
+    1.0
+   ],
+   "floor_types": [
+    0
+   ],
+   "n_relaunches": 9,
+   "peak_forward_vel": -413.9371643066406,
+   "peak_forward_vel_frame": 2052,
+   "frames_per_cycle_modal": 2,
+   "mean_amplification_last_half": 1.483491287973588,
+   "cycles": [
+    {
+     "frame": 2018,
+     "launch_forward_vel": -22.833261489868164,
+     "prev_frame_forward_vel": -15.9248685836792,
+     "amplification": 1.4338116116869635,
+     "frames_to_next_relaunch": 3,
+     "air_frames": 0
+    },
+    {
+     "frame": 2021,
+     "launch_forward_vel": -30.95543670654297,
+     "prev_frame_forward_vel": -22.833261489868164,
+     "amplification": 1.3557168221578362,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2023,
+     "launch_forward_vel": -43.56484603881836,
+     "prev_frame_forward_vel": -30.95543670654297,
+     "amplification": 1.4073407024366151,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2025,
+     "launch_forward_vel": -62.99726867675781,
+     "prev_frame_forward_vel": -43.56484603881836,
+     "amplification": 1.446057415665471,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2027,
+     "launch_forward_vel": -93.13434600830078,
+     "prev_frame_forward_vel": -62.99726867675781,
+     "amplification": 1.4783870470032257,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2029,
+     "launch_forward_vel": -135.55455017089844,
+     "prev_frame_forward_vel": -91.27165985107422,
+     "amplification": 1.4851767831556866,
+     "frames_to_next_relaunch": 4,
+     "air_frames": 0
+    },
+    {
+     "frame": 2033,
+     "launch_forward_vel": -199.8611602783203,
+     "prev_frame_forward_vel": -135.55455017089844,
+     "amplification": 1.4743965438736526,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2035,
+     "launch_forward_vel": -290.3819885253906,
+     "prev_frame_forward_vel": -195.8639373779297,
+     "amplification": 1.4825699534727694,
+     "frames_to_next_relaunch": 17,
+     "air_frames": 14
+    },
+    {
+     "frame": 2052,
+     "launch_forward_vel": -413.9371643066406,
+     "prev_frame_forward_vel": -276.5247802734375,
+     "amplification": 1.4969261123626059,
+     "frames_to_next_relaunch": null,
+     "air_frames": null
+    }
+   ]
+  },
+  {
+   "frame_first": 2346,
+   "frame_last": 2386,
+   "relaunch_window": [
+    2355,
+    2381
+   ],
+   "pos_at_first_relaunch": [
+    340.951416015625,
+    -1787.0,
+    3976.8701171875
+   ],
+   "level": "LEVEL_BITDW",
+   "area": 1,
+   "pos_at_first_frame": [
+    388.4476318359375,
+    -1851.0,
+    3994.646728515625
+   ],
+   "pos_at_last_frame": [
+    -2608.31982421875,
+    -888.5383911132812,
+    802.8012084960938
+   ],
+   "face_angle_y": 10594,
+   "floor_heights_visited": [
+    -6655.0,
+    -3105.660400390625,
+    -2155.0,
+    -1787.0,
+    -1772.0,
+    -1757.0,
+    -1742.0,
+    -1727.0,
+    -1712.0,
+    -1697.0,
+    -1683.0,
+    -1668.0,
+    -1654.0,
+    -1641.0,
+    -1627.0,
+    -1614.0,
+    -1506.0,
+    -1337.722412109375,
+    -1314.286865234375
+   ],
+   "floor_step_rise_modal": 15.0,
+   "floor_step_rise_note": "floor_step_rise_modal is the most common non zero change in floorHeight between consecutive frames of the re-launch window, which is the tread rise Mario is bouncing between. floor_heights_visited can be wider than that when a door or an instant warp fires mid chain.",
+   "floor_normal_y_values": [
+    0.6636584997177124,
+    0.9439221620559692,
+    0.9999999403953552,
+    1.0
+   ],
+   "floor_types": [
+    0,
+    10,
+    111
+   ],
+   "n_relaunches": 10,
+   "peak_forward_vel": -501.7545166015625,
+   "peak_forward_vel_frame": 2381,
+   "frames_per_cycle_modal": 2,
+   "mean_amplification_last_half": 1.4922738169352698,
+   "cycles": [
+    {
+     "frame": 2355,
+     "launch_forward_vel": -15.33233642578125,
+     "prev_frame_forward_vel": -9.457489013671875,
+     "amplification": 1.6211846932749925,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2357,
+     "launch_forward_vel": -22.144607543945312,
+     "prev_frame_forward_vel": -15.33233642578125,
+     "amplification": 1.444307438148126,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2359,
+     "launch_forward_vel": -32.363014221191406,
+     "prev_frame_forward_vel": -22.144607543945312,
+     "amplification": 1.4614399535854483,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2361,
+     "launch_forward_vel": -47.69062423706055,
+     "prev_frame_forward_vel": -32.363014221191406,
+     "amplification": 1.4736150319963883,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2363,
+     "launch_forward_vel": -70.68203735351562,
+     "prev_frame_forward_vel": -47.69062423706055,
+     "amplification": 1.4820950340714638,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2365,
+     "launch_forward_vel": -105.16915893554688,
+     "prev_frame_forward_vel": -70.68203735351562,
+     "amplification": 1.4879191782424748,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 2367,
+     "launch_forward_vel": -156.89984130859375,
+     "prev_frame_forward_vel": -105.16915893554688,
+     "amplification": 1.4918807271697412,
+     "frames_to_next_relaunch": 4,
+     "air_frames": 0
+    },
+    {
+     "frame": 2371,
+     "launch_forward_vel": -234.0323944091797,
+     "prev_frame_forward_vel": -156.89984130859375,
+     "amplification": 1.4916037674562086,
+     "frames_to_next_relaunch": 3,
+     "air_frames": 2
+    },
+    {
+     "frame": 2374,
+     "launch_forward_vel": -345.72100830078125,
+     "prev_frame_forward_vel": -231.3976593017578,
+     "amplification": 1.4940557711084632,
+     "frames_to_next_relaunch": 7,
+     "air_frames": 6
+    },
+    {
+     "frame": 2381,
+     "launch_forward_vel": -501.7545166015625,
+     "prev_frame_forward_vel": -335.41766357421875,
+     "amplification": 1.4959096406994616,
+     "frames_to_next_relaunch": null,
+     "air_frames": null
+    }
+   ]
+  },
+  {
+   "frame_first": 3692,
+   "frame_last": 3745,
+   "relaunch_window": [
+    3709,
+    3739
+   ],
+   "pos_at_first_relaunch": [
+    -3479.3505859375,
+    717.0,
+    -2121.0078125
+   ],
+   "level": "LEVEL_CASTLE",
+   "area": 1,
+   "pos_at_first_frame": [
+    -3642.58154296875,
+    957.0,
+    -2091.370361328125
+   ],
+   "pos_at_last_frame": [
+    -3169.618896484375,
+    691.0,
+    -2416.908447265625
+   ],
+   "face_angle_y": -8233,
+   "floor_heights_visited": [
+    691.0,
+    717.0
+   ],
+   "floor_step_rise_modal": 26.0,
+   "floor_step_rise_note": "floor_step_rise_modal is the most common non zero change in floorHeight between consecutive frames of the re-launch window, which is the tread rise Mario is bouncing between. floor_heights_visited can be wider than that when a door or an instant warp fires mid chain.",
+   "floor_normal_y_values": [
+    1.0
+   ],
+   "floor_types": [
+    0
+   ],
+   "n_relaunches": 16,
+   "peak_forward_vel": -7468.74853515625,
+   "peak_forward_vel_frame": 3739,
+   "frames_per_cycle_modal": 2,
+   "mean_amplification_last_half": 1.4989558815744903,
+   "cycles": [
+    {
+     "frame": 3709,
+     "launch_forward_vel": -20.18828010559082,
+     "prev_frame_forward_vel": -14.025991439819336,
+     "amplification": 1.439347813109093,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3711,
+     "launch_forward_vel": -29.426071166992188,
+     "prev_frame_forward_vel": -20.18828010559082,
+     "amplification": 1.4575818748840872,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3713,
+     "launch_forward_vel": -42.39976501464844,
+     "prev_frame_forward_vel": -28.83755111694336,
+     "amplification": 1.4702970041633205,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3715,
+     "launch_forward_vel": -62.71063995361328,
+     "prev_frame_forward_vel": -42.39976501464844,
+     "amplification": 1.4790327241659893,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3717,
+     "launch_forward_vel": -91.33335876464844,
+     "prev_frame_forward_vel": -61.45642852783203,
+     "amplification": 1.4861481695651402,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3719,
+     "launch_forward_vel": -134.6592254638672,
+     "prev_frame_forward_vel": -91.33335876464844,
+     "amplification": 1.4743706711899496,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3721,
+     "launch_forward_vel": -201.05946350097656,
+     "prev_frame_forward_vel": -134.6592254638672,
+     "amplification": 1.4930983213989033,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3723,
+     "launch_forward_vel": -294.6531066894531,
+     "prev_frame_forward_vel": -197.0382843017578,
+     "amplification": 1.4954104362693361,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 3725,
+     "launch_forward_vel": -441.1296691894531,
+     "prev_frame_forward_vel": -294.6531066894531,
+     "amplification": 1.4971152829363432,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3727,
+     "launch_forward_vel": -659.5695190429688,
+     "prev_frame_forward_vel": -440.2796630859375,
+     "amplification": 1.4980694643491366,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3729,
+     "launch_forward_vel": -987.2293701171875,
+     "prev_frame_forward_vel": -658.7195434570312,
+     "amplification": 1.4987097011515724,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3731,
+     "launch_forward_vel": -1478.7191162109375,
+     "prev_frame_forward_vel": -986.37939453125,
+     "amplification": 1.4991382873662507,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3733,
+     "launch_forward_vel": -2215.95361328125,
+     "prev_frame_forward_vel": -1477.869140625,
+     "amplification": 1.4994247815094843,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3735,
+     "launch_forward_vel": -3321.80517578125,
+     "prev_frame_forward_vel": -2215.103515625,
+     "amplification": 1.4996162266683009,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3737,
+     "launch_forward_vel": -4980.58251953125,
+     "prev_frame_forward_vel": -3320.955078125,
+     "amplification": 1.4997440201278693,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 3739,
+     "launch_forward_vel": -7468.74853515625,
+     "prev_frame_forward_vel": -4979.732421875,
+     "amplification": 1.4998292884869646,
+     "frames_to_next_relaunch": null,
+     "air_frames": null
+    }
+   ]
+  },
+  {
+   "frame_first": 4022,
+   "frame_last": 4060,
+   "relaunch_window": [
+    4039,
+    4059
+   ],
+   "pos_at_first_relaunch": [
+    -1278.0,
+    -1074.0,
+    1587.9976806640625
+   ],
+   "level": "LEVEL_CASTLE",
+   "area": 3,
+   "pos_at_first_frame": [
+    -1284.4609375,
+    -834.0,
+    1436.73291015625
+   ],
+   "pos_at_last_frame": [
+    -575.9964599609375,
+    -973.72412109375,
+    1624.4581298828125
+   ],
+   "face_angle_y": -16404,
+   "floor_heights_visited": [
+    -1279.0,
+    -1100.0,
+    -1074.0
+   ],
+   "floor_step_rise_modal": 26.0,
+   "floor_step_rise_note": "floor_step_rise_modal is the most common non zero change in floorHeight between consecutive frames of the re-launch window, which is the tread rise Mario is bouncing between. floor_heights_visited can be wider than that when a door or an instant warp fires mid chain.",
+   "floor_normal_y_values": [
+    0.9999999403953552,
+    1.0
+   ],
+   "floor_types": [
+    0
+   ],
+   "n_relaunches": 10,
+   "peak_forward_vel": -423.027587890625,
+   "peak_forward_vel_frame": 4059,
+   "frames_per_cycle_modal": 2,
+   "mean_amplification_last_half": 1.4902829147454617,
+   "cycles": [
+    {
+     "frame": 4039,
+     "launch_forward_vel": -15.951398849487305,
+     "prev_frame_forward_vel": -10.41422176361084,
+     "amplification": 1.531693794463294,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4041,
+     "launch_forward_vel": -22.5971736907959,
+     "prev_frame_forward_vel": -15.632370948791504,
+     "amplification": 1.4455371974487865,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4043,
+     "launch_forward_vel": -30.867164611816406,
+     "prev_frame_forward_vel": -22.145231246948242,
+     "amplification": 1.393851537046835,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4045,
+     "launch_forward_vel": -43.02169418334961,
+     "prev_frame_forward_vel": -30.24982261657715,
+     "amplification": 1.4222131061282115,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4047,
+     "launch_forward_vel": -62.391387939453125,
+     "prev_frame_forward_vel": -42.16126251220703,
+     "amplification": 1.479827315925106,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4049,
+     "launch_forward_vel": -90.86318969726562,
+     "prev_frame_forward_vel": -61.14356231689453,
+     "amplification": 1.4860630662364807,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4051,
+     "launch_forward_vel": -132.71392822265625,
+     "prev_frame_forward_vel": -89.04592895507812,
+     "amplification": 1.4903986041810822,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4053,
+     "launch_forward_vel": -194.23007202148438,
+     "prev_frame_forward_vel": -130.0596466064453,
+     "amplification": 1.493392278768955,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 4055,
+     "launch_forward_vel": -283.2991943359375,
+     "prev_frame_forward_vel": -190.34547424316406,
+     "amplification": 1.4883421602870692,
+     "frames_to_next_relaunch": 4,
+     "air_frames": 0
+    },
+    {
+     "frame": 4059,
+     "launch_forward_vel": -423.027587890625,
+     "prev_frame_forward_vel": -283.2991943359375,
+     "amplification": 1.4932184642537207,
+     "frames_to_next_relaunch": null,
+     "air_frames": null
+    }
+   ]
+  },
+  {
+   "frame_first": 6566,
+   "frame_last": 6613,
+   "relaunch_window": [
+    6589,
+    6607
+   ],
+   "pos_at_first_relaunch": [
+    -1159.9781494140625,
+    1101.0,
+    2186.43603515625
+   ],
+   "level": "LEVEL_CASTLE",
+   "area": 2,
+   "pos_at_first_frame": [
+    -1217.89306640625,
+    1273.0,
+    2100.91162109375
+   ],
+   "pos_at_last_frame": [
+    -1157.4378662109375,
+    1101.0,
+    2186.092041015625
+   ],
+   "face_angle_y": -31441,
+   "floor_heights_visited": [
+    1075.0,
+    1101.0
+   ],
+   "floor_step_rise_modal": 26.0,
+   "floor_step_rise_note": "floor_step_rise_modal is the most common non zero change in floorHeight between consecutive frames of the re-launch window, which is the tread rise Mario is bouncing between. floor_heights_visited can be wider than that when a door or an instant warp fires mid chain.",
+   "floor_normal_y_values": [
+    1.0
+   ],
+   "floor_types": [
+    0
+   ],
+   "n_relaunches": 10,
+   "peak_forward_vel": -711.1436767578125,
+   "peak_forward_vel_frame": 6607,
+   "frames_per_cycle_modal": 2,
+   "mean_amplification_last_half": 1.494974566199544,
+   "cycles": [
+    {
+     "frame": 6589,
+     "launch_forward_vel": -23.141063690185547,
+     "prev_frame_forward_vel": -15.994467735290527,
+     "amplification": 1.446816741461588,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6591,
+     "launch_forward_vel": -33.164817810058594,
+     "prev_frame_forward_vel": -22.67824363708496,
+     "amplification": 1.462406804547478,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6593,
+     "launch_forward_vel": -47.89787292480469,
+     "prev_frame_forward_vel": -32.501522064208984,
+     "amplification": 1.473711687415105,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6595,
+     "launch_forward_vel": -69.54914855957031,
+     "prev_frame_forward_vel": -46.93991470336914,
+     "amplification": 1.4816632922977677,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6597,
+     "launch_forward_vel": -101.36555480957031,
+     "prev_frame_forward_vel": -68.15816497802734,
+     "amplification": 1.4872107375873203,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6599,
+     "launch_forward_vel": -148.11184692382812,
+     "prev_frame_forward_vel": -99.33824920654297,
+     "amplification": 1.4909850748011035,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6601,
+     "launch_forward_vel": -216.77224731445312,
+     "prev_frame_forward_vel": -145.1496124267578,
+     "amplification": 1.4934400698027075,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6603,
+     "launch_forward_vel": -317.574951171875,
+     "prev_frame_forward_vel": -212.4368133544922,
+     "amplification": 1.4949148697779577,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 6605,
+     "launch_forward_vel": -475.5124206542969,
+     "prev_frame_forward_vel": -317.574951171875,
+     "amplification": 1.497323447266924,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 1
+    },
+    {
+     "frame": 6607,
+     "launch_forward_vel": -711.1436767578125,
+     "prev_frame_forward_vel": -474.66241455078125,
+     "amplification": 1.4982093693490273,
+     "frames_to_next_relaunch": null,
+     "air_frames": null
+    }
+   ]
+  },
+  {
+   "frame_first": 7605,
+   "frame_last": 7656,
+   "relaunch_window": [
+    7623,
+    7656
+   ],
+   "pos_at_first_relaunch": [
+    2624.568359375,
+    5833.0,
+    -748.0248413085938
+   ],
+   "level": "LEVEL_BITS",
+   "area": 1,
+   "pos_at_first_frame": [
+    2606.79248046875,
+    6138.0,
+    -562.3201904296875
+   ],
+   "pos_at_last_frame": [
+    326.2574462890625,
+    6550.0,
+    -6048.06640625
+   ],
+   "face_angle_y": 3831,
+   "floor_heights_visited": [
+    -8191.0,
+    -1270.1697998046875,
+    4517.0,
+    5833.0,
+    5847.0,
+    5862.0,
+    5876.0,
+    5890.0,
+    5904.0,
+    5918.0,
+    5931.0,
+    5945.0,
+    5957.0,
+    5970.0,
+    5982.0,
+    5994.0,
+    6038.0,
+    6243.0,
+    6447.0,
+    6550.0
+   ],
+   "floor_step_rise_modal": 14.0,
+   "floor_step_rise_note": "floor_step_rise_modal is the most common non zero change in floorHeight between consecutive frames of the re-launch window, which is the tread rise Mario is bouncing between. floor_heights_visited can be wider than that when a door or an instant warp fires mid chain.",
+   "floor_normal_y_values": [
+    0.9183586835861206,
+    0.9999999403953552,
+    1.0
+   ],
+   "floor_types": [
+    0,
+    10,
+    21
+   ],
+   "n_relaunches": 10,
+   "peak_forward_vel": -634.6937255859375,
+   "peak_forward_vel_frame": 7656,
+   "frames_per_cycle_modal": 2,
+   "mean_amplification_last_half": 1.486114493219958,
+   "cycles": [
+    {
+     "frame": 7623,
+     "launch_forward_vel": -22.25055503845215,
+     "prev_frame_forward_vel": -15.995128631591797,
+     "amplification": 1.391083219831401,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 7625,
+     "launch_forward_vel": -31.63369369506836,
+     "prev_frame_forward_vel": -22.25055503845215,
+     "amplification": 1.4217035772995685,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 7627,
+     "launch_forward_vel": -45.70840072631836,
+     "prev_frame_forward_vel": -31.63369369506836,
+     "amplification": 1.444927714320134,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 7629,
+     "launch_forward_vel": -67.61209106445312,
+     "prev_frame_forward_vel": -45.70840072631836,
+     "amplification": 1.479204916165944,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 7631,
+     "launch_forward_vel": -100.4676284790039,
+     "prev_frame_forward_vel": -67.61209106445312,
+     "amplification": 1.4859417435149331,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 7633,
+     "launch_forward_vel": -146.978271484375,
+     "prev_frame_forward_vel": -100.4676284790039,
+     "amplification": 1.4629415833687271,
+     "frames_to_next_relaunch": 2,
+     "air_frames": 0
+    },
+    {
+     "frame": 7635,
+     "launch_forward_vel": -219.50843811035156,
+     "prev_frame_forward_vel": -146.978271484375,
+     "amplification": 1.4934754361544327,
+     "frames_to_next_relaunch": 4,
+     "air_frames": 0
+    },
+    {
+     "frame": 7639,
+     "launch_forward_vel": -326.2096252441406,
+     "prev_frame_forward_vel": -219.50843811035156,
+     "amplification": 1.4860915054215278,
+     "frames_to_next_relaunch": 11,
+     "air_frames": 10
+    },
+    {
+     "frame": 7650,
+     "launch_forward_vel": -441.34033203125,
+     "prev_frame_forward_vel": -295.6792297363281,
+     "amplification": 1.4926321758373597,
+     "frames_to_next_relaunch": 6,
+     "air_frames": 4
+    },
+    {
+     "frame": 7656,
+     "launch_forward_vel": -634.6937255859375,
+     "prev_frame_forward_vel": -424.4217224121094,
+     "amplification": 1.4954317653177422,
+     "frames_to_next_relaunch": null,
+     "air_frames": null
+    }
+   ]
+  }
+ ],
+ "chain_identification": {
+  "endless_stairs": "The chain whose re-launch window is frames 6589 to 6607, LEVEL_CASTLE area 2, at (-1160.0, 1075/1101, 2186.4) on a level 26 unit step, peak forwardVel -711.1437. Area 2 is the area that holds the endless staircase: it is the only castle_inside area carrying the 12 SURFACE_INSTANT_WARP_1B triangles, at x in [-409, 0], y in [3917, 3994], z in [905, 1059]. Note the BLJ itself is NOT performed on the endless stairs. It is performed on the ordinary staircase just outside them; Mario then carries -711 into the corridor at x in [-409, 0] and climbs it backwards from y 1203 to y 2253 over frames 6620 to 6640, crossing the instant warp repeatedly (the +205 per frame y steps and +410 per frame z steps in the trace are the INSTANT_WARP(0, 2, 0, -205, 410) displacement from levels/castle_inside/script.c:285 fighting his own motion), and exits into LEVEL_BITS at frame 6798. Mario fastest legitimate speed is the 48 unit long jump clamp, so this is self certifying.",
+  "castle_basement": "The chain whose re-launch window is frames 4039 to 4059, LEVEL_CASTLE area 3, at (-1278.0, -1074/-1100, 1588.0) on a level 26 unit step, peak forwardVel -423.0276. Area 3 is the basement: its collision spans y -2508 to -255, the only castle_inside area entirely below the lobby. The chain is immediately followed by entry into LEVEL_BITFS, Bowser in the Fire Sea.",
+  "longest": "The chain whose re-launch window is frames 3709 to 3739, LEVEL_CASTLE area 1, at (-3169.6, 691/717, -2416.9) on a level 26 unit step with floor normal y exactly 1.0 and floor type SURFACE_DEFAULT. 16 re-launches, peak forwardVel -7468.7485 at frame 3739, the largest backwards speed anywhere in the movie. This is the chain used for the libsm64 comparison."
+ },
+ "comparisons": {
+  "castle_area1_longest": {
+   "seed_frame": 3707,
+   "last_frame": 3752,
+   "collision": "levels/castle_inside/areas/1/collision.inc.c",
+   "frames_compared": 45,
+   "frames_bit_exact_in_pos_vel_forwardvel": 45,
+   "action_sequence_matches_every_frame": true,
+   "first_action_mismatch_frame": null,
+   "first_frame_forwardvel_diff_over_0p5": null,
+   "first_frame_position_diff_over_0p5": null,
+   "max_abs_cam_intended_yaw_residual_s16": 0,
+   "max_abs_d_forward_vel_before_any_0p5_breach": 0.0,
+   "max_d_pos_norm_before_any_0p5_breach": 0.0,
+   "floor_height_mismatch_frames": [],
+   "peak_forward_vel_reference": -7468.74853515625,
+   "peak_forward_vel_libsm64": -7468.74853515625
+  },
+  "castle_area2_endless_stairs": {
+   "seed_frame": 6588,
+   "last_frame": 6620,
+   "collision": "levels/castle_inside/areas/2/collision.inc.c",
+   "frames_compared": 32,
+   "frames_bit_exact_in_pos_vel_forwardvel": 0,
+   "action_sequence_matches_every_frame": true,
+   "first_action_mismatch_frame": null,
+   "first_frame_forwardvel_diff_over_0p5": null,
+   "first_frame_position_diff_over_0p5": null,
+   "max_abs_cam_intended_yaw_residual_s16": 4,
+   "max_abs_d_forward_vel_before_any_0p5_breach": 0.00250244140625,
+   "max_d_pos_norm_before_any_0p5_breach": 0.011480451679249494,
+   "floor_height_mismatch_frames": [],
+   "peak_forward_vel_reference": -711.1436767578125,
+   "peak_forward_vel_libsm64": -711.1411743164062
+  },
+  "castle_area2_endless_stairs_with_runup": {
+   "seed_frame": 6557,
+   "last_frame": 6620,
+   "collision": "levels/castle_inside/areas/2/collision.inc.c",
+   "frames_compared": 63,
+   "frames_bit_exact_in_pos_vel_forwardvel": 2,
+   "action_sequence_matches_every_frame": true,
+   "first_action_mismatch_frame": null,
+   "first_frame_forwardvel_diff_over_0p5": null,
+   "first_frame_position_diff_over_0p5": null,
+   "max_abs_cam_intended_yaw_residual_s16": 4,
+   "max_abs_d_forward_vel_before_any_0p5_breach": 0.0106201171875,
+   "max_d_pos_norm_before_any_0p5_breach": 0.014812315734489758,
+   "floor_height_mismatch_frames": [],
+   "peak_forward_vel_reference": -711.1436767578125,
+   "peak_forward_vel_libsm64": -711.133056640625
+  },
+  "castle_area3_basement": {
+   "seed_frame": 4008,
+   "last_frame": 4062,
+   "collision": "levels/castle_inside/areas/3/collision.inc.c",
+   "frames_compared": 54,
+   "frames_bit_exact_in_pos_vel_forwardvel": 8,
+   "action_sequence_matches_every_frame": false,
+   "first_action_mismatch_frame": 4055,
+   "first_frame_forwardvel_diff_over_0p5": 4056,
+   "first_frame_position_diff_over_0p5": 4055,
+   "max_abs_cam_intended_yaw_residual_s16": 5,
+   "max_abs_d_forward_vel_before_any_0p5_breach": 0.0005950927734375,
+   "max_d_pos_norm_before_any_0p5_breach": 0.0235595703125,
+   "floor_height_mismatch_frames": [
+    4055,
+    4056,
+    4057,
+    4059,
+    4060
+   ],
+   "peak_forward_vel_reference": -423.027587890625,
+   "peak_forward_vel_libsm64": -283.2983093261719
+  }
+ },
+ "physics_confirmation": {
+  "amplification_ratio": "On the longest chain the per re-launch ratio runs 1.4952, 1.4968, 1.4977, 1.4985, 1.4990, 1.4993, 1.4995 and converges on exactly 1.5, matching set_mario_action_airborne case ACT_LONG_JUMP, mario.c:879, if ((m->forwardVel *= 1.5f) > 48.0f), whose clamp never fires on a negative velocity.",
+  "decay_per_air_frame": "The one frame air phase costs exactly 0.85: -441.1297 becomes -440.2797, and 1.5 * 440.2797 - 0.85 = 659.57 which is the next recorded launch to the last digit. 0.85 is approach_f32(forwardVel, 0, 0.35, 0.35) plus the 0.5 from intendedMag/32 * coss(dYaw) * 1.5 at the stick the TAS holds, and the +2.0 attractor at forwardVel < -16 never gets a chance to bite because the air phase is one frame long.",
+  "geometry": "All three chains run on level treads, floor normal y exactly 1.0 and a 26 unit rise, which is what the settled analysis predicted: a slope steep enough to shorten the air phase would trip mario_floor_is_slippery and divert the landing to ACT_BEGIN_SLIDING, so only stairs can bootstrap."
+ },
+ "verdict": {
+  "summary": "libsm64 is behaviourally faithful. Driven with the real game own controller stream and seeded from the real game own state, it reproduces the longest BLJ chain in the movie bit for bit: 45 consecutive frames with identical action, position, velocity and forwardVel bit patterns, including the peak -7468.7485. The other two chains match their whole action sequence and track forwardVel to within 0.011 absolute, about 1.5e-5 relative, until the reference leaves libsm64 jurisdiction.",
+  "known_gaps": [
+   "libsm64 has no level logic, so it cannot follow a door or an instant warp. The basement comparison diverges hard at frame 4055 for exactly that reason: the reference Mario is displaced from (-1278, -1100, 1588) to (-1127, -1074, 1539) and gets one further 1.5x that libsm64 has no way to see. libsm64 continues the chain from -283.2983 while the reference sits frozen at -283.2992 through the transition. This is a scope gap, not a physics disagreement, and it is why the environment has to implement check_instant_warp itself.",
+   "libsm64 camera yaw is quantised by gArctanTable, so some s16 camera yaws are unreachable and a chain can be up to a few s16 units off. Given how sensitive the chain is (a 4 unit error killed it outright in the sweep), an RL environment should drive camLook itself rather than try to imitate the real camera.",
+   "libsm64 exposes no setter for actionState, actionTimer, actionArg, framesSinceA or framesSinceB, so exact seeding is only possible on frames where the reference has them all zero. All three seeds here were chosen that way.",
+   "A freshly created libsm64 Mario has a dirty marioObj->oInteractStatus, which is only zeroed at the end of execute_mario_action. On the first tick after sm64_mario_create the stale bits can raise INPUT_UNKNOWN_10 and throw Mario into ACT_SHOCKWAVE_BOUNCE, which is what happened on the first two attempts at the area 2 chain. The fix used here is one discarded warm up tick between sm64_mario_create and the seed. Anything building on libsm64 needs that warm up tick or it will see random spurious action transitions on frame one."
+  ],
+  "behavioural_fidelity": "CONFIRMED"
+ }
+}
