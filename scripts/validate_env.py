@@ -90,7 +90,7 @@ def main(argv: list[str]) -> None:
               f"stage {row['curriculum_stage']}  warps {row['warps']:3d}  "
               f"highest y {row['highest_reached']:8.1f}  success {row['success']}")
 
-    escape = minimum_escape_speed(BljEnv(config)._scene.warp)
+    escape = minimum_escape_speed(BljEnv(config).scene.warp)
     print(f"\nwarp zone needs |forwardVel| > {escape:.0f} to be skipped")
 
     os.makedirs(os.path.dirname(_OUT.value), exist_ok=True)

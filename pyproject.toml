@@ -52,8 +52,6 @@ select = ["B", "D", "E", "F", "I", "N", "UP", "W"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["D104"]
-# PpoHyperparameters is a frozen dataclass, so one shared default instance cannot be mutated.
-"src/train/ppo.py" = ["B008"]
 # The imports follow a pytest.importorskip that has to run before them for the skip to work.
 "src/train/ppo_test.py" = ["E402"]
 # The tools are run as scripts, so they put the repo root on sys.path before importing src.

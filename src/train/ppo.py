@@ -343,6 +343,9 @@ class EpisodeRecorder(BaseCallback):
         )
 
 
+_DEFAULT_HYPERPARAMETERS = PpoHyperparameters()
+
+
 def make_env_factory(
     rung: ladder.Rung,
     rom_path: str,
@@ -456,7 +459,7 @@ def build_vec_env(
 def build_model(
     vec_env: VecEnv,
     seed: int,
-    hyperparameters: PpoHyperparameters = PpoHyperparameters(),
+    hyperparameters: PpoHyperparameters = _DEFAULT_HYPERPARAMETERS,
     tensorboard_log: str | None = None,
 ) -> PPO:
     """Constructs the PPO model for a run.
@@ -528,7 +531,7 @@ def train(
     max_frames: int = 3000,
     spawn_jitter: float = 0.0,
     library_path: str | None = None,
-    hyperparameters: PpoHyperparameters = PpoHyperparameters(),
+    hyperparameters: PpoHyperparameters = _DEFAULT_HYPERPARAMETERS,
     checkpoint_every: int = 100_000,
     action_repeats: tuple[int, ...] = ladder.DEFAULT_ACTION_REPEAT_SWEEP,
     force_subprocess: bool = True,
