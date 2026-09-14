@@ -1,16 +1,56 @@
+"""Sweeps the long jump chain over slope angle, A repress delay and stick deflection.
+
+This is the direct sweep, with no policy object in the way: the loop reads Mario's action from the
+previous frame and decides what to press this frame, which is the smallest thing that can hold a
+chain going. It answers what the chain needs from the geometry and from the timing, and
+``results/blj_sweep.json`` is its output.
+
+Two things to know before reading its numbers. It reports the peak absolute speed rather than the
+peak backward speed, so a run that never reversed still shows a number. And ``--stick`` defaults
+to the raw N64 scale of +-64, which libsm64 multiplies by another 64: those rows are in the over
+deflected regime that ``src.env.native`` documents, so their peaks are not comparable with the
+environment's own. Pass ``--stick -1 0 1`` for the normalized range the environment uses.
+"""
+
 import argparse
 import json
 import os
 
 from src.env.geometry import slope_course
-from src.env.native import (ACT_CROUCH_SLIDE, ACT_LONG_JUMP, ACT_LONG_JUMP_LAND,
-                            MarioInputs, Sm64, action_name)
+from src.env.native import (
+    ACT_CROUCH_SLIDE,
+    ACT_LONG_JUMP,
+    ACT_LONG_JUMP_LAND,
+    MarioInputs,
+    Sm64,
+    action_name,
+)
 
 RESULTS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results")
 
 
 def run_chain(game: Sm64, angle: float, repress_delay: int, stick_y: float,
               frames: int, spawn_height: float) -> dict:
+    """Runs one configuration of the chain on one slope and summarizes it.
+
+    The button logic is a reaction to the previous frame's action, not a schedule. Z is held from
+    frame 30 onward so the crouch is available, A is pressed once a crouch slide exists, and after
+    a landing it waits ``repress_delay`` frames before pressing again. That delay is the knob the
+    sweep exists to turn: the relaunch needs a fresh press, and how soon it can come is what
+    decides whether the chain compounds or dies.
+
+    Args:
+        game: Live libsm64 handle. The scene and Mario are both replaced.
+        angle: Slope angle of the course in degrees.
+        repress_delay: Frames to wait after a landing before pressing A again.
+        stick_y: Stick y held for the whole run, on whatever scale the caller passes.
+        frames: Frames to run.
+        spawn_height: y to spawn Mario at.
+
+    Returns:
+        The configuration, the peak absolute forwardVel, the peak height, the number of long jumps
+        and a trace sampled every fifth frame.
+    """
     game.load_surfaces(slope_course(angle))
     game.create_mario(0.0, spawn_height, 200.0)
 
@@ -73,6 +113,11 @@ def run_chain(game: Sm64, angle: float, repress_delay: int, stick_y: float,
 
 
 def main() -> None:
+    """Runs the full sweep, prints one line per configuration and writes the JSON.
+
+    Raises:
+        OSError: If the ROM, the shared library or the output path cannot be opened.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--rom", default=os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "roms", "baserom.us.z64"))
