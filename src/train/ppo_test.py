@@ -127,9 +127,14 @@ class FakeBljEnv(gymnasium.Env):
 
 
 def test_rung_table_is_complete() -> None:
-    """The table holds exactly the ladder rungs, keyed by their own names."""
+    """The table holds exactly the ladder rungs, keyed by their own names.
+
+    The expected names are written out rather than compared against ``LADDER_ORDER``, which would
+    make the assertion tautological and unable to catch a rung being added or dropped.
+    """
+    assert tuple(ladder.RUNGS) == ("terminal", "speed", "height", "height_speed", "curriculum",
+                                   "repeat")
     assert tuple(ladder.RUNGS) == ladder.LADDER_ORDER
-    assert len(ladder.RUNGS) == len(ladder.LADDER_ORDER)
     for name, rung in ladder.RUNGS.items():
         assert rung.name == name
         assert rung.description
