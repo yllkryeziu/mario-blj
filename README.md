@@ -2,67 +2,66 @@
 
 How much hand-holding does an RL agent need before it can perform the backwards long jump?
 
-No results yet. This is the environment scaffold.
-
 ## The question
 
 Super Mario 64's endless staircase cannot be climbed with fewer than 70 stars. It loops. The only
-way up is the backwards long jump, a speed-accumulation glitch that took the speedrunning community
+way up is the backwards long jump, a speed accumulation glitch that took the speedrunning community
 years to find.
 
-That makes it a rare task: success is self-certifying. Reaching the top under 70 stars *is* the
-exploit, so there is no judgement call about whether the agent "cheated".
+That makes it a rare task: success is self-certifying. Reaching the top of the staircase *is* the
+exploit, so there is no judgement call about whether the agent cheated.
 
-The interesting result is not that an agent can be shaped into doing a BLJ. It is the measurement of
-how much shaping that takes. The plan is an ablation ladder, from terminal reward only through
+The interesting result is not that an agent can be shaped into doing a BLJ. It is the measurement
+of how much shaping that takes. The plan is an ablation ladder, from terminal reward only through
 speed shaping, staged curriculum and tuned action repeat, reporting where the agent crosses from
 never to reliably. That turns "RL could never discover this" from an opinion into a number.
 
-The validation is slope transfer. BLJ works on many slopes, not one staircase. Train on one, test on
-others. If it transfers, the policy learned the technique. If not, it memorised a spot.
+The validation is transfer. The same policy should work on geometry it never trained on.
 
-## Why libsm64
+## Where this stands
 
-`sm64_mario_tick` steps one frame of Mario's real decompiled physics:
+An agent found the backwards long jump with no reward shaping at all.
 
-```c
-struct SM64MarioInputs  { float camLookX, camLookZ, stickX, stickY;
-                          uint8_t buttonA, buttonB, buttonZ; };
-struct SM64MarioState   { float position[3], velocity[3], faceAngle, forwardVelocity;
-                          int16_t health; uint32_t action; ... };
-```
+| | result |
+| --- | --- |
+| substrate | libsm64, the decompiled physics as a shared library |
+| fidelity | the BLJ chain is byte identical to upstream `n64decomp/sm64` @`9921382a`, and a real TAS chain replays through it 45 frames bit-identically |
+| task | the real endless staircase, 1923 collision triangles from `castle_inside` area 2 |
+| expert result | reaches the top landing, peak `forwardVel` **-1543.88**, 37 warp resets survived |
+| throughput | 7,700 environment steps per second in one process |
+| PPO result | terminal reward alone reaches a **100% success rate**, first success at **6.3M steps** |
 
-`forwardVelocity` is the shaping signal, `action` is the curriculum stage detector, and
-`sm64_static_surfaces_load` takes an arbitrary triangle mesh, so slopes can be generated
-procedurally. Resets are a function call rather than a savestate. No emulator, no rendering, no
-window.
+The headline is the last row. The rung that pays nothing except for standing on the top landing,
+whose episode returns take only the values 0.0 and 1.0, learned the exploit. So the answer to how
+much shaping an agent needs is, for at least one seed, none. "RL could never discover this" is
+false in this environment, and the interesting quantity becomes how many steps and how often.
 
-The mechanism that makes the BLJ possible is present, carrying the decompilation's own bug marker
-in `mario_actions_airborne.c`:
+Results below are from a run still in progress, 20M steps per seed. The two baselines are at
+12.4M and the two height rungs at 7.2M, so the comparison across rungs is not yet fair.
 
-```c
-//! Uncapped air speed. Net positive when moving forward.
-if (m->forwardVel > dragThreshold) { m->forwardVel -= 1.0f; }
-if (m->forwardVel < -16.0f)        { m->forwardVel += 2.0f; }
-```
+| rung | seeds with successes | best peak `forwardVel` | notes |
+| --- | --- | ---: | --- |
+| terminal | 1 of 3 | -5588 | seed 2 at 33,606 successes in 35,856 episodes, last 500 episodes at 100% |
+| speed | 1 of 3 | -6472 | seed 1, 735 successes |
+| height | **0 of 6** | -56.9 | every seed pinned at return 0.44 |
+| height_speed | **4 of 6** | -7060 | 990, 831, 532 and 224 successes |
 
-libsm64 carries Mario and surfaces but no level logic, so the endless staircase's loop trigger is
-not in it. The plan is to study and train the mechanic here, then demonstrate the real staircase on
-a full `sm64-port` build.
+The sharpest signal is the last two rows against each other. Height progress alone never crosses,
+in six of six seeds. Adding the backwards speed term takes it to four of six. Height reliably
+walks Mario to the barrier and stops; speed is what carries him through it.
 
-## Verified so far
+The height rung failing is the designed outcome rather than a disappointment, and it is worth
+saying why. Its reward states the goal and nothing else, and it goes flat exactly where ordinary
+movement stops working, so there is no gradient across the discontinuity that the exploit lives
+on. A policy that just holds the stick up the stairs earns 0.419 of it, reaches y 3942, and is
+then thrown back down 302 times for nothing.
 
-- libsm64 builds clean as a universal binary
-- every ctypes struct layout matches the C header, checked field by field against `offsetof`
-- ROM converted from v64 to z64 and hash-verified (sha1 `9bef1128...`, the canonical US release)
-- Mario walks, runs, crouch-slides and long jumps under scripted input
-- generated floor normals point up; ramp heights match `length * tan(angle)` exactly
-
-## The mechanism, located in source
+## The mechanism
 
 Three annotated sites in the decompilation carry the whole bug.
 
-`mario.c`, the amplifier. The clamp is one-sided, so negative speed multiplies without bound:
+`mario.c`, in `set_mario_action_airborne`, is the amplifier. The clamp is one sided, so negative
+speed multiplies without bound:
 
 ```c
 //! (BLJ's) This properly handles long jumps from getting forward speed with
@@ -70,7 +69,8 @@ Three annotated sites in the decompilation carry the whole bug.
 if ((m->forwardVel *= 1.5f) > 48.0f) { m->forwardVel = 48.0f; }
 ```
 
-`mario_actions_airborne.c`, the asymmetric air drag:
+`mario_actions_airborne.c`, in `update_air_without_turn`, is the brake, carrying the
+decompilation's own marker:
 
 ```c
 //! Uncapped air speed. Net positive when moving forward.
@@ -78,9 +78,9 @@ if (m->forwardVel > dragThreshold) { m->forwardVel -= 1.0f; }
 if (m->forwardVel < -16.0f)        { m->forwardVel += 2.0f; }
 ```
 
-`mario_actions_moving.c`, Nintendo's own fix, compiled out under `VERSION_US`. Rebuilding with
-`-DVERSION_SH` makes the BLJ impossible, which is a ground-truth negative control shipped by the
-original developers rather than one invented here:
+`mario_actions_moving.c`, in `act_long_jump_land`, holds Nintendo's own fix, compiled out under
+`VERSION_US`. Rebuilding with `-DVERSION_SH` makes the BLJ impossible, which is a ground truth
+negative control shipped by the original developers rather than one invented here:
 
 ```c
 #ifdef VERSION_SH
@@ -89,82 +89,148 @@ original developers rather than one invented here:
 #endif
 ```
 
-## Measured dynamics
+## Why the chain lives or dies
 
-Gain per re-jump is `0.5 * |forwardVel|` from the `*= 1.5`. Loss is air decay toward an attractor at
-exactly -16: below it the `+= 2.0` damping dominates, above it the stick does. Measured air decay
-ranges from +1.70 to +5.70 per frame depending on stick direction relative to Mario's facing, so the
-chain grows only when
+Per cycle the chain is
 
-    0.5 * |forwardVel|  >  decay_rate * air_frames
+    v_launch' = 1.5 * (v_launch - d * k)
 
-## Direction calibration, measured not assumed
+for `k` air frames at decay `d` per frame. Growth therefore needs `|v| > 3 d k`. Measured `d` is
+about 0.85 per frame with the stick held fully against Mario's facing and 2.35 with no stick at all.
 
-| facing | forwardVel | travels |
-| --- | ---: | --- |
-| 0 | +20 | +Z |
-| 0 | -20 | -Z |
-| pi | +20 | -Z |
-| pi | -20 | +Z |
+The `+= 2.0` term makes the air phase an attractor at exactly -16. Any long air phase pins the
+landing speed near -15 no matter how fast the launch was, which caps the next launch at
+`1.5 * 16 = -24`. This is the real ceiling, and it is why air time is the only variable that
+matters.
 
-Air decay per frame, seeded at `forwardVel = -20`, by stick relative to facing: aligned +5.70,
-perpendicular +4.70, opposed +1.70. Decay is minimised when the stick points along the direction of
-travel, and travel must point into rising ground for a short air time. On a uniform ramp those two
-requirements fix each other, which is the whole difficulty.
+`ACT_LONG_JUMP` also gets half gravity, `m->vel[1] -= 2.0f` in `apply_gravity`, so a long jump
+hangs for about 30 frames over level ground. Flat ground and uniform ramps therefore cannot
+bootstrap at all, whatever the stick does.
 
-## Real level geometry
+A steep ramp would shorten the air phase, but `mario_floor_is_slippery` treats any floor with
+`normal.y <= 0.7880108` as a slide, which is about 38 degrees, and then `should_begin_sliding`
+returns true for any `forwardVel <= -1.0` and sends the landing to `ACT_BEGIN_SLIDING` instead of
+back into a long jump. Stair treads are level, `normal.y = 1.0`, however steep the staircase
+envelope is. That is the structural reason every real BLJ spot in the game is a staircase.
 
-`src/env/collision.py` imports `collision.inc.c` from the decompilation into libsm64 surfaces.
-Castle area 3 parses to 1399 triangles with the expected surface types, and contains ~30 degree
-slopes (`normal.y = 0.869`), confirming that synthetic ramps already match real geometry. Geometry
-was therefore not the blocker.
+Measured on synthetic geometry, one input program, varying only the floor:
 
-## Not yet reproduced
+| geometry | air frames | peak `forwardVel` |
+| --- | ---: | ---: |
+| flat ground | 30 | -22.6 |
+| ramp, 20 to 37 degrees | 18 to 25 | -23.1 |
+| ramp, 40 degrees | 30 | -21.7, slides out |
+| stairs, rise 75 run 100 | 1 | **-610.0** |
+| stairs, rise 100 run 60 | 1 | **-351.3** |
 
-A runaway BLJ. On every synthetic geometry tried, the stick direction that minimises air decay
-(+1.70/frame) also sends Mario downhill, giving a 31-frame air time, while the direction giving a
-5-frame air time maximises decay (+5.70/frame). The two requirements are coupled through the ramp,
-and neither setting satisfies the growth condition. Flat ground, treads-only staircases, slippery
-slopes and walls were all tried; slippery surfaces make Mario slide instead of holding the chain.
+## The task
 
-The next step is to stop searching blind and replay a documented BLJ input sequence. If a known-good
-setup fails here, libsm64 is the wrong substrate, since it carries Mario and surfaces but no level
-geometry or object behaviour, and the work should move to a full `sm64-port` build.
+`src/env/endless_stairs.py` loads `castle_inside/areas/2/collision.inc.c`, the real endless
+staircase: 1923 triangles, treads of rise 25.6 and run 51.2, a corridor at `x` in [-409, 0], the
+bottom landing at `y = 3174` and the top landing at `y = 5018`.
 
-## The recurrence, and why the amplifier is confirmed
+The loop is not geometry. Twelve triangles carry the surface type `SURFACE_INSTANT_WARP_1B`, and
+`check_instant_warp` in `level_update.c` displaces Mario by the level script's own
+`INSTANT_WARP(0, 2, 0, -205, 410)` whenever his current floor is one of them, unless the save holds
+70 stars. libsm64 carries Mario and surfaces but no level logic, so the environment reimplements
+that one check against the same surface type and the same displacement.
 
-Seeding at -30 produces a first re-launch at exactly **-45**, which is 1.5 x -30. The amplifier
-works in libsm64; that is not in doubt.
+The check samples Mario's floor once per frame and the warp zone is 154 units deep. Skipping it
+therefore needs a per frame displacement larger than 154 units, while Mario's fastest ordinary
+movement is the long jump clamp at 48. Reaching the top landing cannot be faked.
 
-Per cycle the chain is `v' = 1.5 v + k d`, for k air frames at decay d. Its fixed point
-`v* = -2 k d` is **unstable**, since the multiplier 1.5 exceeds 1. So below the threshold the speed
-should run away and above it decay. For k = 20 and d = 1.70 that predicts a threshold near -68.
+The scripted expert in `src/agent/scripted.py` is the reference: walk away from the rise, crouch
+slide, long jump, then hold the stick back and re-press A on every landing. It gets thrown back
+down 37 times while building speed, then one jump crosses the trigger zone inside a single frame
+and it reaches `y = 5074`.
 
-The prediction is untested rather than refuted. Above roughly |v| = 45 the chain stops
-re-triggering: Mario never enters `ACT_LONG_JUMP_LAND` at all. The likely cause is that at high
-speed he covers enough ground per frame to miss the floor, so no landing registers on an isolated
-uniform ramp. In the real game the staircase keeps him in contact.
+## The environment
 
-## sm64-port status
+`src/env/blj_env.py` is a Gymnasium environment.
 
-A full `sm64-port` build was attempted to replay a documented TAS and settle whether libsm64 is
-faithful. Asset extraction succeeds and most of the game compiles. Three macOS issues were hit and
-two remain:
+- Observation: 24 floats, normalized. Position relative to the goal, velocity, `forwardVel`, facing,
+  floor normal and height, whether the current floor is a warp trigger, action group flags, action
+  timer, air frames, and the buttons held last frame.
+- Action: `Discrete(36)`, nine stick directions at full deflection crossed with A and Z. Full
+  deflection matters. The runaway needs a stick magnitude around 0.8 to 1.0 and does not happen at
+  0.5.
+- Reward: every term is a weight in `RewardConfig`, because the weights are the experiment. Shaping
+  pays on each new record backward speed rather than on the instantaneous value, so it stays
+  potential based and cannot be farmed by hovering.
 
-- build output directories are not created by the Makefile; pre-mirroring all 953 of them fixes it
-- `bcopy` and `bzero` collide with macOS fortified builtins, fixed by undefining them in
-  `include/PR/os_libc.h`
-- **open**: `SDL2/SDL.h` is not on the include path under Homebrew
-- **open**: clang rejects `--defsym` when assembling the sound sequences, which needs a GNU
-  assembler
+libsm64 keeps one static surface set per process, so vectorized training uses one subprocess per
+environment.
 
-Linux is sm64-port's documented platform and none of these would appear there, so the next attempt
-belongs on the cluster, which is also where training would run.
+## The ablation ladder
 
-## Setup
+| rung | reward |
+| --- | --- |
+| terminal | reaching the top landing, nothing else |
+| speed | plus a record backward speed term |
+| height | plus a record climbed height term, which states the goal and not the method |
+| height_speed | both shaping terms |
+| curriculum | plus a bonus per stage of a hand written recipe |
 
-    ./scripts/setup.sh
-    # place a Super Mario 64 US ROM at roms/baserom.us.z64 (v64 input is converted automatically)
-    PYTHONPATH=. python3 scripts/verify_blj.py
+The ladder is not a single chain. `height` and `speed` are independent branches off `terminal`
+and `height_speed` is their combination, so the invariant the tests hold is that each rung's
+difference from `terminal` is exactly its own advertised ingredients.
 
-No ROM is distributed here.
+`curriculum` pays for reaching each of grounded, crouched, long jump, backwards long jump and
+chained. That names the action recipe rather than the goal, which is why it was the first rung to
+work and why it was dropped: succeeding at it says nothing except that the answer was supplied.
+Its runs are kept in the history rather than deleted, as the upper bound on how much help is
+possible.
+
+Both shaping terms pay on records rather than per frame, which the warp loop makes necessary. Any
+per frame progress term would pay an agent forever for re-climbing the same steps while the loop
+resets him, and looping is easier than the exploit.
+
+Action repeat was the fourth rung and it was measuring the wrong thing. `INPUT_A_PRESSED` never
+re-latches on a held button, so holding one action for k frames forces a minimum A press period of
+2k. Measured with this project's own expert on the real staircase: period 2 reaches -715, period 4
+reaches -31.6, period 6 reaches -20.8, period 8 reaches -22.1. Above a repeat of 1 the exploit is
+not harder to learn, it is impossible to express, and the runs confirmed it with zero successes at
+every repeat of 2 and above. Recording that as "shaping insufficient" would have been a false
+negative, so the axis is out until A press parity is separated from action repeat and the discount
+is corrected by `gamma ** action_repeat`.
+
+## Watching it
+
+`scripts/record_episode.py` records an episode from either the scripted expert or a trained model
+and writes a replay. `tools/pack_replays.py` and `tools/make_viewer.py` turn replays into a single
+self contained HTML viewer with a side view, the live controller input, the `forwardVel` trace with
+the -16 attractor marked, and a frame scrubber.
+
+## An input bug worth remembering
+
+The earlier sweep found nothing, and the reason was the stick. `libsm64.c` does
+`gController.stickX = -64.0f * inputs->stickX`, so the API wants `[-1, 1]`. The sweep passed
+`stickY` values of `-64`, `0` and `+64`. At `0` there is no backwards drive at all; at `+-64` the
+stick magnitude becomes 4096 and `forwardVel` jumps to -6142 in one frame, which throws Mario out
+of the level before a chain can form. The sweep covered only those two useless cases and never the
+range in between.
+
+## Reproducing
+
+    ./scripts/setup.sh                      # clone and patch libsm64 and sm64-port, then build
+    # place a Super Mario 64 US ROM at roms/baserom.us.z64, sha1 9bef1128...
+    make test
+    PYTHONPATH=. python3 scripts/validate_env.py    # the expert beats the staircase
+    PYTHONPATH=. python3 scripts/blj_runaway.py     # the geometry sweep
+    PYTHONPATH=. python3 scripts/record_episode.py  # record a replay
+    make viewer
+
+No ROM is distributed here. `patches/` holds the changes this project makes to libsm64, applied by
+`setup.sh` on a fresh clone: one to export Mario's floor and action detail, which the instant warp
+check needs, and one to stop the Makefile listing its generated sources twice.
+
+## Layout
+
+    src/env/       libsm64 binding, geometry, real collision import, the staircase, the environment
+    src/agent/     the scripted expert and the driver adapters
+    src/train/     the ablation ladder and the PPO harness
+    scripts/       setup, validation, sweeps, recording, training entry points
+    tools/         replay packing and the HTML viewers
+    cluster/       Slurm jobs
+    patches/       changes to vendored third party code
+    results/       measured output
