@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mario-blj"
+version = "0.1.0"
+description = "Measuring how much reward shaping an RL agent needs to learn the Super Mario 64 backwards long jump."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Yll Kryeziu", email = "yll.kryeziu@helmholtz-munich.de" }]
+keywords = ["reinforcement-learning", "super-mario-64", "reward-shaping", "libsm64"]
+classifiers = [
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "absl-py>=2.1.0",
+  "gymnasium>=0.29.1",
+  "numpy>=1.26.0",
+  "stable-baselines3>=2.3.0",
+  "torch>=2.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pyright>=1.1.380",
+  "pytest>=8.0.0",
+  "ruff>=0.6.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+testpaths = ["src"]
+python_files = ["*_test.py"]
+python_classes = ["!Test"]
+addopts = ["--import-mode=prepend", "-ra", "--strict-markers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["third_party", "roms", "results"]
+
+[tool.ruff.lint]
+select = ["B", "D", "E", "F", "I", "N", "UP", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["D104"]
+# PpoHyperparameters is a frozen dataclass, so one shared default instance cannot be mutated.
+"src/train/ppo.py" = ["B008"]
+# The imports follow a pytest.importorskip that has to run before them for the skip to work.
+"src/train/ppo_test.py" = ["E402"]
+# The tools are run as scripts, so they put the repo root on sys.path before importing src.
+"tools/dump_mesh.py" = ["E402"]
+"tools/dump_swarm.py" = ["E402"]
+"tools/make_viewer3d.py" = ["E402"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.pyright]
+include = ["src", "scripts", "tools"]
+exclude = ["**/__pycache__", "third_party", ".venv"]
+typeCheckingMode = "basic"
+pythonVersion = "3.11"
+reportMissingImports = "warning"
+reportMissingModuleSource = "none"
+
+[tool.ruff.format]
+line-ending = "lf"
+quote-style = "double"
