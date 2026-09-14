@@ -1,0 +1,7 @@
+.venv/
+roms/
+third_party/
+results/*.npz
+__pycache__/
+*.so
+*.dylib

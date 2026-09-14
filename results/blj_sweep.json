@@ -1,0 +1,584 @@
+{
+  "runs": [
+    {
+      "angle": 20.0,
+      "repress_delay": 0,
+      "stick_y": 0.0,
+      "peak_abs_speed": 2.0,
+      "peak_height": 100.0,
+      "long_jumps": 0,
+      "trace": [
+        {
+          "frame": 0,
+          "action": "0x00001924",
+          "forward_velocity": 2.0,
+          "y": 100.0,
+          "z": 202.0
+        },
+        {
+          "frame": 5,
+          "action": "0x00001325",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 10,
+          "action": "0x00001325",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 15,
+          "action": "0x00001325",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 20,
+          "action": "idle",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 25,
+          "action": "idle",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 30,
+          "action": "start_crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 35,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 40,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 45,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 50,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 55,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 60,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 65,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 70,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 75,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 80,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 85,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 90,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 95,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 100,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 105,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 110,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 115,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 120,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 125,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 130,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 135,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 140,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 145,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 150,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 155,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 160,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 165,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 170,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 175,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 180,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 185,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 190,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        },
+        {
+          "frame": 195,
+          "action": "crouching",
+          "forward_velocity": 0.0,
+          "y": 75.7,
+          "z": 208.5
+        }
+      ]
+    }
+  ],
+  "best": {
+    "angle": 20.0,
+    "repress_delay": 0,
+    "stick_y": 0.0,
+    "peak_abs_speed": 2.0,
+    "peak_height": 100.0,
+    "long_jumps": 0,
+    "trace": [
+      {
+        "frame": 0,
+        "action": "0x00001924",
+        "forward_velocity": 2.0,
+        "y": 100.0,
+        "z": 202.0
+      },
+      {
+        "frame": 5,
+        "action": "0x00001325",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 10,
+        "action": "0x00001325",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 15,
+        "action": "0x00001325",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 20,
+        "action": "idle",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 25,
+        "action": "idle",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 30,
+        "action": "start_crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 35,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 40,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 45,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 50,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 55,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 60,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 65,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 70,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 75,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 80,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 85,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 90,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 95,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 100,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 105,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 110,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 115,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 120,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 125,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 130,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 135,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 140,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 145,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 150,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 155,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 160,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 165,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 170,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 175,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 180,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 185,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 190,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      },
+      {
+        "frame": 195,
+        "action": "crouching",
+        "forward_velocity": 0.0,
+        "y": 75.7,
+        "z": 208.5
+      }
+    ]
+  }
+}
