@@ -1,0 +1,777 @@
+<title>Backwards Long Jump Replay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+
+<style>
+:root {
+  --ground: #edf1f3;
+  --panel: #ffffff;
+  --ink: #0f181f;
+  --muted: #5d6e7a;
+  --rule: #d5dee3;
+  --grid: #e3eaee;
+  --floor: #2e7d6b;
+  --floor-fill: rgba(46, 125, 107, 0.13);
+  --speed: #c4751a;
+  --speed-fill: rgba(196, 117, 26, 0.16);
+  --dead: #b23a32;
+  --shadow: 0 1px 2px rgba(15, 24, 31, 0.06), 0 8px 24px rgba(15, 24, 31, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0d1317;
+    --panel: #141c22;
+    --ink: #e7eef2;
+    --muted: #8598a4;
+    --rule: #23303a;
+    --grid: #1b252c;
+    --floor: #4fb79c;
+    --floor-fill: rgba(79, 183, 156, 0.15);
+    --speed: #e8a33d;
+    --speed-fill: rgba(232, 163, 61, 0.18);
+    --dead: #e0665c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0d1317;
+  --panel: #141c22;
+  --ink: #e7eef2;
+  --muted: #8598a4;
+  --rule: #23303a;
+  --grid: #1b252c;
+  --floor: #4fb79c;
+  --floor-fill: rgba(79, 183, 156, 0.15);
+  --speed: #e8a33d;
+  --speed-fill: rgba(232, 163, 61, 0.18);
+  --dead: #e0665c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+header { display: flex; flex-direction: column; gap: 6px; }
+
+h1 {
+  font-family: Archivo, "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lede { color: var(--muted); max-width: 62ch; margin: 0; }
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scenes { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.scene {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 2px;
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 168px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: border-color 120ms, transform 120ms;
+}
+
+.scene:hover { border-color: var(--muted); }
+.scene[aria-pressed="true"] { border-color: var(--speed); box-shadow: inset 2px 0 0 var(--speed); }
+.scene:focus-visible { outline: 2px solid var(--speed); outline-offset: 2px; }
+
+.scene .geo { font-weight: 500; }
+.scene .peak {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.28rem;
+  letter-spacing: -0.01em;
+}
+.scene .verdict { font-size: 0.75rem; color: var(--muted); }
+.scene[aria-pressed="true"] .peak { color: var(--speed); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+canvas { display: block; width: 100%; }
+#stage { aspect-ratio: 16 / 8; }
+#chart { height: 148px; }
+#pad { height: 100%; min-height: 300px; }
+
+.top { display: grid; grid-template-columns: minmax(0, 1fr) 236px; }
+.padwrap { border-left: 1px solid var(--rule); display: flex; flex-direction: column; }
+.padhead { padding: 9px 12px 0; }
+
+@media (max-width: 760px) {
+  .top { grid-template-columns: minmax(0, 1fr); }
+  .padwrap { border-left: 0; border-top: 1px solid var(--rule); }
+  #pad { min-height: 248px; }
+}
+
+.chartwrap { border-top: 1px solid var(--rule); position: relative; }
+
+.readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border-top: 1px solid var(--rule);
+}
+
+.cell { background: var(--panel); padding: 9px 12px; display: flex; flex-direction: column; gap: 1px; }
+.cell .v {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+.cell .v.hot { color: var(--speed); }
+
+.controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+button.ctrl {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  font: 500 0.875rem "IBM Plex Sans", sans-serif;
+  border-radius: 2px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+button.ctrl:hover { border-color: var(--muted); }
+button.ctrl:focus-visible { outline: 2px solid var(--speed); outline-offset: 2px; }
+button.ctrl[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+
+#play { min-width: 92px; }
+
+input[type="range"] {
+  flex: 1 1 260px;
+  min-width: 180px;
+  accent-color: var(--speed);
+  height: 22px;
+}
+
+.rates { display: flex; gap: 6px; }
+
+.legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 0.8125rem; }
+.key { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 3px; border-radius: 2px; background: currentColor; }
+
+footer { color: var(--muted); font-size: 0.8125rem; max-width: 74ch; }
+code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.86em;
+  background: var(--grid);
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="label">libsm64 · decompiled Mario physics · 30 fps frames</p>
+    <h1>Backwards Long Jump Replay</h1>
+    <p class="lede">One scripted input program, four floors. Walk away from the rise, crouch,
+      long jump, then hold the stick back and re-press A on every landing. Whether Mario's speed
+      runs away or stalls is decided entirely by the shape of the ground under him. On the real
+      endless staircase the instant warp keeps throwing him back down, marked as rings, until one
+      jump crosses the whole trigger zone inside a single frame.</p>
+  </header>
+
+  <div class="scenes" id="scenes"></div>
+
+  <div class="panel">
+    <div class="top">
+      <canvas id="stage"></canvas>
+      <div class="padwrap">
+        <div class="padhead"><span class="label">controller, live</span></div>
+        <canvas id="pad"></canvas>
+      </div>
+    </div>
+    <div class="chartwrap"><canvas id="chart"></canvas></div>
+    <div class="readout" id="readout"></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl" id="play" aria-pressed="false">Play</button>
+    <input type="range" id="scrub" min="0" max="1" value="0" step="1" aria-label="Frame">
+    <div class="rates" id="rates"></div>
+    <button class="ctrl" id="follow" aria-pressed="true">Follow Mario</button>
+  </div>
+
+  <div class="legend">
+    <span class="key" style="color: var(--floor)"><span class="swatch"></span>floor surface</span>
+    <span class="key" style="color: var(--speed)"><span class="swatch"></span>forward velocity, negative is backwards</span>
+    <span class="key" style="color: var(--muted)"><span class="swatch"></span>path travelled</span>
+    <span class="key" style="color: var(--dead)"><span class="swatch"></span>−16 air attractor, and instant warp resets</span>
+  </div>
+
+  <footer>Every long jump multiplies <code>forwardVel</code> by 1.5 and the clamp that follows it
+    only catches positive speed, so a negative value grows without bound. Air drag pushes it back
+    toward −16 at roughly 0.85 per frame, which means the chain only survives if the air phase is
+    short. Flat ground and ramps give 20 to 30 air frames and the chain stalls near −22. Stair
+    treads are level however steep the staircase is, so they give one or two air frames and the
+    same input program runs away.</footer>
+</div>
+
+<script>
+const REPLAYS = __REPLAY_DATA__;
+
+const SCENE_META = {
+  endless_stairs: { geo: "The endless staircase", note: "the real castle, rise 25.6 run 51.2" },
+  stairs: { geo: "Synthetic stairs, 36.9°", note: "rise 75, run 100" },
+  ramp: { geo: "Ramp, 30°", note: "uniform slope" },
+  flat: { geo: "Flat ground", note: "no rise at all" },
+};
+
+const ORDER = ["endless_stairs", "stairs", "ramp", "flat"].filter((key) => key in REPLAYS);
+const stage = document.getElementById("stage");
+const chart = document.getElementById("chart");
+const pad = document.getElementById("pad");
+const scrub = document.getElementById("scrub");
+const playButton = document.getElementById("play");
+const followButton = document.getElementById("follow");
+const readout = document.getElementById("readout");
+
+const state = { scene: ORDER[0], frame: 0, playing: false, rate: 1, follow: true, last: 0 };
+
+function tokens() {
+  const style = getComputedStyle(document.documentElement);
+  const read = (name) => style.getPropertyValue(name).trim();
+  return {
+    ink: read("--ink"), muted: read("--muted"), rule: read("--rule"), grid: read("--grid"),
+    floor: read("--floor"), floorFill: read("--floor-fill"), speed: read("--speed"),
+    speedFill: read("--speed-fill"), dead: read("--dead"), panel: read("--panel"),
+  };
+}
+
+function fit(canvas) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * ratio);
+  canvas.height = Math.round(rect.height * ratio);
+  const context = canvas.getContext("2d");
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { context, width: rect.width, height: rect.height };
+}
+
+function launchFrames(replay) {
+  return new Map(replay.cycles.map((cycle) => [cycle.frame, cycle]));
+}
+
+function drawStage() {
+  const replay = REPLAYS[state.scene];
+  const { context, width, height } = fit(stage);
+  const colors = tokens();
+  context.clearRect(0, 0, width, height);
+
+  const pad = { left: 16, right: 16, top: 18, bottom: 14 };
+  const frame = state.frame;
+  let zMin;
+  let zMax;
+  if (state.follow) {
+    const span = 3200;
+    zMin = replay.z[frame] - span / 2;
+    zMax = replay.z[frame] + span / 2;
+  } else {
+    zMin = Math.min(...replay.z) - 600;
+    zMax = Math.max(...replay.z) + 600;
+  }
+  const visible = replay.profile.filter((point) => point[0] >= zMin - 200 && point[0] <= zMax + 200);
+  const heights = visible.map((point) => point[1]);
+  const marioY = replay.y.slice(0, frame + 1);
+  let yMin = Math.min(...heights, ...marioY.slice(-160));
+  let yMax = Math.max(...heights, ...marioY.slice(-160));
+  const yPad = Math.max(260, (yMax - yMin) * 0.22);
+  yMin -= yPad * 0.35;
+  yMax += yPad;
+
+  const sx = (z) => pad.left + ((z - zMin) / (zMax - zMin)) * (width - pad.left - pad.right);
+  const sy = (y) => height - pad.bottom - ((y - yMin) / (yMax - yMin)) * (height - pad.top - pad.bottom);
+
+  context.strokeStyle = colors.grid;
+  context.lineWidth = 1;
+  for (let i = 1; i < 6; i += 1) {
+    const y = pad.top + ((height - pad.top - pad.bottom) * i) / 6;
+    context.beginPath();
+    context.moveTo(pad.left, y);
+    context.lineTo(width - pad.right, y);
+    context.stroke();
+  }
+
+  if (visible.length > 1) {
+    context.beginPath();
+    context.moveTo(sx(visible[0][0]), sy(visible[0][1]));
+    for (const [z, y] of visible) context.lineTo(sx(z), sy(y));
+    context.lineTo(sx(visible[visible.length - 1][0]), height - pad.bottom);
+    context.lineTo(sx(visible[0][0]), height - pad.bottom);
+    context.closePath();
+    context.fillStyle = colors.floorFill;
+    context.fill();
+
+    context.beginPath();
+    context.moveTo(sx(visible[0][0]), sy(visible[0][1]));
+    for (const [z, y] of visible) context.lineTo(sx(z), sy(y));
+    context.strokeStyle = colors.floor;
+    context.lineWidth = 1.6;
+    context.stroke();
+  }
+
+  context.beginPath();
+  for (let i = 0; i <= frame; i += 1) {
+    const px = sx(replay.z[i]);
+    const py = sy(replay.y[i]);
+    if (i === 0) context.moveTo(px, py);
+    else context.lineTo(px, py);
+  }
+  context.strokeStyle = colors.muted;
+  context.globalAlpha = 0.5;
+  context.lineWidth = 1.2;
+  context.stroke();
+  context.globalAlpha = 1;
+
+  const trailStart = Math.max(0, frame - 90);
+  context.beginPath();
+  for (let i = trailStart; i <= frame; i += 1) {
+    const px = sx(replay.z[i]);
+    const py = sy(replay.y[i]);
+    if (i === trailStart) context.moveTo(px, py);
+    else context.lineTo(px, py);
+  }
+  context.strokeStyle = colors.speed;
+  context.lineWidth = 2;
+  context.stroke();
+
+  if (replay.warped) {
+    for (let at = 0; at <= frame; at += 1) {
+      if (!replay.warped[at]) continue;
+      const px = sx(replay.z[at]);
+      const py = sy(replay.y[at]);
+      context.beginPath();
+      context.arc(px, py, 4, 0, Math.PI * 2);
+      context.strokeStyle = colors.dead;
+      context.lineWidth = 1.4;
+      context.stroke();
+    }
+  }
+
+  const launches = launchFrames(replay);
+  for (const [at] of launches) {
+    if (at > frame) continue;
+    const px = sx(replay.z[at]);
+    const py = sy(replay.y[at]);
+    context.beginPath();
+    context.moveTo(px, py - 7);
+    context.lineTo(px, py + 7);
+    context.strokeStyle = colors.speed;
+    context.globalAlpha = 0.45;
+    context.lineWidth = 1;
+    context.stroke();
+    context.globalAlpha = 1;
+  }
+
+  const mx = sx(replay.z[frame]);
+  const my = sy(replay.y[frame]);
+  const velocity = replay.v[frame];
+  if (Math.abs(velocity) > 0.5) {
+    const direction = velocity < 0 ? 1 : -1;
+    const reach = Math.min(120, 14 + Math.abs(velocity) * 1.1) * direction;
+    context.beginPath();
+    context.moveTo(mx, my);
+    context.lineTo(mx + reach, my);
+    context.strokeStyle = colors.speed;
+    context.lineWidth = 2.4;
+    context.stroke();
+    context.beginPath();
+    context.moveTo(mx + reach, my);
+    context.lineTo(mx + reach - 6 * direction, my - 4);
+    context.lineTo(mx + reach - 6 * direction, my + 4);
+    context.closePath();
+    context.fillStyle = colors.speed;
+    context.fill();
+  }
+
+  context.beginPath();
+  context.arc(mx, my, 5.5, 0, Math.PI * 2);
+  context.fillStyle = colors.ink;
+  context.fill();
+  context.strokeStyle = colors.panel;
+  context.lineWidth = 1.6;
+  context.stroke();
+
+  context.font = '500 11px "IBM Plex Mono", monospace';
+  context.fillStyle = colors.muted;
+  context.textAlign = "left";
+  context.fillText(`z ${replay.z[frame].toFixed(0)}`, pad.left + 2, height - pad.bottom - 4);
+  context.textAlign = "right";
+  context.fillText(`y ${replay.y[frame].toFixed(0)}`, width - pad.right - 2, pad.top + 10);
+}
+
+function drawChart() {
+  const replay = REPLAYS[state.scene];
+  const { context, width, height } = fit(chart);
+  const colors = tokens();
+  context.clearRect(0, 0, width, height);
+
+  const pad = { left: 46, right: 14, top: 12, bottom: 18 };
+  const count = replay.v.length;
+  const lowest = Math.min(-30, ...replay.v);
+  const highest = Math.max(35, ...replay.v);
+  const sx = (i) => pad.left + (i / (count - 1)) * (width - pad.left - pad.right);
+  const sy = (v) => height - pad.bottom - ((v - lowest) / (highest - lowest)) * (height - pad.top - pad.bottom);
+
+  context.font = '400 10px "IBM Plex Mono", monospace';
+  context.textAlign = "right";
+  for (const value of [highest, 0, -16, lowest]) {
+    const y = sy(value);
+    context.strokeStyle = value === -16 ? colors.dead : colors.grid;
+    context.setLineDash(value === -16 ? [3, 3] : []);
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(pad.left, y);
+    context.lineTo(width - pad.right, y);
+    context.stroke();
+    context.setLineDash([]);
+    context.fillStyle = value === -16 ? colors.dead : colors.muted;
+    context.fillText(value.toFixed(0), pad.left - 6, y + 3);
+  }
+
+  context.beginPath();
+  context.moveTo(sx(0), sy(0));
+  for (let i = 0; i < count; i += 1) context.lineTo(sx(i), sy(Math.min(0, replay.v[i])));
+  context.lineTo(sx(count - 1), sy(0));
+  context.closePath();
+  context.fillStyle = colors.speedFill;
+  context.fill();
+
+  context.beginPath();
+  for (let i = 0; i < count; i += 1) {
+    const px = sx(i);
+    const py = sy(replay.v[i]);
+    if (i === 0) context.moveTo(px, py);
+    else context.lineTo(px, py);
+  }
+  context.strokeStyle = colors.speed;
+  context.lineWidth = 1.4;
+  context.stroke();
+
+  const px = sx(state.frame);
+  context.strokeStyle = colors.ink;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(px, pad.top - 4);
+  context.lineTo(px, height - pad.bottom);
+  context.stroke();
+
+  context.textAlign = "left";
+  context.fillStyle = colors.muted;
+  context.fillText("forwardVel by frame", pad.left + 4, pad.top + 2);
+}
+
+function drawPad() {
+  const replay = REPLAYS[state.scene];
+  const { context, width, height } = fit(pad);
+  const colors = tokens();
+  const frame = state.frame;
+  context.clearRect(0, 0, width, height);
+
+  const centre = { x: width / 2, y: 92 };
+  const radius = 58;
+  const gate = 8;
+
+  context.beginPath();
+  for (let i = 0; i < gate; i += 1) {
+    const angle = (Math.PI * 2 * i) / gate - Math.PI / gate;
+    const px = centre.x + Math.cos(angle) * radius;
+    const py = centre.y + Math.sin(angle) * radius;
+    if (i === 0) context.moveTo(px, py);
+    else context.lineTo(px, py);
+  }
+  context.closePath();
+  context.fillStyle = colors.grid;
+  context.fill();
+  context.strokeStyle = colors.rule;
+  context.lineWidth = 1;
+  context.stroke();
+
+  context.strokeStyle = colors.rule;
+  context.beginPath();
+  context.moveTo(centre.x - radius, centre.y);
+  context.lineTo(centre.x + radius, centre.y);
+  context.moveTo(centre.x, centre.y - radius);
+  context.lineTo(centre.x, centre.y + radius);
+  context.stroke();
+
+  const stickX = replay.stick_x[frame];
+  const stickY = replay.stick_y[frame];
+  const tipX = centre.x + stickX * radius;
+  const tipY = centre.y - stickY * radius;
+  const deflected = Math.hypot(stickX, stickY) > 0.02;
+
+  if (deflected) {
+    context.beginPath();
+    context.moveTo(centre.x, centre.y);
+    context.lineTo(tipX, tipY);
+    context.strokeStyle = colors.speed;
+    context.lineWidth = 2;
+    context.stroke();
+  }
+  context.beginPath();
+  context.arc(tipX, tipY, 9, 0, Math.PI * 2);
+  context.fillStyle = deflected ? colors.speed : colors.muted;
+  context.fill();
+  context.strokeStyle = colors.panel;
+  context.lineWidth = 1.6;
+  context.stroke();
+
+  context.font = '500 11px "IBM Plex Mono", monospace';
+  context.textAlign = "center";
+  context.fillStyle = colors.muted;
+  context.fillText(`${stickX >= 0 ? "+" : ""}${stickX.toFixed(2)}, ${stickY >= 0 ? "+" : ""}${stickY.toFixed(2)}`,
+    centre.x, centre.y + radius + 18);
+
+  const buttons = [["A", replay.button_a[frame]], ["B", replay.button_b[frame]], ["Z", replay.button_z[frame]]];
+  const buttonY = centre.y + radius + 46;
+  buttons.forEach(([glyph, held], index) => {
+    const px = centre.x + (index - 1) * 52;
+    context.beginPath();
+    context.arc(px, buttonY, 17, 0, Math.PI * 2);
+    context.fillStyle = held ? colors.speed : colors.panel;
+    context.fill();
+    context.strokeStyle = held ? colors.speed : colors.rule;
+    context.lineWidth = 1.4;
+    context.stroke();
+    context.font = '600 13px Archivo, sans-serif';
+    context.fillStyle = held ? colors.panel : colors.muted;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(glyph, px, buttonY + 1);
+    context.textBaseline = "alphabetic";
+  });
+
+  const historyTop = buttonY + 44;
+  const span = 48;
+  const cell = (width - 36) / span;
+  const rows = [["A", replay.button_a], ["Z", replay.button_z]];
+  context.font = '400 10px "IBM Plex Mono", monospace';
+  rows.forEach(([glyph, series], row) => {
+    const y = historyTop + row * 20;
+    context.textAlign = "left";
+    context.fillStyle = colors.muted;
+    context.fillText(glyph, 10, y + 9);
+    for (let i = 0; i < span; i += 1) {
+      const at = frame - span + 1 + i;
+      if (at < 0) continue;
+      const held = series[at];
+      context.fillStyle = held ? colors.speed : colors.grid;
+      context.fillRect(26 + i * cell, y, Math.max(1, cell - 1), 11);
+    }
+  });
+  context.textAlign = "left";
+  context.fillStyle = colors.muted;
+  context.fillText(`last ${span} frames`, 26, historyTop + 54);
+}
+
+const FIELDS = [
+  ["frame", (r, i) => String(i).padStart(3, "0")],
+  ["action", (r, i) => r.actions[r.code[i]]],
+  ["forwardVel", (r, i) => r.v[i].toFixed(2), true],
+  ["vel y", (r, i) => r.vy[i].toFixed(1)],
+  ["height y", (r, i) => r.y[i].toFixed(0)],
+  ["depth z", (r, i) => r.z[i].toFixed(0)],
+  ["long jumps", (r, i) => String(r.cycles.filter((c) => c.frame <= i).length)],
+  ["warps", (r, i) => r.warped ? String(r.warped.slice(0, i + 1).reduce((a, b) => a + b, 0)) : "—"],
+  ["air frames", (r, i) => {
+    const previous = r.cycles.filter((c) => c.frame <= i).pop();
+    return previous ? String(i - previous.frame) : "—";
+  }],
+];
+
+function drawReadout() {
+  const replay = REPLAYS[state.scene];
+  readout.innerHTML = "";
+  for (const [label, get, hot] of FIELDS) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    const name = document.createElement("span");
+    name.className = "label";
+    name.textContent = label;
+    const value = document.createElement("span");
+    value.className = hot ? "v hot" : "v";
+    value.textContent = get(replay, state.frame);
+    cell.append(name, value);
+    readout.append(cell);
+  }
+}
+
+function render() {
+  drawStage();
+  drawPad();
+  drawChart();
+  drawReadout();
+  scrub.value = String(state.frame);
+}
+
+function buildScenes() {
+  const host = document.getElementById("scenes");
+  host.innerHTML = "";
+  for (const key of ORDER) {
+    const replay = REPLAYS[key];
+    const meta = SCENE_META[key] || { geo: key, note: "" };
+    const button = document.createElement("button");
+    button.className = "scene";
+    button.type = "button";
+    button.setAttribute("aria-pressed", String(key === state.scene));
+    const geo = document.createElement("span");
+    geo.className = "geo";
+    geo.textContent = meta.geo;
+    const peak = document.createElement("span");
+    peak.className = "peak";
+    peak.textContent = replay.peak_velocity.toFixed(1);
+    const verdict = document.createElement("span");
+    verdict.className = "verdict";
+    verdict.textContent = replay.success
+      ? `reaches the top · ${meta.note}`
+      : replay.peak_velocity < -200
+        ? `runs away · ${meta.note}`
+        : `stalls near the attractor · ${meta.note}`;
+    button.append(geo, peak, verdict);
+    button.addEventListener("click", () => {
+      state.scene = key;
+      state.frame = 0;
+      scrub.max = String(REPLAYS[key].v.length - 1);
+      buildScenes();
+      render();
+    });
+    host.append(button);
+  }
+}
+
+function buildRates() {
+  const host = document.getElementById("rates");
+  for (const rate of [0.25, 1, 2, 4]) {
+    const button = document.createElement("button");
+    button.className = "ctrl";
+    button.type = "button";
+    button.textContent = `${rate}×`;
+    button.setAttribute("aria-pressed", String(rate === state.rate));
+    button.addEventListener("click", () => {
+      state.rate = rate;
+      for (const sibling of host.children) {
+        sibling.setAttribute("aria-pressed", String(sibling === button));
+      }
+    });
+    host.append(button);
+  }
+}
+
+function tick(now) {
+  if (state.playing) {
+    const step = 1000 / (30 * state.rate);
+    if (now - state.last >= step) {
+      state.last = now;
+      const count = REPLAYS[state.scene].v.length;
+      state.frame = (state.frame + 1) % count;
+      render();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+playButton.addEventListener("click", () => {
+  state.playing = !state.playing;
+  playButton.textContent = state.playing ? "Pause" : "Play";
+  playButton.setAttribute("aria-pressed", String(state.playing));
+  state.last = 0;
+});
+
+followButton.addEventListener("click", () => {
+  state.follow = !state.follow;
+  followButton.setAttribute("aria-pressed", String(state.follow));
+  render();
+});
+
+scrub.addEventListener("input", () => {
+  state.frame = Number(scrub.value);
+  render();
+});
+
+chart.addEventListener("click", (event) => {
+  const rect = chart.getBoundingClientRect();
+  const count = REPLAYS[state.scene].v.length;
+  const ratio = (event.clientX - rect.left - 46) / (rect.width - 60);
+  state.frame = Math.max(0, Math.min(count - 1, Math.round(ratio * (count - 1))));
+  render();
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === " ") {
+    event.preventDefault();
+    playButton.click();
+  } else if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+    event.preventDefault();
+    const count = REPLAYS[state.scene].v.length;
+    const delta = (event.key === "ArrowRight" ? 1 : -1) * (event.shiftKey ? 10 : 1);
+    state.frame = Math.max(0, Math.min(count - 1, state.frame + delta));
+    render();
+  }
+});
+
+window.addEventListener("resize", render);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+new MutationObserver(render).observe(document.documentElement, {
+  attributes: true, attributeFilter: ["data-theme"],
+});
+
+scrub.max = String(REPLAYS[state.scene].v.length - 1);
+buildScenes();
+buildRates();
+render();
+requestAnimationFrame(tick);
+</script>
