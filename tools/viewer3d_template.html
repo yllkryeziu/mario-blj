@@ -1,0 +1,1664 @@
+<title>Backwards Long Jump in 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+
+<style>
+:root {
+  --ground: #edf1f3;
+  --panel: #ffffff;
+  --ink: #0f181f;
+  --muted: #5d6e7a;
+  --rule: #d5dee3;
+  --grid: #e3eaee;
+  --floor: #2e7d6b;
+  --floor-fill: rgba(46, 125, 107, 0.13);
+  --speed: #c4751a;
+  --speed-fill: rgba(196, 117, 26, 0.16);
+  --dead: #b23a32;
+  --hud: rgba(255, 255, 255, 0.84);
+  --shadow: 0 1px 2px rgba(15, 24, 31, 0.06), 0 8px 24px rgba(15, 24, 31, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0d1317;
+    --panel: #141c22;
+    --ink: #e7eef2;
+    --muted: #8598a4;
+    --rule: #23303a;
+    --grid: #1b252c;
+    --floor: #4fb79c;
+    --floor-fill: rgba(79, 183, 156, 0.15);
+    --speed: #e8a33d;
+    --speed-fill: rgba(232, 163, 61, 0.18);
+    --dead: #e0665c;
+    --hud: rgba(20, 28, 34, 0.84);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0d1317;
+  --panel: #141c22;
+  --ink: #e7eef2;
+  --muted: #8598a4;
+  --rule: #23303a;
+  --grid: #1b252c;
+  --floor: #4fb79c;
+  --floor-fill: rgba(79, 183, 156, 0.15);
+  --speed: #e8a33d;
+  --speed-fill: rgba(232, 163, 61, 0.18);
+  --dead: #e0665c;
+  --hud: rgba(20, 28, 34, 0.84);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+header { display: flex; flex-direction: column; gap: 6px; }
+
+h1 {
+  font-family: Archivo, "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lede { color: var(--muted); max-width: 62ch; margin: 0; }
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scenes { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.scene {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 2px;
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 168px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: border-color 120ms, transform 120ms;
+}
+
+.scene:hover { border-color: var(--muted); }
+.scene[aria-pressed="true"] { border-color: var(--speed); box-shadow: inset 2px 0 0 var(--speed); }
+.scene:focus-visible { outline: 2px solid var(--speed); outline-offset: 2px; }
+
+.scene .geo { font-weight: 500; }
+.scene .peak {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.28rem;
+  letter-spacing: -0.01em;
+}
+.scene .verdict { font-size: 0.75rem; color: var(--muted); }
+.scene[aria-pressed="true"] .peak { color: var(--speed); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+canvas { display: block; width: 100%; }
+#chart { height: 148px; }
+
+.stagewrap { position: relative; }
+#stage {
+  aspect-ratio: 16 / 9;
+  touch-action: none;
+  cursor: grab;
+  background: var(--panel);
+}
+#stage.dragging { cursor: grabbing; }
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px;
+  gap: 10px;
+}
+
+.hudtop {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--hud);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 8px 12px 10px;
+}
+
+.vel {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--speed);
+}
+
+.velbar {
+  height: 4px;
+  width: 240px;
+  max-width: 100%;
+  background: var(--grid);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.velbar i { display: block; height: 100%; background: var(--speed); width: 0%; }
+
+.hudbottom {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: var(--hud);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 6px 12px;
+}
+.hudbottom b { color: var(--ink); font-weight: 500; }
+.hudbottom .warn { color: var(--dead); }
+
+.status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  color: var(--muted);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 24px;
+}
+.status[hidden] { display: none; }
+
+.chartwrap { border-top: 1px solid var(--rule); position: relative; }
+
+.readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(134px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border-top: 1px solid var(--rule);
+}
+
+.cell { background: var(--panel); padding: 9px 12px; display: flex; flex-direction: column; gap: 1px; }
+.cell .v {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+.cell .v.hot { color: var(--speed); }
+
+.controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+button.ctrl {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  font: 500 0.875rem "IBM Plex Sans", sans-serif;
+  border-radius: 2px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+button.ctrl:hover { border-color: var(--muted); }
+button.ctrl:focus-visible { outline: 2px solid var(--speed); outline-offset: 2px; }
+button.ctrl[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+
+#play { min-width: 92px; }
+
+input[type="range"] {
+  flex: 1 1 260px;
+  min-width: 180px;
+  accent-color: var(--speed);
+  height: 22px;
+}
+
+.rates { display: flex; gap: 6px; }
+
+.legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 0.8125rem; }
+.key { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 3px; border-radius: 2px; background: currentColor; }
+
+footer { color: var(--muted); font-size: 0.8125rem; max-width: 74ch; }
+.note { color: var(--muted); font-size: 0.8125rem; max-width: 74ch; margin: 0; }
+code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.86em;
+  background: var(--grid);
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="label">libsm64 · Mario's own mesh · decompiled castle collision · 30 fps frames</p>
+    <h1>Backwards Long Jump in 3D</h1>
+    <p class="lede">Every triangle here came out of the game. Mario is the model libsm64 rebuilds
+      each tick by walking the decompilation's display lists with his own bone matrices, 752
+      triangles a frame, textured from the ROM's 704 by 64 atlas. The staircase is the collision
+      data of <code>castle_inside/areas/2</code>. Drag to orbit, scroll to zoom, and watch
+      <code>forwardVel</code> in the corner: it is the whole finding. Append
+      <code>#scene=endless_stairs&amp;frame=1113</code> to the address to open on one exact
+      frame.</p>
+  </header>
+
+  <div class="scenes" id="scenes"></div>
+
+  <div class="panel">
+    <div class="stagewrap">
+      <canvas id="stage"></canvas>
+      <div class="hud">
+        <div class="hudtop">
+          <span class="label">forwardVel</span>
+          <span class="vel" id="vel">0.00</span>
+          <span class="velbar"><i id="velbar"></i></span>
+          <span class="label" id="velnote">share of the run's peak, log scale</span>
+        </div>
+        <div class="hudbottom" id="hudbottom"></div>
+      </div>
+      <div class="status" id="status">decoding the replay container</div>
+    </div>
+    <div class="chartwrap"><canvas id="chart"></canvas></div>
+    <div class="readout" id="readout"></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl" id="play" aria-pressed="false">Play</button>
+    <input type="range" id="scrub" min="0" max="1" value="0" step="1" aria-label="Frame">
+    <div class="rates" id="rates"></div>
+    <button class="ctrl" id="follow" aria-pressed="true">Chase Mario</button>
+    <button class="ctrl" id="textures" aria-pressed="true">Textures</button>
+  </div>
+
+  <p class="note" id="clipnote"></p>
+
+  <div class="legend">
+    <span class="key" style="color: var(--floor)"><span class="swatch"></span>collision
+      triangles, treads bright and risers dim</span>
+    <span class="key" style="color: var(--dead)"><span class="swatch"></span>the twelve
+      SURFACE_INSTANT_WARP_1B triangles</span>
+    <span class="key" style="color: var(--speed)"><span class="swatch"></span>path travelled,
+      and forwardVel on a signed log axis</span>
+  </div>
+
+  <footer>Each long jump multiplies <code>forwardVel</code> by 1.5 and the clamp that follows only
+    catches positive speed, so a negative value grows without bound. Air drag pulls it back toward
+    the −16 attractor at about 0.85 per frame, which means the chain only survives when the air
+    phase is short. Stair treads are level however steep the staircase is, so they give one or two
+    air frames and the chain runs away. The red triangles are the instant warp: once a frame, if
+    Mario's floor is one of them, the level script displaces him 205 down and 410 back down-stream.
+    The zone is only 154 units deep in z and the long jump clamp is 48, so the only way past it is
+    a speed no ordinary action can reach.</footer>
+</div>
+
+<script>
+const REPLAY = __REPLAY_DATA__;
+
+const LENGTH_BASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67,
+  83, 99, 115, 131, 163, 195, 227, 258];
+const LENGTH_EXTRA = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5,
+  5, 5, 5, 0];
+const DIST_BASE = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769,
+  1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577];
+const DIST_EXTRA = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11,
+  11, 12, 12, 13, 13];
+const CODE_ORDER = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+
+function huffman(lengths) {
+  const counts = new Int32Array(16);
+  for (let i = 0; i < lengths.length; i += 1) counts[lengths[i]] += 1;
+  counts[0] = 0;
+  const offsets = new Int32Array(16);
+  for (let bits = 1; bits < 16; bits += 1) offsets[bits] = offsets[bits - 1] + counts[bits - 1];
+  const symbols = new Int32Array(lengths.length);
+  for (let i = 0; i < lengths.length; i += 1) {
+    if (lengths[i]) symbols[offsets[lengths[i]]++] = i;
+  }
+  return { counts, symbols };
+}
+
+const FIXED_LITERAL = (() => {
+  const lengths = new Uint8Array(288);
+  for (let i = 0; i < 144; i += 1) lengths[i] = 8;
+  for (let i = 144; i < 256; i += 1) lengths[i] = 9;
+  for (let i = 256; i < 280; i += 1) lengths[i] = 7;
+  for (let i = 280; i < 288; i += 1) lengths[i] = 8;
+  return huffman(lengths);
+})();
+
+const FIXED_DISTANCE = huffman(new Uint8Array(30).fill(5));
+
+function inflate(source, hint) {
+  let at = 0;
+  if (source.length > 2 && (source[0] & 0x0f) === 8
+      && (((source[0] << 8) | source[1]) % 31) === 0) {
+    at = 2;
+  }
+  let bitBuffer = 0;
+  let bitCount = 0;
+  let out = new Uint8Array(Math.max(1024, hint || source.length * 4));
+  let length = 0;
+
+  function bits(need) {
+    while (bitCount < need) {
+      bitBuffer |= source[at++] << bitCount;
+      bitCount += 8;
+    }
+    const value = bitBuffer & ((1 << need) - 1);
+    bitBuffer >>>= need;
+    bitCount -= need;
+    return value;
+  }
+
+  function decode(tree) {
+    let code = 0;
+    let first = 0;
+    let index = 0;
+    for (let size = 1; size < 16; size += 1) {
+      code |= bits(1);
+      const count = tree.counts[size];
+      if (code - first < count) return tree.symbols[index + (code - first)];
+      index += count;
+      first = (first + count) << 1;
+      code <<= 1;
+    }
+    throw new Error("inflate: oversubscribed code");
+  }
+
+  function reserve(extra) {
+    if (length + extra <= out.length) return;
+    let size = out.length;
+    while (size < length + extra) size *= 2;
+    const next = new Uint8Array(size);
+    next.set(out.subarray(0, length));
+    out = next;
+  }
+
+  for (;;) {
+    const last = bits(1);
+    const type = bits(2);
+    if (type === 0) {
+      at -= bitCount >> 3;
+      bitBuffer = 0;
+      bitCount = 0;
+      const stored = source[at] | (source[at + 1] << 8);
+      at += 4;
+      reserve(stored);
+      out.set(source.subarray(at, at + stored), length);
+      at += stored;
+      length += stored;
+    } else if (type === 1 || type === 2) {
+      let literals = FIXED_LITERAL;
+      let distances = FIXED_DISTANCE;
+      if (type === 2) {
+        const literalCount = bits(5) + 257;
+        const distanceCount = bits(5) + 1;
+        const codeCount = bits(4) + 4;
+        const codeLengths = new Uint8Array(19);
+        for (let i = 0; i < codeCount; i += 1) codeLengths[CODE_ORDER[i]] = bits(3);
+        const codeTree = huffman(codeLengths);
+        const lengths = new Uint8Array(literalCount + distanceCount);
+        let filled = 0;
+        while (filled < lengths.length) {
+          const symbol = decode(codeTree);
+          if (symbol < 16) {
+            lengths[filled++] = symbol;
+          } else if (symbol === 16) {
+            const previous = lengths[filled - 1];
+            let repeat = 3 + bits(2);
+            while (repeat--) lengths[filled++] = previous;
+          } else if (symbol === 17) {
+            let repeat = 3 + bits(3);
+            while (repeat--) lengths[filled++] = 0;
+          } else {
+            let repeat = 11 + bits(7);
+            while (repeat--) lengths[filled++] = 0;
+          }
+        }
+        literals = huffman(lengths.subarray(0, literalCount));
+        distances = huffman(lengths.subarray(literalCount));
+      }
+      for (;;) {
+        const symbol = decode(literals);
+        if (symbol < 256) {
+          reserve(1);
+          out[length++] = symbol;
+        } else if (symbol === 256) {
+          break;
+        } else {
+          const slot = symbol - 257;
+          const run = LENGTH_BASE[slot] + bits(LENGTH_EXTRA[slot]);
+          const distanceSlot = decode(distances);
+          const distance = DIST_BASE[distanceSlot] + bits(DIST_EXTRA[distanceSlot]);
+          reserve(run);
+          let from = length - distance;
+          for (let i = 0; i < run; i += 1) out[length++] = out[from++];
+        }
+      }
+    } else {
+      throw new Error("inflate: bad block type");
+    }
+    if (last) break;
+  }
+  return out.slice(0, length);
+}
+
+async function unpack(bytes, hint) {
+  if (typeof DecompressionStream === "function") {
+    try {
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+      const buffer = await new Response(stream).arrayBuffer();
+      return new Uint8Array(buffer);
+    } catch (error) {
+      // A browser that advertises the stream but refuses the data falls back to the decoder below.
+    }
+  }
+  return inflate(bytes, hint);
+}
+
+function base64Bytes(text) {
+  const raw = atob(text);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+const MAGIC = "MBLJMESH1";
+
+const CLIP_MARGIN = [400, 900, 1200];
+
+function openContainer(bytes) {
+  let magic = "";
+  for (let i = 0; i < MAGIC.length; i += 1) magic += String.fromCharCode(bytes[i]);
+  if (magic !== MAGIC) throw new Error("not a " + MAGIC + " container");
+  const view = new DataView(bytes.buffer, bytes.byteOffset);
+  const headerLength = view.getUint32(MAGIC.length, true);
+  const start = MAGIC.length + 4;
+  const header = JSON.parse(new TextDecoder().decode(bytes.subarray(start, start + headerLength)));
+  return { header, payload: bytes.subarray(start + headerLength) };
+}
+
+const DTYPE_SIZE = { uint8: 1, int8: 1, int16: 2, int32: 4, float32: 4 };
+
+function expectedBytes(header, entry) {
+  let count = 1;
+  for (const dimension of entry.shape) {
+    count *= dimension < 0 ? header.triangle_counts[0] : dimension;
+  }
+  return count * DTYPE_SIZE[entry.dtype];
+}
+
+async function stream(container, name, Kind) {
+  const entry = container.header.streams[name];
+  const slice = container.payload.subarray(entry.offset, entry.offset + entry.length);
+  const bytes = entry.codec === "raw"
+    ? slice.slice()
+    : await unpack(slice, expectedBytes(container.header, entry));
+  const view = new Kind(bytes.buffer, 0, bytes.byteLength / Kind.BYTES_PER_ELEMENT);
+  if (entry.codec.indexOf("delta") === 0) {
+    const frames = container.header.frame_count;
+    const span = view.length / frames;
+    for (let frame = 1; frame < frames; frame += 1) {
+      const base = frame * span;
+      for (let i = 0; i < span; i += 1) view[base + i] = view[base + i] + view[base + i - span];
+    }
+  }
+  return view;
+}
+
+function hexRgb(text) {
+  const value = parseInt(text.trim().replace("#", ""), 16);
+  return [((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255];
+}
+
+function tokens() {
+  const style = getComputedStyle(document.documentElement);
+  const read = (name) => style.getPropertyValue(name).trim();
+  return {
+    ink: read("--ink"), muted: read("--muted"), rule: read("--rule"), grid: read("--grid"),
+    floor: read("--floor"), floorFill: read("--floor-fill"), speed: read("--speed"),
+    speedFill: read("--speed-fill"), dead: read("--dead"), panel: read("--panel"),
+  };
+}
+
+function identity() {
+  return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+}
+
+function perspective(out, fovY, aspect, near, far) {
+  const focal = 1 / Math.tan(fovY / 2);
+  out.fill(0);
+  out[0] = focal / aspect;
+  out[5] = focal;
+  out[10] = (far + near) / (near - far);
+  out[11] = -1;
+  out[14] = (2 * far * near) / (near - far);
+  return out;
+}
+
+function lookAt(out, eye, target, up) {
+  let fx = target[0] - eye[0];
+  let fy = target[1] - eye[1];
+  let fz = target[2] - eye[2];
+  const flen = Math.hypot(fx, fy, fz) || 1;
+  fx /= flen; fy /= flen; fz /= flen;
+  let sx = fy * up[2] - fz * up[1];
+  let sy = fz * up[0] - fx * up[2];
+  let sz = fx * up[1] - fy * up[0];
+  const slen = Math.hypot(sx, sy, sz) || 1;
+  sx /= slen; sy /= slen; sz /= slen;
+  const ux = sy * fz - sz * fy;
+  const uy = sz * fx - sx * fz;
+  const uz = sx * fy - sy * fx;
+  out[0] = sx; out[1] = ux; out[2] = -fx; out[3] = 0;
+  out[4] = sy; out[5] = uy; out[6] = -fy; out[7] = 0;
+  out[8] = sz; out[9] = uz; out[10] = -fz; out[11] = 0;
+  out[12] = -(sx * eye[0] + sy * eye[1] + sz * eye[2]);
+  out[13] = -(ux * eye[0] + uy * eye[1] + uz * eye[2]);
+  out[14] = fx * eye[0] + fy * eye[1] + fz * eye[2];
+  out[15] = 1;
+  return out;
+}
+
+function multiply(out, a, b) {
+  for (let column = 0; column < 4; column += 1) {
+    const b0 = b[column * 4];
+    const b1 = b[column * 4 + 1];
+    const b2 = b[column * 4 + 2];
+    const b3 = b[column * 4 + 3];
+    out[column * 4] = a[0] * b0 + a[4] * b1 + a[8] * b2 + a[12] * b3;
+    out[column * 4 + 1] = a[1] * b0 + a[5] * b1 + a[9] * b2 + a[13] * b3;
+    out[column * 4 + 2] = a[2] * b0 + a[6] * b1 + a[10] * b2 + a[14] * b3;
+    out[column * 4 + 3] = a[3] * b0 + a[7] * b1 + a[11] * b2 + a[15] * b3;
+  }
+  return out;
+}
+
+const LEVEL_VERTEX = [
+  "attribute vec3 aPos;",
+  "attribute vec3 aNormal;",
+  "attribute vec3 aTint;",
+  "uniform mat4 uViewProj;",
+  "uniform vec3 uEye;",
+  "varying vec3 vNormal;",
+  "varying vec3 vTint;",
+  "varying vec3 vWorld;",
+  "varying float vDepth;",
+  "void main() {",
+  "  vNormal = aNormal;",
+  "  vTint = aTint;",
+  "  vWorld = aPos;",
+  "  vDepth = length(aPos - uEye);",
+  "  gl_Position = uViewProj * vec4(aPos, 1.0);",
+  "}",
+].join("\n");
+
+const LEVEL_FRAGMENT = [
+  "precision highp float;",
+  "uniform vec3 uLight;",
+  "uniform vec3 uFog;",
+  "uniform vec2 uFogRange;",
+  "uniform vec3 uClipMin;",
+  "uniform vec3 uClipMax;",
+  "varying vec3 vNormal;",
+  "varying vec3 vTint;",
+  "varying vec3 vWorld;",
+  "varying float vDepth;",
+  "void main() {",
+  "  if (any(lessThan(vWorld, uClipMin)) || any(greaterThan(vWorld, uClipMax))) discard;",
+  "  vec3 normal = normalize(vNormal);",
+  "  float key = max(dot(normal, uLight), 0.0);",
+  "  float sky = 0.5 + 0.5 * normal.y;",
+  "  vec3 shade = vTint * (0.42 + 0.44 * key + 0.24 * sky);",
+  "  float fog = clamp((vDepth - uFogRange.x) / (uFogRange.y - uFogRange.x), 0.0, 1.0);",
+  "  gl_FragColor = vec4(mix(shade, uFog, fog * 0.88), 1.0);",
+  "}",
+].join("\n");
+
+const MARIO_VERTEX = [
+  "attribute vec3 aPos;",
+  "attribute vec3 aNormal;",
+  "attribute vec3 aColor;",
+  "attribute vec2 aUv;",
+  "attribute vec4 aSlot;",
+  "attribute float aTextured;",
+  "uniform mat4 uViewProj;",
+  "uniform vec3 uOrigin;",
+  "uniform float uInvScale;",
+  "varying vec3 vNormal;",
+  "varying vec3 vColor;",
+  "varying vec2 vUv;",
+  "varying vec4 vSlot;",
+  "varying float vTextured;",
+  "void main() {",
+  "  vNormal = aNormal;",
+  "  vColor = aColor;",
+  "  vUv = aUv;",
+  "  vSlot = aSlot;",
+  "  vTextured = aTextured;",
+  "  gl_Position = uViewProj * vec4(uOrigin + aPos * uInvScale, 1.0);",
+  "}",
+].join("\n");
+
+const MARIO_FRAGMENT = [
+  "precision highp float;",
+  "uniform sampler2D uAtlas;",
+  "uniform vec3 uLight;",
+  "uniform float uUseAtlas;",
+  "varying vec3 vNormal;",
+  "varying vec3 vColor;",
+  "varying vec2 vUv;",
+  "varying vec4 vSlot;",
+  "varying float vTextured;",
+  "void main() {",
+  "  vec3 base = vColor;",
+  "  if (vTextured > 0.5 && uUseAtlas > 0.5) {",
+  "    vec4 texel = texture2D(uAtlas, clamp(vUv, vSlot.xy, vSlot.zw));",
+  "    base = mix(base, texel.rgb * vColor, texel.a);",
+  "  }",
+  "  vec3 normal = normalize(vNormal);",
+  "  float key = max(dot(normal, uLight), 0.0);",
+  "  float sky = 0.5 + 0.5 * normal.y;",
+  "  gl_FragColor = vec4(base * (0.40 + 0.50 * key + 0.22 * sky), 1.0);",
+  "}",
+].join("\n");
+
+const LINE_VERTEX = [
+  "attribute vec3 aPos;",
+  "uniform mat4 uViewProj;",
+  "void main() {",
+  "  gl_Position = uViewProj * vec4(aPos, 1.0);",
+  "}",
+].join("\n");
+
+const LINE_FRAGMENT = [
+  "precision highp float;",
+  "uniform vec3 uColor;",
+  "uniform float uAlpha;",
+  "void main() {",
+  "  gl_FragColor = vec4(uColor, uAlpha);",
+  "}",
+].join("\n");
+
+function compile(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    throw new Error("shader: " + gl.getShaderInfoLog(shader));
+  }
+  return shader;
+}
+
+function link(gl, vertexSource, fragmentSource, attributes, uniforms) {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, vertexSource));
+  gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, fragmentSource));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    throw new Error("program: " + gl.getProgramInfoLog(program));
+  }
+  const handle = { program, attribute: {}, uniform: {} };
+  for (const name of attributes) handle.attribute[name] = gl.getAttribLocation(program, name);
+  for (const name of uniforms) handle.uniform[name] = gl.getUniformLocation(program, name);
+  return handle;
+}
+
+function buffer(gl, data, usage) {
+  const handle = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, handle);
+  gl.bufferData(gl.ARRAY_BUFFER, data, usage || gl.STATIC_DRAW);
+  return handle;
+}
+
+function bindAttribute(gl, location, handle, size, type, normalized, stride, offset) {
+  if (location < 0) return;
+  gl.bindBuffer(gl.ARRAY_BUFFER, handle);
+  gl.enableVertexAttribArray(location);
+  gl.vertexAttribPointer(location, size, type, normalized, stride, offset);
+}
+
+function triangleNormal(vertices, triangle) {
+  const base = triangle * 9;
+  const ux = vertices[base + 3] - vertices[base];
+  const uy = vertices[base + 4] - vertices[base + 1];
+  const uz = vertices[base + 5] - vertices[base + 2];
+  const vx = vertices[base + 6] - vertices[base];
+  const vy = vertices[base + 7] - vertices[base + 1];
+  const vz = vertices[base + 8] - vertices[base + 2];
+  const nx = uy * vz - uz * vy;
+  const ny = uz * vx - ux * vz;
+  const nz = ux * vy - uy * vx;
+  const length = Math.hypot(nx, ny, nz) || 1;
+  return [nx / length, ny / length, nz / length];
+}
+
+function overlapsBox(vertices, triangle, box) {
+  for (let axis = 0; axis < 3; axis += 1) {
+    const base = triangle * 9 + axis;
+    const a = vertices[base];
+    const b = vertices[base + 3];
+    const c = vertices[base + 6];
+    if (Math.min(a, b, c) > box[axis + 3] || Math.max(a, b, c) < box[axis]) return false;
+  }
+  return true;
+}
+
+function drawable(vertices, triangle, normal, box) {
+  if (!box) return true;
+  return overlapsBox(vertices, triangle, box)
+    && Math.abs(normal[0]) <= 0.9 && normal[1] >= -0.35;
+}
+
+function levelMesh(vertices, surfaceTypes, warpType, palette, box) {
+  const kept = [];
+  const keptNormals = [];
+  for (let triangle = 0; triangle < surfaceTypes.length; triangle += 1) {
+    const normal = triangleNormal(vertices, triangle);
+    if (!drawable(vertices, triangle, normal, box)) continue;
+    kept.push(triangle);
+    keptNormals.push(normal);
+  }
+  const count = kept.length;
+  const types = new Int16Array(count);
+  const positions = new Float32Array(count * 9);
+  const normals = new Float32Array(count * 9);
+  const tints = new Float32Array(count * 9);
+  const bounds = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  for (let triangle = 0; triangle < count; triangle += 1) {
+    const base = triangle * 9;
+    const source = kept[triangle] * 9;
+    types[triangle] = surfaceTypes[kept[triangle]];
+    for (let i = 0; i < 9; i += 1) {
+      const value = vertices[source + i];
+      positions[base + i] = value;
+      const axis = i % 3;
+      if (value < bounds[axis]) bounds[axis] = value;
+      if (value > bounds[axis + 3]) bounds[axis + 3] = value;
+    }
+    const [nx, ny, nz] = keptNormals[triangle];
+    const warp = types[triangle] === warpType;
+    const tread = ny > 0.9;
+    const ceiling = ny < -0.35;
+    let tint = palette.floor;
+    let gain = 1;
+    if (warp) {
+      tint = palette.dead;
+      gain = 1.05;
+    } else if (ceiling) {
+      tint = palette.muted;
+      gain = 0.32;
+    } else if (!tread) {
+      gain = 0.52;
+    }
+    for (let corner = 0; corner < 3; corner += 1) {
+      normals[base + corner * 3] = nx;
+      normals[base + corner * 3 + 1] = ny;
+      normals[base + corner * 3 + 2] = nz;
+      tints[base + corner * 3] = tint[0] * gain;
+      tints[base + corner * 3 + 1] = tint[1] * gain;
+      tints[base + corner * 3 + 2] = tint[2] * gain;
+    }
+  }
+  return { positions, normals, tints, types, count: count * 3, total: surfaceTypes.length,
+    bounds };
+}
+
+function slotRects(atlas) {
+  const halfU = 0.5 / atlas.width;
+  const halfV = 0.5 / atlas.height;
+  return atlas.slots.map((slot) => [
+    slot.u0 + halfU, slot.v0 + halfV, slot.u1 - halfU, slot.v1 - halfV,
+  ]);
+}
+
+function uvAttributes(uv, triangles, sentinel, rects) {
+  const textured = new Uint8Array(triangles * 3);
+  const slots = new Float32Array(triangles * 12);
+  const hits = new Int32Array(rects.length);
+  let count = 0;
+  for (let triangle = 0; triangle < triangles; triangle += 1) {
+    const base = triangle * 6;
+    let plain = true;
+    for (let i = 0; i < 6; i += 1) {
+      if (uv[base + i] !== sentinel) plain = false;
+    }
+    if (plain) continue;
+    let best = 0;
+    let bestCost = Infinity;
+    for (let slot = 0; slot < rects.length; slot += 1) {
+      const rect = rects[slot];
+      let cost = 0;
+      for (let corner = 0; corner < 3; corner += 1) {
+        const u = uv[base + corner * 2];
+        const v = uv[base + corner * 2 + 1];
+        cost += Math.max(0, rect[0] - u) + Math.max(0, u - rect[2]);
+        cost += Math.max(0, rect[1] - v) + Math.max(0, v - rect[3]);
+      }
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = slot;
+      }
+    }
+    hits[best] += 1;
+    count += 1;
+    const rect = rects[best];
+    for (let corner = 0; corner < 3; corner += 1) {
+      textured[triangle * 3 + corner] = 255;
+      const target = triangle * 12 + corner * 4;
+      slots[target] = rect[0];
+      slots[target + 1] = rect[1];
+      slots[target + 2] = rect[2];
+      slots[target + 3] = rect[3];
+    }
+  }
+  return { textured, slots, count, hits };
+}
+
+function vertexColors(indices, palette, triangles) {
+  const colors = new Uint8Array(triangles * 9);
+  for (let triangle = 0; triangle < triangles; triangle += 1) {
+    const rgb = palette[indices[triangle]];
+    for (let corner = 0; corner < 3; corner += 1) {
+      colors[triangle * 9 + corner * 3] = rgb[0];
+      colors[triangle * 9 + corner * 3 + 1] = rgb[1];
+      colors[triangle * 9 + corner * 3 + 2] = rgb[2];
+    }
+  }
+  return colors;
+}
+
+const stage = document.getElementById("stage");
+const chart = document.getElementById("chart");
+const scrub = document.getElementById("scrub");
+const playButton = document.getElementById("play");
+const followButton = document.getElementById("follow");
+const textureButton = document.getElementById("textures");
+const readout = document.getElementById("readout");
+const hudBottom = document.getElementById("hudbottom");
+const velLabel = document.getElementById("vel");
+const velBar = document.getElementById("velbar");
+const statusPanel = document.getElementById("status");
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const view = {
+  scene: REPLAY.order[0],
+  frame: 0,
+  playing: false,
+  rate: 1,
+  follow: true,
+  textures: true,
+  yaw: 0.72,
+  pitch: 0.30,
+  distance: 800,
+  target: [0, 0, 0],
+  last: 0,
+  ready: false,
+};
+
+const gl = stage.getContext("webgl2", { antialias: true, alpha: false })
+  || stage.getContext("webgl", { antialias: true, alpha: false });
+
+const scenes = new Map();
+let programs = null;
+let atlasTexture = null;
+let marioBuffers = null;
+let lineBuffer = null;
+
+const viewProj = identity();
+const projection = identity();
+const camera = identity();
+
+function scenesReady() {
+  return view.ready && scenes.has(view.scene);
+}
+
+function current() {
+  return scenes.get(view.scene);
+}
+
+function buildPrograms() {
+  programs = {
+    level: link(gl, LEVEL_VERTEX, LEVEL_FRAGMENT, ["aPos", "aNormal", "aTint"],
+      ["uViewProj", "uEye", "uLight", "uFog", "uFogRange", "uClipMin", "uClipMax"]),
+    mario: link(gl, MARIO_VERTEX, MARIO_FRAGMENT,
+      ["aPos", "aNormal", "aColor", "aUv", "aSlot", "aTextured"],
+      ["uViewProj", "uOrigin", "uInvScale", "uAtlas", "uLight", "uUseAtlas"]),
+    line: link(gl, LINE_VERTEX, LINE_FRAGMENT, ["aPos"], ["uViewProj", "uColor", "uAlpha"]),
+  };
+}
+
+function uploadAtlas(image) {
+  atlasTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+}
+
+function loadAtlas(bytes) {
+  return new Promise((resolve) => {
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+    const image = new Image();
+    image.onload = () => {
+      uploadAtlas(image);
+      resolve(true);
+    };
+    image.onerror = () => resolve(false);
+    image.src = "data:image/png;base64," + btoa(binary);
+  });
+}
+
+async function buildScene(key) {
+  const payload = REPLAY.scenes[key];
+  const container = openContainer(base64Bytes(payload.container));
+  const header = container.header;
+  const triangles = header.triangle_counts[0];
+  const positions = await stream(container, "positions", Int16Array);
+  const normals = await stream(container, "normals", Int8Array);
+  const transforms = await stream(container, "transforms", Float32Array);
+  const colorIndex = await stream(container, "color_index", Uint8Array);
+  const uv = await stream(container, "uv", Float32Array);
+  const surfaceVertices = await stream(container, "surface_vertices", Int32Array);
+  const surfaceTypes = await stream(container, "surface_types", Int16Array);
+  const atlasBytes = await stream(container, "atlas_png", Uint8Array);
+
+  const rects = slotRects(header.atlas);
+  const uvVariants = [];
+  for (let variant = 0; variant < header.uv_variant_count; variant += 1) {
+    const slice = uv.subarray(variant * triangles * 6, (variant + 1) * triangles * 6);
+    uvVariants.push(Object.assign(
+      { uv: slice }, uvAttributes(slice, triangles, header.untextured_uv_sentinel, rects)));
+  }
+  const colorVariants = [];
+  for (let variant = 0; variant < header.color_variant_count; variant += 1) {
+    colorVariants.push(vertexColors(
+      colorIndex.subarray(variant * triangles, (variant + 1) * triangles),
+      header.color_palette, triangles));
+  }
+
+  const path = new Float32Array(header.frame_count * 3);
+  const trail = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  for (let frame = 0; frame < header.frame_count; frame += 1) {
+    for (let axis = 0; axis < 3; axis += 1) {
+      const value = transforms[frame * 4 + axis];
+      path[frame * 3 + axis] = value + (axis === 1 ? 80 : 0);
+      if (value < trail[axis]) trail[axis] = value;
+      if (value > trail[axis + 3]) trail[axis + 3] = value;
+    }
+  }
+
+  const warpType = (payload.meta.warp && payload.meta.warp.surface_type) || -1;
+  const palette = { floor: [0, 0, 0], dead: [0, 0, 0], muted: [0, 0, 0] };
+  const box = [
+    trail[0] - CLIP_MARGIN[0], trail[1] - CLIP_MARGIN[1], trail[2] - CLIP_MARGIN[2],
+    trail[3] + CLIP_MARGIN[0], trail[4] + CLIP_MARGIN[1], trail[5] + CLIP_MARGIN[2],
+  ];
+  const level = levelMesh(surfaceVertices, surfaceTypes, warpType, palette, box);
+
+  const fields = header.frame_fields;
+  const rows = header.frames;
+  const velocity = rows.map((row) => row[fields.indexOf("forward_velocity")]);
+  const action = rows.map((row) => row[fields.indexOf("action")]);
+  const colorOf = rows.map((row) => row[fields.indexOf("color_variant")]);
+  const uvOf = rows.map((row) => row[fields.indexOf("uv_variant")]);
+
+  const scene = {
+    payload, header, triangles, positions, normals, transforms, path, trail, level, box,
+    uvVariants, colorVariants, velocity, action, colorOf, uvOf,
+    actionNames: header.action_names,
+    warped: payload.meta.warped || null,
+    span: triangles * 9,
+    levelBuffers: {
+      positions: buffer(gl, level.positions),
+      normals: buffer(gl, level.normals),
+      tints: buffer(gl, level.tints),
+    },
+    pathBuffer: buffer(gl, path),
+    variantBuffers: {
+      uv: uvVariants.map((variant) => buffer(gl, variant.uv)),
+      slots: uvVariants.map((variant) => buffer(gl, variant.slots)),
+      textured: uvVariants.map((variant) => buffer(gl, variant.textured)),
+      colors: colorVariants.map((variant) => buffer(gl, variant)),
+    },
+    atlasBytes,
+  };
+  scenes.set(key, scene);
+  refreshLevelTints(scene);
+  return scene;
+}
+
+function refreshLevelTints(scene) {
+  const colors = tokens();
+  const palette = {
+    floor: hexRgb(colors.floor),
+    dead: hexRgb(colors.dead),
+    muted: hexRgb(colors.muted),
+  };
+  const tints = scene.level.tints;
+  const normals = scene.level.normals;
+  const types = scene.level.types;
+  const warpType = (scene.payload.meta.warp && scene.payload.meta.warp.surface_type) || -1;
+  for (let triangle = 0; triangle < types.length; triangle += 1) {
+    const base = triangle * 9;
+    const ny = normals[base + 1];
+    const warp = types[triangle] === warpType;
+    const tread = ny > 0.9;
+    const ceiling = ny < -0.35;
+    let tint = palette.floor;
+    let gain = 1;
+    if (warp) {
+      tint = palette.dead;
+      gain = 1.05;
+    } else if (ceiling) {
+      tint = palette.muted;
+      gain = 0.32;
+    } else if (!tread) {
+      gain = 0.52;
+    }
+    for (let corner = 0; corner < 3; corner += 1) {
+      tints[base + corner * 3] = tint[0] * gain;
+      tints[base + corner * 3 + 1] = tint[1] * gain;
+      tints[base + corner * 3 + 2] = tint[2] * gain;
+    }
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.levelBuffers.tints);
+  gl.bufferData(gl.ARRAY_BUFFER, tints, gl.STATIC_DRAW);
+}
+
+function fitCanvas() {
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const rect = stage.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width * ratio));
+  const height = Math.max(1, Math.round(rect.height * ratio));
+  if (stage.width !== width || stage.height !== height) {
+    stage.width = width;
+    stage.height = height;
+  }
+  return rect.width / Math.max(1, rect.height);
+}
+
+function cameraTarget(scene) {
+  if (view.follow) {
+    const frame = view.frame * 3;
+    return [scene.path[frame], scene.path[frame + 1], scene.path[frame + 2]];
+  }
+  return [
+    (scene.trail[0] + scene.trail[3]) / 2,
+    (scene.trail[1] + scene.trail[4]) / 2,
+    (scene.trail[2] + scene.trail[5]) / 2,
+  ];
+}
+
+function drawScene() {
+  const scene = current();
+  const aspect = fitCanvas();
+  const colors = tokens();
+  const fog = hexRgb(colors.panel);
+
+  const desired = cameraTarget(scene);
+  const blend = view.playing && !reduceMotion ? 0.35 : 1;
+  for (let axis = 0; axis < 3; axis += 1) {
+    view.target[axis] += (desired[axis] - view.target[axis]) * blend;
+  }
+
+  const eye = [
+    view.target[0] + view.distance * Math.cos(view.pitch) * Math.sin(view.yaw),
+    view.target[1] + view.distance * Math.sin(view.pitch),
+    view.target[2] + view.distance * Math.cos(view.pitch) * Math.cos(view.yaw),
+  ];
+  perspective(projection, (48 * Math.PI) / 180, aspect, 12, 48000);
+  lookAt(camera, eye, view.target, [0, 1, 0]);
+  multiply(viewProj, projection, camera);
+
+  gl.viewport(0, 0, stage.width, stage.height);
+  gl.clearColor(fog[0], fog[1], fog[2], 1);
+  gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  const light = [0.42, 0.80, 0.43];
+
+  gl.useProgram(programs.level.program);
+  gl.enable(gl.CULL_FACE);
+  gl.frontFace(gl.CCW);
+  gl.cullFace(gl.BACK);
+  gl.uniformMatrix4fv(programs.level.uniform.uViewProj, false, viewProj);
+  gl.uniform3fv(programs.level.uniform.uEye, eye);
+  gl.uniform3fv(programs.level.uniform.uLight, light);
+  gl.uniform3fv(programs.level.uniform.uFog, fog);
+  gl.uniform2f(programs.level.uniform.uFogRange, view.distance * 1.1,
+    view.distance * 1.1 + 5200);
+  gl.uniform3f(programs.level.uniform.uClipMin, scene.box[0], scene.box[1], scene.box[2]);
+  gl.uniform3f(programs.level.uniform.uClipMax, scene.box[3], scene.box[4], scene.box[5]);
+  bindAttribute(gl, programs.level.attribute.aPos, scene.levelBuffers.positions, 3, gl.FLOAT,
+    false, 12, 0);
+  bindAttribute(gl, programs.level.attribute.aNormal, scene.levelBuffers.normals, 3, gl.FLOAT,
+    false, 12, 0);
+  bindAttribute(gl, programs.level.attribute.aTint, scene.levelBuffers.tints, 3, gl.FLOAT,
+    false, 12, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, scene.level.count);
+
+  gl.useProgram(programs.line.program);
+  gl.disable(gl.CULL_FACE);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.uniformMatrix4fv(programs.line.uniform.uViewProj, false, viewProj);
+  gl.uniform3fv(programs.line.uniform.uColor, hexRgb(colors.speed));
+  gl.uniform1f(programs.line.uniform.uAlpha, 0.5);
+  bindAttribute(gl, programs.line.attribute.aPos, scene.pathBuffer, 3, gl.FLOAT, false, 12, 0);
+  gl.drawArrays(gl.LINE_STRIP, 0, view.frame + 1);
+  gl.disable(gl.BLEND);
+
+  const uvVariant = scene.uvOf[view.frame];
+  const colorVariant = scene.colorOf[view.frame];
+  const origin = [
+    scene.transforms[view.frame * 4],
+    scene.transforms[view.frame * 4 + 1],
+    scene.transforms[view.frame * 4 + 2],
+  ];
+  gl.bindBuffer(gl.ARRAY_BUFFER, marioBuffers.positions);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0,
+    scene.positions.subarray(view.frame * scene.span, (view.frame + 1) * scene.span));
+  gl.bindBuffer(gl.ARRAY_BUFFER, marioBuffers.normals);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0,
+    scene.normals.subarray(view.frame * scene.span, (view.frame + 1) * scene.span));
+
+  gl.useProgram(programs.mario.program);
+  gl.uniformMatrix4fv(programs.mario.uniform.uViewProj, false, viewProj);
+  gl.uniform3fv(programs.mario.uniform.uOrigin, origin);
+  gl.uniform1f(programs.mario.uniform.uInvScale, 1 / scene.header.position_scale);
+  gl.uniform3fv(programs.mario.uniform.uLight, light);
+  gl.uniform1f(programs.mario.uniform.uUseAtlas,
+    view.textures && atlasTexture !== null ? 1 : 0);
+  if (atlasTexture !== null) {
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
+    gl.uniform1i(programs.mario.uniform.uAtlas, 0);
+  }
+  bindAttribute(gl, programs.mario.attribute.aPos, marioBuffers.positions, 3, gl.SHORT, false,
+    6, 0);
+  bindAttribute(gl, programs.mario.attribute.aNormal, marioBuffers.normals, 3, gl.BYTE, true,
+    3, 0);
+  bindAttribute(gl, programs.mario.attribute.aColor,
+    scene.variantBuffers.colors[colorVariant], 3, gl.UNSIGNED_BYTE, true, 3, 0);
+  bindAttribute(gl, programs.mario.attribute.aUv,
+    scene.variantBuffers.uv[uvVariant], 2, gl.FLOAT, false, 8, 0);
+  bindAttribute(gl, programs.mario.attribute.aSlot,
+    scene.variantBuffers.slots[uvVariant], 4, gl.FLOAT, false, 16, 0);
+  bindAttribute(gl, programs.mario.attribute.aTextured,
+    scene.variantBuffers.textured[uvVariant], 1, gl.UNSIGNED_BYTE, true, 1, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, scene.triangles * 3);
+}
+
+function fit2d(canvas) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * ratio);
+  canvas.height = Math.round(rect.height * ratio);
+  const context = canvas.getContext("2d");
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { context, width: rect.width, height: rect.height };
+}
+
+function drawChart() {
+  const scene = current();
+  const { context, width, height } = fit2d(chart);
+  const colors = tokens();
+  context.clearRect(0, 0, width, height);
+
+  const pad = { left: 56, right: 14, top: 12, bottom: 18 };
+  const count = scene.velocity.length;
+  const lowest = Math.min(-30, ...scene.velocity);
+  const highest = Math.max(35, ...scene.velocity);
+  const compress = (v) => Math.sign(v) * Math.log1p(Math.abs(v));
+  const floorTick = compress(lowest);
+  const ceilTick = compress(highest);
+  const sx = (i) => pad.left + (i / Math.max(1, count - 1)) * (width - pad.left - pad.right);
+  const sy = (v) => height - pad.bottom
+    - ((compress(v) - floorTick) / (ceilTick - floorTick)) * (height - pad.top - pad.bottom);
+
+  context.font = '400 10px "IBM Plex Mono", monospace';
+  context.textAlign = "right";
+  const ticks = [highest, 0, -16, -100, -1000, lowest]
+    .filter((value) => value >= lowest && value <= highest);
+  const drawn = [];
+  for (const value of ticks) {
+    const y = sy(value);
+    if (drawn.some((other) => Math.abs(other - y) < 10)) continue;
+    drawn.push(y);
+    context.strokeStyle = value === -16 ? colors.dead : colors.grid;
+    context.setLineDash(value === -16 ? [3, 3] : []);
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(pad.left, y);
+    context.lineTo(width - pad.right, y);
+    context.stroke();
+    context.setLineDash([]);
+    context.fillStyle = value === -16 ? colors.dead : colors.muted;
+    context.fillText(value.toFixed(0), pad.left - 6, y + 3);
+  }
+
+  if (scene.warped) {
+    context.strokeStyle = colors.dead;
+    context.globalAlpha = 0.45;
+    context.lineWidth = 1;
+    for (let i = 0; i < count; i += 1) {
+      if (!scene.warped[i]) continue;
+      context.beginPath();
+      context.moveTo(sx(i), height - pad.bottom);
+      context.lineTo(sx(i), height - pad.bottom - 7);
+      context.stroke();
+    }
+    context.globalAlpha = 1;
+  }
+
+  context.beginPath();
+  context.moveTo(sx(0), sy(0));
+  for (let i = 0; i < count; i += 1) context.lineTo(sx(i), sy(Math.min(0, scene.velocity[i])));
+  context.lineTo(sx(count - 1), sy(0));
+  context.closePath();
+  context.fillStyle = colors.speedFill;
+  context.fill();
+
+  context.beginPath();
+  for (let i = 0; i < count; i += 1) {
+    const px = sx(i);
+    const py = sy(scene.velocity[i]);
+    if (i === 0) context.moveTo(px, py);
+    else context.lineTo(px, py);
+  }
+  context.strokeStyle = colors.speed;
+  context.lineWidth = 1.4;
+  context.stroke();
+
+  const px = sx(view.frame);
+  context.strokeStyle = colors.ink;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(px, pad.top - 4);
+  context.lineTo(px, height - pad.bottom);
+  context.stroke();
+
+  context.textAlign = "left";
+  context.fillStyle = colors.muted;
+  context.fillText("forwardVel by frame, signed log scale, red ticks are instant warps",
+    pad.left + 4, pad.top + 2);
+}
+
+function longJumps(scene, upTo) {
+  let total = 0;
+  let previous = null;
+  for (let i = 0; i <= upTo; i += 1) {
+    const name = scene.actionNames[String(scene.action[i])];
+    if (name === "long_jump" && previous !== "long_jump") total += 1;
+    previous = name;
+  }
+  return total;
+}
+
+const FIELDS = [
+  ["frame", (scene, i) => String(i).padStart(4, "0") + " / " + scene.velocity.length],
+  ["action", (scene, i) => scene.actionNames[String(scene.action[i])] || "?"],
+  ["forwardVel", (scene, i) => scene.velocity[i].toFixed(2), true],
+  ["height y", (scene, i) => scene.transforms[i * 4 + 1].toFixed(0)],
+  ["depth z", (scene, i) => scene.transforms[i * 4 + 2].toFixed(0)],
+  ["face angle", (scene, i) => ((scene.transforms[i * 4 + 3] * 180) / Math.PI).toFixed(0) + "°"],
+  ["long jumps", (scene, i) => String(longJumps(scene, i))],
+  ["warps", (scene, i) => scene.warped
+    ? String(scene.warped.slice(0, i + 1).reduce((a, b) => a + b, 0)) : "—"],
+  ["mario tris", (scene) => String(scene.triangles)],
+  ["textured", (scene, i) => scene.uvVariants[scene.uvOf[i]].count + " of "
+    + scene.triangles],
+  ["level tris", (scene) => scene.level.count / 3 + " of " + scene.level.total],
+];
+
+function drawReadout() {
+  const scene = current();
+  readout.innerHTML = "";
+  for (const [label, get, hot] of FIELDS) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    const name = document.createElement("span");
+    name.className = "label";
+    name.textContent = label;
+    const value = document.createElement("span");
+    value.className = hot ? "v hot" : "v";
+    value.textContent = get(scene, view.frame);
+    cell.append(name, value);
+    readout.append(cell);
+  }
+}
+
+function drawClipNote() {
+  const scene = current();
+  document.getElementById("clipnote").textContent =
+    "drawing " + scene.level.count / 3 + " of the area's " + scene.level.total
+    + " collision triangles, then cutting them to the corridor Mario travels through: the side "
+    + "walls and the ceiling are dropped whole, and the rest is trimmed in the shader so the "
+    + "camera can see into the stairwell";
+}
+
+function drawHud() {
+  const scene = current();
+  const velocity = scene.velocity[view.frame];
+  velLabel.textContent = velocity.toFixed(2);
+  const peak = Math.max(1, Math.abs(scene.payload.peak_velocity));
+  const share = Math.log1p(Math.abs(velocity)) / Math.log1p(peak);
+  velBar.style.width = Math.min(100, Math.max(0, share) * 100).toFixed(1) + "%";
+
+  const escape = scene.payload.meta.warp
+    ? scene.payload.meta.warp.minimum_escape_speed : null;
+  const parts = [
+    "action <b>" + (scene.actionNames[String(scene.action[view.frame])] || "?") + "</b>",
+    "y <b>" + scene.transforms[view.frame * 4 + 1].toFixed(0) + "</b>",
+    "z <b>" + scene.transforms[view.frame * 4 + 2].toFixed(0) + "</b>",
+  ];
+  if (escape !== null) {
+    const covered = Math.abs(velocity);
+    parts.push(covered > escape
+      ? "this frame covers <b>" + covered.toFixed(0) + "</b>, clearing the warp zone's "
+        + escape.toFixed(0)
+      : 'this frame covers <span class="warn">' + covered.toFixed(0)
+        + "</span> of the warp zone's " + escape.toFixed(0));
+  }
+  if (scene.payload.meta.top_frame !== null && scene.payload.meta.top_frame !== undefined
+      && view.frame >= scene.payload.meta.top_frame) {
+    parts.push("<b>top landing reached</b>");
+  }
+  hudBottom.innerHTML = parts.join(" · ");
+}
+
+function render() {
+  if (!scenesReady()) return;
+  drawScene();
+  drawChart();
+  drawReadout();
+  drawHud();
+  drawClipNote();
+  scrub.value = String(view.frame);
+}
+
+function buildScenes() {
+  const host = document.getElementById("scenes");
+  host.innerHTML = "";
+  for (const key of REPLAY.order) {
+    const payload = REPLAY.scenes[key];
+    const button = document.createElement("button");
+    button.className = "scene";
+    button.type = "button";
+    button.setAttribute("aria-pressed", String(key === view.scene));
+    const geo = document.createElement("span");
+    geo.className = "geo";
+    geo.textContent = payload.label;
+    const peak = document.createElement("span");
+    peak.className = "peak";
+    peak.textContent = payload.peak_velocity.toFixed(1);
+    const verdict = document.createElement("span");
+    verdict.className = "verdict";
+    const reached = payload.meta && payload.meta.success;
+    verdict.textContent = (reached ? "reaches the top · "
+      : payload.peak_velocity < -200 ? "runs away · " : "stalls near the attractor · ")
+      + payload.note;
+    button.append(geo, peak, verdict);
+    button.addEventListener("click", () => {
+      selectScene(key);
+    });
+    host.append(button);
+  }
+}
+
+async function selectScene(key) {
+  if (key === view.scene && scenes.has(key)) return;
+  view.scene = key;
+  view.frame = 0;
+  if (!scenes.has(key)) {
+    statusPanel.hidden = false;
+    statusPanel.textContent = "decoding " + REPLAY.scenes[key].label;
+    await buildScene(key);
+    statusPanel.hidden = true;
+  }
+  const scene = current();
+  scrub.max = String(scene.velocity.length - 1);
+  view.target = cameraTarget(scene);
+  view.distance = view.follow ? 800
+    : Math.max(1800, Math.hypot(scene.trail[3] - scene.trail[0],
+      scene.trail[4] - scene.trail[1], scene.trail[5] - scene.trail[2]) * 0.75);
+  buildScenes();
+  render();
+}
+
+function buildRates() {
+  const host = document.getElementById("rates");
+  for (const rate of [0.25, 1, 2, 4]) {
+    const button = document.createElement("button");
+    button.className = "ctrl";
+    button.type = "button";
+    button.textContent = rate + "×";
+    button.setAttribute("aria-pressed", String(rate === view.rate));
+    button.addEventListener("click", () => {
+      view.rate = rate;
+      for (const sibling of host.children) {
+        sibling.setAttribute("aria-pressed", String(sibling === button));
+      }
+    });
+    host.append(button);
+  }
+}
+
+function tick(now) {
+  if (view.playing && scenesReady()) {
+    const step = 1000 / (30 * view.rate);
+    if (now - view.last >= step) {
+      view.last = now;
+      const count = current().velocity.length;
+      view.frame = (view.frame + 1) % count;
+      render();
+    } else {
+      drawScene();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function setPlaying(playing) {
+  view.playing = playing;
+  playButton.textContent = playing ? "Pause" : "Play";
+  playButton.setAttribute("aria-pressed", String(playing));
+  view.last = 0;
+}
+
+playButton.addEventListener("click", () => setPlaying(!view.playing));
+
+followButton.addEventListener("click", () => {
+  view.follow = !view.follow;
+  followButton.setAttribute("aria-pressed", String(view.follow));
+  if (!scenesReady()) return;
+  const scene = current();
+  view.target = cameraTarget(scene);
+  view.distance = view.follow ? 800
+    : Math.max(1800, Math.hypot(scene.trail[3] - scene.trail[0],
+      scene.trail[4] - scene.trail[1], scene.trail[5] - scene.trail[2]) * 0.75);
+  render();
+});
+
+textureButton.addEventListener("click", () => {
+  view.textures = !view.textures;
+  textureButton.setAttribute("aria-pressed", String(view.textures));
+  render();
+});
+
+scrub.addEventListener("input", () => {
+  view.frame = Number(scrub.value);
+  render();
+});
+
+chart.addEventListener("click", (event) => {
+  if (!scenesReady()) return;
+  const rect = chart.getBoundingClientRect();
+  const count = current().velocity.length;
+  const ratio = (event.clientX - rect.left - 56) / (rect.width - 70);
+  view.frame = Math.max(0, Math.min(count - 1, Math.round(ratio * (count - 1))));
+  render();
+});
+
+let drag = null;
+
+stage.addEventListener("pointerdown", (event) => {
+  drag = { x: event.clientX, y: event.clientY };
+  stage.classList.add("dragging");
+  stage.setPointerCapture(event.pointerId);
+});
+
+stage.addEventListener("pointermove", (event) => {
+  if (!drag) return;
+  view.yaw -= (event.clientX - drag.x) * 0.006;
+  view.pitch = Math.max(-1.4, Math.min(1.4, view.pitch + (event.clientY - drag.y) * 0.005));
+  drag = { x: event.clientX, y: event.clientY };
+  if (!view.playing) render();
+});
+
+function endDrag(event) {
+  drag = null;
+  stage.classList.remove("dragging");
+  if (stage.hasPointerCapture && stage.hasPointerCapture(event.pointerId)) {
+    stage.releasePointerCapture(event.pointerId);
+  }
+}
+
+stage.addEventListener("pointerup", endDrag);
+stage.addEventListener("pointercancel", endDrag);
+
+stage.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  view.distance = Math.max(160, Math.min(24000, view.distance * Math.exp(event.deltaY * 0.0012)));
+  if (!view.playing) render();
+}, { passive: false });
+
+window.addEventListener("keydown", (event) => {
+  if (!scenesReady()) return;
+  if (event.key === " ") {
+    event.preventDefault();
+    setPlaying(!view.playing);
+  } else if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+    event.preventDefault();
+    const count = current().velocity.length;
+    const delta = (event.key === "ArrowRight" ? 1 : -1) * (event.shiftKey ? 10 : 1);
+    view.frame = Math.max(0, Math.min(count - 1, view.frame + delta));
+    render();
+  }
+});
+
+window.addEventListener("resize", render);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  if (scenesReady()) refreshLevelTints(current());
+  render();
+});
+new MutationObserver(() => {
+  if (scenesReady()) refreshLevelTints(current());
+  render();
+}).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+function requestedFrame(count) {
+  const match = /(?:^|[#&])frame=(\d+)/.exec(window.location.hash);
+  if (!match) return null;
+  return Math.max(0, Math.min(count - 1, Number(match[1])));
+}
+
+function requestedScene() {
+  const match = /(?:^|[#&])scene=([\w-]+)/.exec(window.location.hash);
+  return match && REPLAY.scenes[match[1]] ? match[1] : REPLAY.order[0];
+}
+
+async function start() {
+  if (!gl) {
+    statusPanel.textContent = "this browser has no WebGL context, so the 3D replay cannot draw";
+    return;
+  }
+  buildPrograms();
+  view.scene = requestedScene();
+  const scene = await buildScene(view.scene);
+  marioBuffers = {
+    positions: buffer(gl, new Int16Array(scene.span), gl.DYNAMIC_DRAW),
+    normals: buffer(gl, new Int8Array(scene.span), gl.DYNAMIC_DRAW),
+  };
+  await loadAtlas(scene.atlasBytes);
+  view.ready = true;
+  statusPanel.hidden = true;
+  scrub.max = String(scene.velocity.length - 1);
+  const pinned = requestedFrame(scene.velocity.length);
+  if (pinned !== null) view.frame = pinned;
+  view.target = cameraTarget(scene);
+  buildScenes();
+  buildRates();
+  render();
+  requestAnimationFrame(tick);
+  if (!reduceMotion && pinned === null) setPlaying(true);
+}
+
+start().catch((error) => {
+  statusPanel.hidden = false;
+  statusPanel.textContent = "could not decode the replay: " + error.message;
+});
+</script>

@@ -5,3 +5,16 @@ results/*.npz
 __pycache__/
 *.so
 *.dylib
+results/replay_*.json
+results/replays.json
+
+# tooling and build products
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+results/viewer.html
+.DS_Store
+results/viewer3d.html
+results/viewer_swarm.html
