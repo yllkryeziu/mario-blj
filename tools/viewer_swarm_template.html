@@ -1,0 +1,3990 @@
+<title>Six Million Steps to a Backwards Long Jump</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+
+<style>
+:root {
+  --ground: #edf1f3;
+  --panel: #ffffff;
+  --ink: #0f181f;
+  --muted: #5d6e7a;
+  --neutral: #6e8794;
+  --rule: #d5dee3;
+  --grid: #e3eaee;
+  --floor: #2e7d6b;
+  --floor-fill: rgba(46, 125, 107, 0.13);
+  --speed: #c4751a;
+  --speed-fill: rgba(196, 117, 26, 0.16);
+  --dead: #b23a32;
+  --hud: rgba(255, 255, 255, 0.84);
+  --shadow: 0 1px 2px rgba(15, 24, 31, 0.06), 0 8px 24px rgba(15, 24, 31, 0.05);
+  --sky-low: #c3d1da;
+  --sky-high: #fbfdfd;
+  --contact: #1d2b33;
+  --track: #dde5ea;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0d1317;
+    --panel: #141c22;
+    --ink: #e7eef2;
+    --muted: #8598a4;
+    --neutral: #93a9b6;
+    --rule: #23303a;
+    --grid: #1b252c;
+    --floor: #4fb79c;
+    --floor-fill: rgba(79, 183, 156, 0.15);
+    --speed: #e8a33d;
+    --speed-fill: rgba(232, 163, 61, 0.18);
+    --dead: #e0665c;
+    --hud: rgba(20, 28, 34, 0.84);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+    --sky-low: #080f14;
+    --sky-high: #2a3d4a;
+    --contact: #000000;
+    --track: #1b252c;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0d1317;
+  --panel: #141c22;
+  --ink: #e7eef2;
+  --muted: #8598a4;
+  --neutral: #93a9b6;
+  --rule: #23303a;
+  --grid: #1b252c;
+  --floor: #4fb79c;
+  --floor-fill: rgba(79, 183, 156, 0.15);
+  --speed: #e8a33d;
+  --speed-fill: rgba(232, 163, 61, 0.18);
+  --dead: #e0665c;
+  --hud: rgba(20, 28, 34, 0.84);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3);
+  --sky-low: #080f14;
+  --sky-high: #2a3d4a;
+  --contact: #000000;
+  --track: #1b252c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 40ch);
+  gap: 10px 44px;
+  align-items: end;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 18px;
+}
+
+h1 {
+  font-family: Archivo, "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  letter-spacing: -0.028em;
+  line-height: 1.02;
+  margin: 0;
+  text-wrap: balance;
+  grid-column: 1;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+.masthead .eyebrow { grid-column: 1 / -1; }
+
+.lede {
+  color: var(--muted);
+  margin: 0;
+  grid-column: 2;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  align-self: end;
+  border-left: 1px solid var(--rule);
+  padding-left: 18px;
+}
+
+.label {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+canvas { display: block; width: 100%; }
+
+/* ---- the film strip ---- */
+
+.striphead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 13px 16px 11px;
+  border-bottom: 1px solid var(--rule);
+}
+.stripnote {
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.6875rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.frames {
+  display: grid;
+  gap: 0;
+  background: var(--rule);
+}
+
+.axis, .frame {
+  background: var(--panel);
+  border: 0;
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.frames > :last-child { border-right: 0; }
+
+.axis { padding-left: 0; }
+.axis canvas { background: none; }
+
+.frame {
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 120ms;
+}
+.frame:hover { background: var(--grid); }
+.frame:focus-visible { outline: 2px solid var(--speed); outline-offset: -2px; }
+
+/* The selected panel is marked three ways at once, because the strip is the page's only
+   navigation and a single cue at this size is easy to lose: the head bar inverts, a rule lands
+   on the top edge, and the thumbnail loses its dimming. */
+.frame[aria-selected="true"] { background: var(--panel); }
+.frame[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--speed);
+}
+.frame[aria-selected="true"] .fhead { background: var(--ink); border-color: var(--ink); }
+.frame[aria-selected="true"] .fsteps { color: var(--panel); }
+.frame[aria-selected="true"] .fphase { color: var(--panel); opacity: 0.72; }
+.frame .fthumb { opacity: 0.62; transition: opacity 120ms; }
+.frame[aria-selected="true"] .fthumb, .frame:hover .fthumb { opacity: 1; }
+
+.fhead {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 9px 10px 8px;
+  border-bottom: 1px solid var(--rule);
+  min-height: 52px;
+}
+.fsteps {
+  font-family: Archivo, "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.fsteps em { font-style: normal; font-size: 0.62em; letter-spacing: 0.02em; color: var(--muted); }
+.frame[aria-selected="true"] .fsteps em { color: var(--panel); opacity: 0.7; }
+.fphase {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fthumb { aspect-ratio: 7 / 5; background: none; }
+
+.frate {
+  display: flex;
+  flex-direction: column;
+  padding: 7px 10px 9px;
+  border-top: 1px solid var(--rule);
+  min-height: 48px;
+}
+.frate b {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 1.05rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.frate em {
+  font-style: normal;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.5875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.frate b.zero { color: var(--muted); }
+.frate b.some { color: var(--speed); }
+.frate b.most { color: var(--floor); }
+
+.stripfoot {
+  border-top: 1px solid var(--rule);
+  padding: 10px 16px 12px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ---- the live view ---- */
+
+.instrument {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+.stagewrap { position: relative; border-right: 1px solid var(--rule); }
+
+#stage {
+  aspect-ratio: 15 / 10;
+  touch-action: none;
+  cursor: grab;
+  background: var(--sky-low);
+}
+#stage.dragging { cursor: grabbing; }
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  padding: 14px 16px;
+}
+
+.hudtop {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--hud);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 7px 11px 9px;
+  backdrop-filter: blur(6px);
+}
+
+.vel {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-size: clamp(1.9rem, 5vw, 2.9rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--speed);
+}
+
+.hudsub {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.hudbottom {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  width: fit-content;
+  max-width: calc(100% - 46px);
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: var(--hud);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 5px 11px;
+  backdrop-filter: blur(6px);
+}
+.hudbottom b { color: var(--ink); font-weight: 500; }
+.hudbottom .warn { color: var(--dead); }
+.hudbottom .win { color: var(--floor); }
+
+.gauge {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  bottom: 56px;
+  width: 9px;
+  background: var(--track);
+  border: 1px solid var(--rule);
+  border-radius: 1px;
+}
+
+.gaugefill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  background: var(--floor);
+  opacity: 0.55;
+}
+
+.gaugenow {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  bottom: 0%;
+  height: 2px;
+  background: var(--speed);
+}
+
+.gaugeband {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: 0%;
+  height: 2px;
+  background: var(--dead);
+  opacity: 0.55;
+}
+
+.gaugetick {
+  position: absolute;
+  right: 100%;
+  bottom: 0%;
+  transform: translateY(50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.gaugetick i { order: 2; display: block; width: 10px; height: 1px; background: currentColor; }
+.gaugetick span {
+  order: 1;
+  background: var(--hud);
+  padding: 1px 5px;
+  border-radius: 1px;
+}
+.gaugetick.goal { color: var(--floor); }
+.gaugetick.warp { color: var(--dead); }
+
+.status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  color: var(--muted);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 24px;
+}
+.status[hidden] { display: none; }
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 18px;
+  gap: 2px;
+  min-width: 0;
+}
+
+.steps {
+  font-family: Archivo, "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  margin: 2px 0 0;
+}
+.steps em { font-style: normal; font-size: 0.42em; letter-spacing: 0.02em; color: var(--muted); }
+
+.phase {
+  margin: 6px 0 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 2px 8px;
+}
+.phase::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  flex: none;
+}
+.phase.none { color: var(--muted); }
+.phase.barrier { color: var(--dead); }
+.phase.through { color: var(--speed); }
+.phase.reliable { color: var(--floor); }
+
+/* The population histogram. Four altitude bands, one stacked bar, counts underneath. It is the
+   same four colours the bodies and the trails are tinted with, so the bar is a readout of the
+   picture rather than a second encoding to learn. */
+.census { margin: 16px 0 0; }
+.censusbar {
+  display: flex;
+  height: 10px;
+  background: var(--track);
+  border: 1px solid var(--rule);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.censusbar i { display: block; height: 100%; flex: 0 0 auto; transition: none; }
+.censusrows {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0 8px;
+}
+.censusrows dt {
+  display: contents;
+  font-size: 0.8125rem;
+}
+.censusrows .dot {
+  grid-column: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: currentColor;
+  align-self: center;
+}
+.censusrows .name {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 0.78rem;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.censusrows .count {
+  grid-column: 3;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8125rem;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.stats {
+  margin: 14px 0 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.stats dt {
+  grid-column: 1;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.stats dd {
+  grid-column: 2;
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
+  text-align: right;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.stats dd.hot { color: var(--speed); }
+.stats dd.good { color: var(--floor); }
+.stats dd.bad { color: var(--dead); }
+
+/* The rail is taller than its contents at the stage's height, so the closing sentence sits on
+   the bottom edge rather than leaving a hole under it. */
+.verdict {
+  margin: auto 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.verdict b { color: var(--ink); font-weight: 500; }
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--rule);
+  padding: 11px 14px;
+  grid-column: 1 / -1;
+}
+
+#chart { height: 152px; cursor: crosshair; }
+.chartwrap { position: relative; }
+
+.readout {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border-top: 1px solid var(--rule);
+}
+
+.cell {
+  background: var(--panel);
+  padding: 8px 12px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.cell .v {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.cell .v.hot { color: var(--speed); }
+.cell .v.good { color: var(--floor); }
+
+button.ctrl {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  font: 400 0.8125rem "IBM Plex Mono", ui-monospace, monospace;
+  letter-spacing: 0.02em;
+  border-radius: 2px;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+button.ctrl:hover { border-color: var(--muted); }
+button.ctrl:focus-visible { outline: 2px solid var(--speed); outline-offset: 2px; }
+button.ctrl[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--panel);
+  border-color: var(--ink);
+}
+button.ctrl:disabled { opacity: 0.45; cursor: default; }
+
+#play { min-width: 84px; font-weight: 500; }
+#sound[aria-pressed="true"] { background: var(--speed); border-color: var(--speed); color: #fff; }
+
+input[type="range"] {
+  flex: 1 1 220px;
+  min-width: 150px;
+  accent-color: var(--speed);
+  height: 22px;
+  background: none;
+}
+input[type="range"]:focus-visible { outline: 2px solid var(--speed); outline-offset: 3px; }
+
+.rates { display: flex; gap: 5px; }
+
+.legend {
+  display: flex;
+  gap: 8px 22px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.key { display: inline-flex; align-items: baseline; gap: 8px; max-width: 30ch; }
+.swatch {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.85;
+  transform: translateY(2px);
+}
+
+footer { color: var(--muted); font-size: 0.8125rem; max-width: 76ch; }
+.note { color: var(--muted); font-size: 0.8125rem; max-width: 78ch; margin: 0; }
+code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.86em;
+  background: var(--grid);
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+}
+
+@media (max-width: 1080px) {
+  .readout { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 960px) {
+  .frames { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important; }
+  .axis { display: none; }
+  .frame { border-bottom: 1px solid var(--rule); }
+}
+
+@media (max-width: 940px) {
+  .instrument { grid-template-columns: minmax(0, 1fr); }
+  .stagewrap { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .masthead { grid-template-columns: minmax(0, 1fr); }
+  .lede { grid-column: 1; border-left: 0; padding-left: 0; padding-top: 8px; }
+  .steps { font-size: 2.2rem; }
+  .gauge { bottom: 66px; }
+  .hudbottom { right: 16px; }
+}
+
+@media (max-width: 660px) {
+  .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow" id="kicker">libsm64 · one process · one shared staircase</p>
+    <h1>Six million steps to a backwards long jump</h1>
+    <p class="lede">Forty-eight rollouts of one policy on the real castle staircase, ticked by the
+      decompiled physics. The reward pays 1.0 for standing on the top landing and nothing else, so
+      every episode return is either 0.0 or 1.0 and no shaping term of any kind was involved. It
+      is the ladder's <em>terminal</em> rung, seed 2, whose first success came at step
+      6,324,840.</p>
+  </header>
+
+  <section class="panel">
+    <div class="striphead">
+      <p class="eyebrow">the whole run, one panel per checkpoint</p>
+      <p class="stripnote" id="stripnote"></p>
+    </div>
+    <div class="frames" id="strip" role="tablist" aria-label="Training checkpoint">
+      <div class="axis" id="axiscol">
+        <span class="fhead" aria-hidden="true"><span class="fsteps">&nbsp;</span>
+          <span class="fphase">&nbsp;</span></span>
+        <canvas class="fthumb" id="stripaxis" aria-hidden="true"></canvas>
+        <span class="frate" aria-hidden="true"><b>&nbsp;</b><em>&nbsp;</em></span>
+      </div>
+    </div>
+    <p class="stripfoot" id="stripfoot"></p>
+  </section>
+
+  <section class="panel instrument">
+    <div class="stagewrap">
+      <canvas id="stage"></canvas>
+      <div class="hud">
+        <div class="hudtop">
+          <span class="label" id="headline">highest mario, y</span>
+          <span class="vel" id="height">0</span>
+          <span class="hudsub" id="heightnote">top landing at 4966</span>
+        </div>
+        <div class="gauge" id="gauge">
+          <i class="gaugefill" id="gaugebest"></i>
+          <i class="gaugeband" id="gaugeband"></i>
+          <i class="gaugenow" id="gaugenow"></i>
+          <span class="gaugetick goal" id="tickgoal"><span>top landing</span><i></i></span>
+          <span class="gaugetick warp" id="tickwarp"><span>warp ceiling</span><i></i></span>
+          <span class="gaugetick" id="tickspawn"><span>spawn</span><i></i></span>
+        </div>
+        <div class="hudbottom" id="hudbottom"></div>
+      </div>
+      <div class="status" id="status">decoding the swarm container</div>
+    </div>
+    <aside class="rail">
+      <p class="eyebrow">selected checkpoint</p>
+      <p class="steps" id="railsteps">0<em> steps</em></p>
+      <p class="phase none" id="railphase">no climb</p>
+      <div class="census">
+        <div class="censusbar" id="censusbar"></div>
+        <dl class="censusrows" id="censusrows"></dl>
+      </div>
+      <dl class="stats" id="railstats"></dl>
+      <p class="verdict" id="railverdict"></p>
+    </aside>
+    <div class="transport">
+      <button class="ctrl" id="play" aria-pressed="false">Play</button>
+      <span class="label">frame</span>
+      <input type="range" id="scrub" min="0" max="1" value="0" step="1" aria-label="Frame">
+      <div class="rates" id="rates"></div>
+      <div class="rates" id="cameras"></div>
+      <button class="ctrl" id="trails" aria-pressed="true">Trails</button>
+      <button class="ctrl" id="textures" aria-pressed="true">Textures</button>
+      <button class="ctrl" id="sound" aria-pressed="false">Sound off</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="chartwrap"><canvas id="chart"></canvas></div>
+    <div class="readout" id="readout"></div>
+  </section>
+
+  <p class="note" id="scenenote"></p>
+
+  <div class="legend">
+    <span class="key" style="color: var(--neutral)"><span class="swatch"></span>climbing below the
+      warp, which at step 0 and 2.0M means standing on the spawn tile</span>
+    <span class="key" style="color: var(--dead)"><span class="swatch"></span>inside the band the
+      twelve SURFACE_INSTANT_WARP_1B triangles guard, or being thrown back by them</span>
+    <span class="key" style="color: var(--speed)"><span class="swatch"></span>above the band, past
+      the barrier and still climbing</span>
+    <span class="key" style="color: var(--floor)"><span class="swatch"></span>on the top landing,
+      the only state the reward pays for</span>
+  </div>
+
+  <footer id="soundnote"></footer>
+
+  <footer>One long jump multiplies <code>forwardVel</code> by 1.5 and the clamp that follows only
+    catches positive speed, so a negative value grows without bound. The staircase answers with an
+    instant warp 154 units deep in z: whenever Mario's floor is one of the twelve red triangles the
+    level script throws him 205 down and 410 back. Mario's fastest ordinary move covers 48 units in
+    a frame, so the barrier holds against everything except a chain that has already run away. That
+    is why the room looks like a crowd bouncing off an invisible wall, and why the frame a single
+    Mario crosses it is the whole result.</footer>
+</div>
+
+<script>
+const SWARM = __REPLAY_DATA__;
+
+const LENGTH_BASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67,
+  83, 99, 115, 131, 163, 195, 227, 258];
+const LENGTH_EXTRA = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5,
+  5, 5, 5, 0];
+const DIST_BASE = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769,
+  1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577];
+const DIST_EXTRA = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11,
+  11, 12, 12, 13, 13];
+const CODE_ORDER = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+
+function huffman(lengths) {
+  const counts = new Int32Array(16);
+  for (let i = 0; i < lengths.length; i += 1) counts[lengths[i]] += 1;
+  counts[0] = 0;
+  const offsets = new Int32Array(16);
+  for (let bits = 1; bits < 16; bits += 1) offsets[bits] = offsets[bits - 1] + counts[bits - 1];
+  const symbols = new Int32Array(lengths.length);
+  for (let i = 0; i < lengths.length; i += 1) {
+    if (lengths[i]) symbols[offsets[lengths[i]]++] = i;
+  }
+  return { counts, symbols };
+}
+
+const FIXED_LITERAL = (() => {
+  const lengths = new Uint8Array(288);
+  for (let i = 0; i < 144; i += 1) lengths[i] = 8;
+  for (let i = 144; i < 256; i += 1) lengths[i] = 9;
+  for (let i = 256; i < 280; i += 1) lengths[i] = 7;
+  for (let i = 280; i < 288; i += 1) lengths[i] = 8;
+  return huffman(lengths);
+})();
+
+const FIXED_DISTANCE = huffman(new Uint8Array(30).fill(5));
+
+function inflate(source, hint) {
+  let at = 0;
+  if (source.length > 2 && (source[0] & 0x0f) === 8
+      && (((source[0] << 8) | source[1]) % 31) === 0) {
+    at = 2;
+  }
+  let bitBuffer = 0;
+  let bitCount = 0;
+  let out = new Uint8Array(Math.max(1024, hint || source.length * 4));
+  let length = 0;
+
+  function bits(need) {
+    while (bitCount < need) {
+      bitBuffer |= source[at++] << bitCount;
+      bitCount += 8;
+    }
+    const value = bitBuffer & ((1 << need) - 1);
+    bitBuffer >>>= need;
+    bitCount -= need;
+    return value;
+  }
+
+  function decode(tree) {
+    let code = 0;
+    let first = 0;
+    let index = 0;
+    for (let size = 1; size < 16; size += 1) {
+      code |= bits(1);
+      const count = tree.counts[size];
+      if (code - first < count) return tree.symbols[index + (code - first)];
+      index += count;
+      first = (first + count) << 1;
+      code <<= 1;
+    }
+    throw new Error("inflate: oversubscribed code");
+  }
+
+  function reserve(extra) {
+    if (length + extra <= out.length) return;
+    let size = out.length;
+    while (size < length + extra) size *= 2;
+    const next = new Uint8Array(size);
+    next.set(out.subarray(0, length));
+    out = next;
+  }
+
+  for (;;) {
+    const last = bits(1);
+    const type = bits(2);
+    if (type === 0) {
+      at -= bitCount >> 3;
+      bitBuffer = 0;
+      bitCount = 0;
+      const stored = source[at] | (source[at + 1] << 8);
+      at += 4;
+      reserve(stored);
+      out.set(source.subarray(at, at + stored), length);
+      at += stored;
+      length += stored;
+    } else if (type === 1 || type === 2) {
+      let literals = FIXED_LITERAL;
+      let distances = FIXED_DISTANCE;
+      if (type === 2) {
+        const literalCount = bits(5) + 257;
+        const distanceCount = bits(5) + 1;
+        const codeCount = bits(4) + 4;
+        const codeLengths = new Uint8Array(19);
+        for (let i = 0; i < codeCount; i += 1) codeLengths[CODE_ORDER[i]] = bits(3);
+        const codeTree = huffman(codeLengths);
+        const lengths = new Uint8Array(literalCount + distanceCount);
+        let filled = 0;
+        while (filled < lengths.length) {
+          const symbol = decode(codeTree);
+          if (symbol < 16) {
+            lengths[filled++] = symbol;
+          } else if (symbol === 16) {
+            const previous = lengths[filled - 1];
+            let repeat = 3 + bits(2);
+            while (repeat--) lengths[filled++] = previous;
+          } else if (symbol === 17) {
+            let repeat = 3 + bits(3);
+            while (repeat--) lengths[filled++] = 0;
+          } else {
+            let repeat = 11 + bits(7);
+            while (repeat--) lengths[filled++] = 0;
+          }
+        }
+        literals = huffman(lengths.subarray(0, literalCount));
+        distances = huffman(lengths.subarray(literalCount));
+      }
+      for (;;) {
+        const symbol = decode(literals);
+        if (symbol < 256) {
+          reserve(1);
+          out[length++] = symbol;
+        } else if (symbol === 256) {
+          break;
+        } else {
+          const slot = symbol - 257;
+          const run = LENGTH_BASE[slot] + bits(LENGTH_EXTRA[slot]);
+          const distanceSlot = decode(distances);
+          const distance = DIST_BASE[distanceSlot] + bits(DIST_EXTRA[distanceSlot]);
+          reserve(run);
+          let from = length - distance;
+          for (let i = 0; i < run; i += 1) out[length++] = out[from++];
+        }
+      }
+    } else {
+      throw new Error("inflate: bad block type");
+    }
+    if (last) break;
+  }
+  return out.slice(0, length);
+}
+
+async function unpack(bytes, hint) {
+  if (typeof DecompressionStream === "function") {
+    try {
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
+      const buffer = await new Response(stream).arrayBuffer();
+      return new Uint8Array(buffer);
+    } catch (error) {
+      // A browser that advertises the stream but refuses the data falls back to the decoder above.
+    }
+  }
+  return inflate(bytes, hint);
+}
+
+function base64Bytes(text) {
+  const raw = atob(text);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+const MAGIC = "MBLJSWRM1";
+
+const DTYPES = {
+  uint8: Uint8Array, int8: Int8Array, uint16: Uint16Array, int16: Int16Array,
+  uint32: Uint32Array, int32: Int32Array, float32: Float32Array,
+};
+
+function openContainer(bytes) {
+  let magic = "";
+  for (let i = 0; i < MAGIC.length; i += 1) magic += String.fromCharCode(bytes[i]);
+  if (magic !== MAGIC) throw new Error("not a " + MAGIC + " container");
+  const view = new DataView(bytes.buffer, bytes.byteOffset);
+  const headerLength = view.getUint32(MAGIC.length, true);
+  const start = MAGIC.length + 4;
+  const header = JSON.parse(new TextDecoder().decode(bytes.subarray(start, start + headerLength)));
+  if (header.format !== "mblj-swarm/1") throw new Error("unknown format " + header.format);
+  return { header, payload: bytes.subarray(start + headerLength) };
+}
+
+function poseTriangles(header) {
+  let most = 0;
+  for (const pose of header.poses) most = Math.max(most, pose[2]);
+  return most;
+}
+
+function expectedBytes(header, entry) {
+  const triangles = poseTriangles(header);
+  let count = 1;
+  for (const dimension of entry.shape) count *= dimension < 0 ? triangles : dimension;
+  return count * DTYPES[entry.dtype].BYTES_PER_ELEMENT;
+}
+
+// Every stream is either raw, deflated, or deflated on top of a delta down its first axis. The
+// delta is taken in the signed type of the same width and allowed to wrap, so accumulating it in
+// an Int16Array or an Int8Array reproduces the writer's arithmetic exactly, and reading those same
+// bits back through the declared unsigned view is what turns a wrapped total into a pose index.
+async function decodeStream(container, name) {
+  const entry = container.header.streams[name];
+  if (!entry) throw new Error("container has no stream " + name);
+  const slice = container.payload.subarray(entry.offset, entry.offset + entry.length);
+  const bytes = entry.codec === "raw"
+    ? slice.slice()
+    : await unpack(slice, expectedBytes(container.header, entry));
+  const Kind = DTYPES[entry.dtype];
+  if (!Kind) throw new Error("unknown dtype " + entry.dtype);
+  if (entry.codec === "raw" || entry.codec === "deflate") {
+    return new Kind(bytes.buffer, bytes.byteOffset, bytes.byteLength / Kind.BYTES_PER_ELEMENT);
+  }
+  const wide = entry.codec === "delta16+deflate";
+  if (!wide && entry.codec !== "delta8+deflate") throw new Error("unknown codec " + entry.codec);
+  const Signed = wide ? Int16Array : Int8Array;
+  const running = new Signed(bytes.buffer, bytes.byteOffset,
+    bytes.byteLength / Signed.BYTES_PER_ELEMENT);
+  const rows = entry.shape[0];
+  const span = running.length / rows;
+  for (let row = 1; row < rows; row += 1) {
+    const base = row * span;
+    for (let i = 0; i < span; i += 1) running[base + i] += running[base + i - span];
+  }
+  return new Kind(running.buffer, running.byteOffset, running.length);
+}
+
+function hexRgb(text) {
+  const value = parseInt(text.trim().replace("#", ""), 16);
+  return [((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255];
+}
+
+function tokens() {
+  const style = getComputedStyle(document.documentElement);
+  const read = (name) => style.getPropertyValue(name).trim();
+  return {
+    ink: read("--ink"), muted: read("--muted"), rule: read("--rule"), grid: read("--grid"),
+    neutral: read("--neutral"),
+    floor: read("--floor"), floorFill: read("--floor-fill"), speed: read("--speed"),
+    speedFill: read("--speed-fill"), dead: read("--dead"), panel: read("--panel"),
+    skyLow: read("--sky-low"), skyHigh: read("--sky-high"), contact: read("--contact"),
+    track: read("--track"),
+  };
+}
+
+function identity() {
+  return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+}
+
+function perspective(out, fovY, aspect, near, far) {
+  const focal = 1 / Math.tan(fovY / 2);
+  out.fill(0);
+  out[0] = focal / aspect;
+  out[5] = focal;
+  out[10] = (far + near) / (near - far);
+  out[11] = -1;
+  out[14] = (2 * far * near) / (near - far);
+  return out;
+}
+
+function lookAt(out, eye, target, up) {
+  let fx = target[0] - eye[0];
+  let fy = target[1] - eye[1];
+  let fz = target[2] - eye[2];
+  const flen = Math.hypot(fx, fy, fz) || 1;
+  fx /= flen; fy /= flen; fz /= flen;
+  let sx = fy * up[2] - fz * up[1];
+  let sy = fz * up[0] - fx * up[2];
+  let sz = fx * up[1] - fy * up[0];
+  const slen = Math.hypot(sx, sy, sz) || 1;
+  sx /= slen; sy /= slen; sz /= slen;
+  const ux = sy * fz - sz * fy;
+  const uy = sz * fx - sx * fz;
+  const uz = sx * fy - sy * fx;
+  out[0] = sx; out[1] = ux; out[2] = -fx; out[3] = 0;
+  out[4] = sy; out[5] = uy; out[6] = -fy; out[7] = 0;
+  out[8] = sz; out[9] = uz; out[10] = -fz; out[11] = 0;
+  out[12] = -(sx * eye[0] + sy * eye[1] + sz * eye[2]);
+  out[13] = -(ux * eye[0] + uy * eye[1] + uz * eye[2]);
+  out[14] = fx * eye[0] + fy * eye[1] + fz * eye[2];
+  out[15] = 1;
+  return out;
+}
+
+function multiply(out, a, b) {
+  for (let column = 0; column < 4; column += 1) {
+    const b0 = b[column * 4];
+    const b1 = b[column * 4 + 1];
+    const b2 = b[column * 4 + 2];
+    const b3 = b[column * 4 + 3];
+    out[column * 4] = a[0] * b0 + a[4] * b1 + a[8] * b2 + a[12] * b3;
+    out[column * 4 + 1] = a[1] * b0 + a[5] * b1 + a[9] * b2 + a[13] * b3;
+    out[column * 4 + 2] = a[2] * b0 + a[6] * b1 + a[10] * b2 + a[14] * b3;
+    out[column * 4 + 3] = a[3] * b0 + a[7] * b1 + a[11] * b2 + a[15] * b3;
+  }
+  return out;
+}
+
+// The corridor is lit as an atmosphere rather than a room. Height is the only thing the page is
+// really about, so height is what carries the light: the haze is dark down at the spawn tile and
+// pale up at the top landing, and every surface fades into the haze at its own altitude rather
+// than into one flat grey. The staircase runs the same gradient the other way, deep teal at the
+// bottom and bright mint at the top, so geometry and air never converge on the same colour.
+const SKY_FUNCTION = [
+  "uniform vec3 uSkyLow;",
+  "uniform vec3 uSkyHigh;",
+  "uniform vec2 uSkyRange;",
+  "vec3 skyAt(float height) {",
+  "  float t = clamp((height - uSkyRange.x) / (uSkyRange.y - uSkyRange.x), 0.0, 1.0);",
+  "  return mix(uSkyLow, uSkyHigh, t * t * (3.0 - 2.0 * t));",
+  "}",
+].join("\n");
+
+const SKY_VERTEX = [
+  "#version 300 es",
+  "precision highp float;",
+  "in vec2 aCorner;",
+  "uniform vec3 uRayForward;",
+  "uniform vec3 uRayRight;",
+  "uniform vec3 uRayUp;",
+  "out vec3 vDir;",
+  "void main() {",
+  "  vDir = uRayForward + aCorner.x * uRayRight + aCorner.y * uRayUp;",
+  "  gl_Position = vec4(aCorner, 0.0, 1.0);",
+  "}",
+].join("\n");
+
+const SKY_FRAGMENT = [
+  "#version 300 es",
+  "precision highp float;",
+  SKY_FUNCTION,
+  "uniform vec3 uEye;",
+  "uniform float uSkyDistance;",
+  "in vec3 vDir;",
+  "out vec4 fragColor;",
+  "void main() {",
+  "  vec3 dir = normalize(vDir);",
+  "  fragColor = vec4(skyAt(uEye.y + dir.y * uSkyDistance), 1.0);",
+  "}",
+].join("\n");
+
+const LEVEL_VERTEX = [
+  "#version 300 es",
+  "precision highp float;",
+  "in vec3 aPos;",
+  "in vec3 aNormal;",
+  "in vec3 aTint;",
+  "uniform mat4 uViewProj;",
+  "uniform vec3 uEye;",
+  "out vec3 vNormal;",
+  "out vec3 vTint;",
+  "out vec3 vWorld;",
+  "out float vDepth;",
+  "void main() {",
+  "  vNormal = aNormal;",
+  "  vTint = aTint;",
+  "  vWorld = aPos;",
+  "  vDepth = length(aPos - uEye);",
+  "  gl_Position = uViewProj * vec4(aPos, 1.0);",
+  "}",
+].join("\n");
+
+const LEVEL_FRAGMENT = [
+  "#version 300 es",
+  "precision highp float;",
+  SKY_FUNCTION,
+  "uniform vec3 uLight;",
+  "uniform vec2 uFogRange;",
+  "uniform vec3 uClipMin;",
+  "uniform vec3 uClipMax;",
+  "in vec3 vNormal;",
+  "in vec3 vTint;",
+  "in vec3 vWorld;",
+  "in float vDepth;",
+  "out vec4 fragColor;",
+  "void main() {",
+  "  if (any(lessThan(vWorld, uClipMin)) || any(greaterThan(vWorld, uClipMax))) discard;",
+  "  vec3 normal = normalize(vNormal);",
+  "  float key = pow(0.5 + 0.5 * dot(normal, uLight), 1.6);",
+  "  float sky = 0.5 + 0.5 * normal.y;",
+  "  float bounce = max(-normal.y, 0.0);",
+  "  vec3 shade = vTint * (0.22 + 0.58 * key + 0.26 * sky + 0.10 * bounce);",
+  "  float fog = clamp((vDepth - uFogRange.x) / (uFogRange.y - uFogRange.x), 0.0, 1.0);",
+  "  float grey = dot(shade, vec3(0.299, 0.587, 0.114));",
+  "  shade = mix(shade, vec3(grey), fog * 0.30);",
+  "  fragColor = vec4(mix(shade, skyAt(vWorld.y) * 0.88, fog * 0.72), 1.0);",
+  "}",
+].join("\n");
+
+// One Mario mesh, one draw call, one instance per slot. Nothing about the body is a per vertex
+// attribute: the pose dictionary lives in textures and the vertex shader fetches vertex
+// gl_VertexID of pose aInstPose out of it, so the only per instance data on the bus is a
+// position, a yaw, a pose index and a tint. aVertex carries the vertex's own index and is the one
+// attribute with divisor zero, which also keeps the draw legal on a driver that dislikes a
+// vertex spec made entirely of instanced arrays. aInstPos is interpolated between the outgoing
+// and the incoming checkpoint while the population re-seats, which is the only thing the
+// checkpoint crossfade needs, because the pose index can snap without anyone noticing.
+const MARIO_VERTEX = [
+  "#version 300 es",
+  "precision highp float;",
+  "precision highp int;",
+  "in float aVertex;",
+  "in vec3 aInstPos;",
+  "in float aInstYaw;",
+  "in float aInstPose;",
+  "in vec3 aInstTint;",
+  "in float aInstMix;",
+  "uniform mat4 uViewProj;",
+  "uniform vec3 uEye;",
+  "uniform highp isampler2D uPosePos;",
+  "uniform highp isampler2D uPoseNorm;",
+  "uniform highp isampler2D uPoseMeta;",
+  "uniform highp sampler2D uPoseUv;",
+  "uniform highp sampler2D uPoseSlot;",
+  "uniform highp sampler2D uPoseColor;",
+  "uniform int uTexWidth;",
+  "uniform int uPoseStride;",
+  "uniform int uTriangles;",
+  "uniform float uPoseScale;",
+  "uniform float uNormalScale;",
+  "out vec3 vNormal;",
+  "out vec3 vColor;",
+  "out vec2 vUv;",
+  "out vec4 vSlot;",
+  "out vec3 vTint;",
+  "out vec3 vWorld;",
+  "out vec3 vView;",
+  "out float vMix;",
+  "out float vDepth;",
+  "ivec2 at(int index) {",
+  "  return ivec2(index % uTexWidth, index / uTexWidth);",
+  "}",
+  "void main() {",
+  "  int vertex = int(aVertex);",
+  "  int pose = int(aInstPose);",
+  "  int triangle = vertex / 3;",
+  "  ivec4 meta = texelFetch(uPoseMeta, at(pose), 0);",
+  "  int texel = pose * uPoseStride + vertex;",
+  "  vec3 local = vec3(texelFetch(uPosePos, at(texel), 0).xyz) / uPoseScale;",
+  "  vec3 raw = vec3(texelFetch(uPoseNorm, at(texel), 0).xyz) / uNormalScale;",
+  "  float cosine = cos(aInstYaw);",
+  "  float sine = sin(aInstYaw);",
+  "  vec3 world = vec3(local.x * cosine + local.z * sine, local.y,",
+  "                    -local.x * sine + local.z * cosine) + aInstPos;",
+  "  vNormal = vec3(raw.x * cosine + raw.z * sine, raw.y, -raw.x * sine + raw.z * cosine);",
+  "  vUv = texelFetch(uPoseUv, at(meta.z * uPoseStride + vertex), 0).rg;",
+  "  vSlot = texelFetch(uPoseSlot, at(meta.z * uTriangles + triangle), 0);",
+  "  vColor = texelFetch(uPoseColor, at(meta.y * uTriangles + triangle), 0).rgb;",
+  "  vTint = aInstTint;",
+  "  vMix = aInstMix;",
+  "  vWorld = world;",
+  "  vView = uEye - world;",
+  "  vDepth = length(vView);",
+  "  gl_Position = uViewProj * vec4(world, 1.0);",
+  "}",
+].join("\n");
+
+// Forty-eight Marios have to read as a crowd with legible individuals, which a flat tint wash
+// cannot do: it throws away the one thing that makes a Mario a Mario, his own red and blue. So
+// outcome rides on a rim term instead. Every body gets a faint rim in the sky colour, which is
+// just the sky reflecting off him and is what separates one silhouette from the next; a Mario the
+// warp is throwing back gets a red rim, a Mario whose episode has reached the landing a teal one,
+// and a Mario on the frame he respawns an amber flash. The body colour survives all of it.
+const MARIO_FRAGMENT = [
+  "#version 300 es",
+  "precision highp float;",
+  SKY_FUNCTION,
+  "uniform highp sampler2D uAtlas;",
+  "uniform vec3 uLight;",
+  "uniform vec2 uFogRange;",
+  "uniform float uUseAtlas;",
+  "uniform float uRimGain;",
+  "in vec3 vNormal;",
+  "in vec3 vColor;",
+  "in vec2 vUv;",
+  "in vec4 vSlot;",
+  "in vec3 vTint;",
+  "in vec3 vWorld;",
+  "in vec3 vView;",
+  "in float vMix;",
+  "in float vDepth;",
+  "out vec4 fragColor;",
+  "void main() {",
+  "  vec3 base = vColor;",
+  "  if (vSlot.x >= 0.0 && uUseAtlas > 0.5) {",
+  "    vec4 texel = texture(uAtlas, clamp(vUv, vSlot.xy, vSlot.zw));",
+  "    base = mix(base, texel.rgb * vColor, texel.a);",
+  "  }",
+  "  vec3 normal = normalize(vNormal);",
+  "  vec3 eye = normalize(vView);",
+  "  float lambert = max(dot(normal, uLight), 0.0);",
+  "  float key = pow(0.5 + 0.5 * dot(normal, uLight), 1.7);",
+  "  float sky = 0.5 + 0.5 * normal.y;",
+  "  float bounce = max(-normal.y, 0.0);",
+  "  vec3 shade = base * (0.18 + 0.66 * key + 0.22 * sky + 0.10 * bounce);",
+  "  float sheen = pow(max(dot(normal, normalize(uLight + eye)), 0.0), 26.0);",
+  "  shade += vec3(sheen * lambert * 0.20);",
+  "  float amount = clamp(vMix, 0.0, 1.0);",
+  "  float rim = pow(1.0 - clamp(dot(normal, eye), 0.0, 1.0), 1.9);",
+  "  shade = mix(shade, shade * 0.55 + vTint * 0.72, amount * 0.85);",
+  "  shade += vTint * rim * uRimGain * (0.32 + 1.30 * amount);",
+  "  float fog = clamp((vDepth - uFogRange.x) / (uFogRange.y - uFogRange.x), 0.0, 1.0);",
+  "  float grey = dot(shade, vec3(0.299, 0.587, 0.114));",
+  "  shade = mix(shade, vec3(grey), fog * 0.30);",
+  "  fragColor = vec4(mix(shade, skyAt(vWorld.y) * 0.88, fog * 0.72), 1.0);",
+  "}",
+].join("\n");
+
+// A contact shadow is the cheapest way to nail forty-eight bodies to the geometry they are
+// standing on, and it stays honest about the ones who are not standing on anything: the disc sits
+// at the tread the slot last had under his feet and fades out over the frames he spends in the
+// air, so a Mario mid chain trails a shadow that is left behind on the step he launched from.
+const SHADOW_VERTEX = [
+  "#version 300 es",
+  "precision highp float;",
+  "in vec2 aCorner;",
+  "in vec3 aDropPos;",
+  "in vec2 aDropShape;",
+  "uniform mat4 uViewProj;",
+  "uniform vec3 uEye;",
+  "out vec2 vLocal;",
+  "out float vStrength;",
+  "out float vDepth;",
+  "void main() {",
+  "  vLocal = aCorner;",
+  "  vStrength = aDropShape.y;",
+  "  vec3 world = aDropPos + vec3(aCorner.x * aDropShape.x, 0.0, aCorner.y * aDropShape.x);",
+  "  vDepth = length(world - uEye);",
+  "  gl_Position = uViewProj * vec4(world, 1.0);",
+  "}",
+].join("\n");
+
+const SHADOW_FRAGMENT = [
+  "#version 300 es",
+  "precision highp float;",
+  "uniform vec3 uColor;",
+  "uniform float uAlpha;",
+  "uniform vec2 uFogRange;",
+  "in vec2 vLocal;",
+  "in float vStrength;",
+  "in float vDepth;",
+  "out vec4 fragColor;",
+  "void main() {",
+  "  float edge = 1.0 - smoothstep(0.30, 1.0, length(vLocal));",
+  "  float fog = clamp((vDepth - uFogRange.x) / (uFogRange.y - uFogRange.x), 0.0, 1.0);",
+  "  float alpha = edge * edge * vStrength * uAlpha * (1.0 - fog * 0.7);",
+  "  if (alpha < 0.004) discard;",
+  "  fragColor = vec4(uColor, alpha);",
+  "}",
+].join("\n");
+
+const TRAIL_VERTEX = [
+  "#version 300 es",
+  "precision highp float;",
+  "in vec3 aPos;",
+  "in float aFade;",
+  "in vec3 aTint;",
+  "uniform mat4 uViewProj;",
+  "uniform float uPointSize;",
+  "out float vFade;",
+  "out vec3 vTint;",
+  "void main() {",
+  "  vFade = aFade;",
+  "  vTint = aTint;",
+  "  gl_PointSize = uPointSize;",
+  "  gl_Position = uViewProj * vec4(aPos, 1.0);",
+  "}",
+].join("\n");
+
+const TRAIL_FRAGMENT = [
+  "#version 300 es",
+  "precision highp float;",
+  "uniform float uAlpha;",
+  "in float vFade;",
+  "in vec3 vTint;",
+  "out vec4 fragColor;",
+  "void main() {",
+  "  fragColor = vec4(vTint, uAlpha * vFade);",
+  "}",
+].join("\n");
+
+const FLAT_VERTEX = [
+  "#version 300 es",
+  "precision highp float;",
+  "in vec3 aPos;",
+  "in float aFade;",
+  "uniform mat4 uViewProj;",
+  "uniform float uPointSize;",
+  "out float vFade;",
+  "out vec3 vWorld;",
+  "void main() {",
+  "  vFade = aFade;",
+  "  vWorld = aPos;",
+  "  gl_PointSize = uPointSize;",
+  "  gl_Position = uViewProj * vec4(aPos, 1.0);",
+  "}",
+].join("\n");
+
+const FLAT_FRAGMENT = [
+  "#version 300 es",
+  "precision highp float;",
+  "uniform vec3 uColor;",
+  "uniform float uAlpha;",
+  "uniform vec2 uHatch;",
+  "in float vFade;",
+  "in vec3 vWorld;",
+  "out vec4 fragColor;",
+  "void main() {",
+  "  float alpha = uAlpha * vFade;",
+  "  if (uHatch.x > 0.0) {",
+  "    float phase = fract((vWorld.x + vWorld.z) / uHatch.x);",
+  "    float stripe = smoothstep(0.34, 0.46, phase) * (1.0 - smoothstep(0.54, 0.66, phase));",
+  "    alpha *= mix(1.0, 0.18 + 1.5 * stripe, uHatch.y);",
+  "  }",
+  "  fragColor = vec4(uColor, alpha);",
+  "}",
+].join("\n");
+
+function compile(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    throw new Error("shader: " + gl.getShaderInfoLog(shader));
+  }
+  return shader;
+}
+
+function link(gl, vertexSource, fragmentSource, attributes, uniforms) {
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, vertexSource));
+  gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, fragmentSource));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    throw new Error("program: " + gl.getProgramInfoLog(program));
+  }
+  const handle = { program, attribute: {}, uniform: {} };
+  for (const name of attributes) handle.attribute[name] = gl.getAttribLocation(program, name);
+  for (const name of uniforms) handle.uniform[name] = gl.getUniformLocation(program, name);
+  const missing = attributes.filter((name) => handle.attribute[name] < 0)
+    .concat(uniforms.filter((name) => handle.uniform[name] === null));
+  if (missing.length) throw new Error("program dropped " + missing.join(", "));
+  return handle;
+}
+
+function buffer(gl, data, usage) {
+  const handle = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, handle);
+  gl.bufferData(gl.ARRAY_BUFFER, data, usage || gl.STATIC_DRAW);
+  return handle;
+}
+
+function bindAttribute(gl, location, handle, size, type, normalized, stride, offset, divisor) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, handle);
+  gl.enableVertexAttribArray(location);
+  gl.vertexAttribPointer(location, size, type, normalized, stride, offset);
+  gl.vertexAttribDivisor(location, divisor || 0);
+}
+
+function triangleNormal(vertices, triangle) {
+  const base = triangle * 9;
+  const ux = vertices[base + 3] - vertices[base];
+  const uy = vertices[base + 4] - vertices[base + 1];
+  const uz = vertices[base + 5] - vertices[base + 2];
+  const vx = vertices[base + 6] - vertices[base];
+  const vy = vertices[base + 7] - vertices[base + 1];
+  const vz = vertices[base + 8] - vertices[base + 2];
+  const nx = uy * vz - uz * vy;
+  const ny = uz * vx - ux * vz;
+  const nz = ux * vy - uy * vx;
+  const length = Math.hypot(nx, ny, nz) || 1;
+  return [nx / length, ny / length, nz / length];
+}
+
+function overlapsBox(vertices, triangle, box) {
+  for (let axis = 0; axis < 3; axis += 1) {
+    const base = triangle * 9 + axis;
+    const a = vertices[base];
+    const b = vertices[base + 3];
+    const c = vertices[base + 6];
+    if (Math.min(a, b, c) > box[axis + 3] || Math.max(a, b, c) < box[axis]) return false;
+  }
+  return true;
+}
+
+// The corridor is a slot between two walls with a ceiling on top, so a camera outside it sees
+// nothing. Dropping the side walls and the ceilings opens it up, and the box trims the rest of
+// the area away in the shader, which keeps the staircase readable from any orbit. The last cut is
+// by size rather than by facing, because a riser and a shaft wall both point along z. Measured on
+// castle_inside/areas/2 the 144 near vertical triangles inside the corridor box come in two
+// clumps, 25 to 26 units tall for the risers and 256 or 307 for the six wall panels, so a cut at
+// 120 separates them with room to spare and stops a wall parking itself in front of the warp.
+const WALL_HEIGHT = 120;
+
+function drawable(vertices, triangle, normal, box) {
+  if (!overlapsBox(vertices, triangle, box)) return false;
+  if (Math.abs(normal[0]) > 0.9 || normal[1] < -0.35) return false;
+  if (Math.abs(normal[1]) < 0.5) {
+    const base = triangle * 9 + 1;
+    const a = vertices[base];
+    const b = vertices[base + 3];
+    const c = vertices[base + 6];
+    if (Math.max(a, b, c) - Math.min(a, b, c) > WALL_HEIGHT) return false;
+  }
+  return true;
+}
+
+function levelMesh(vertices, surfaceTypes, warpType, box) {
+  const kept = [];
+  const keptNormals = [];
+  for (let triangle = 0; triangle < surfaceTypes.length; triangle += 1) {
+    const normal = triangleNormal(vertices, triangle);
+    if (!drawable(vertices, triangle, normal, box)) continue;
+    kept.push(triangle);
+    keptNormals.push(normal);
+  }
+  const count = kept.length;
+  const types = new Int16Array(count);
+  const positions = new Float32Array(count * 9);
+  const normals = new Float32Array(count * 9);
+  const tints = new Float32Array(count * 9);
+  const bounds = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  for (let triangle = 0; triangle < count; triangle += 1) {
+    const base = triangle * 9;
+    const source = kept[triangle] * 9;
+    types[triangle] = surfaceTypes[kept[triangle]];
+    for (let i = 0; i < 9; i += 1) {
+      const value = vertices[source + i];
+      positions[base + i] = value;
+      const axis = i % 3;
+      if (value < bounds[axis]) bounds[axis] = value;
+      if (value > bounds[axis + 3]) bounds[axis + 3] = value;
+    }
+    const [nx, ny, nz] = keptNormals[triangle];
+    for (let corner = 0; corner < 3; corner += 1) {
+      normals[base + corner * 3] = nx;
+      normals[base + corner * 3 + 1] = ny;
+      normals[base + corner * 3 + 2] = nz;
+    }
+  }
+  return { positions, normals, tints, types, warpType, count: count * 3,
+    total: surfaceTypes.length, bounds };
+}
+
+// Treads bright, risers a little behind them, undersides almost gone, and the twelve warp
+// triangles red. The gap between tread and riser is small on purpose: looking up the stairwell
+// from behind, almost every pixel of the staircase is a riser, so burying them loses the
+// staircase. On top of
+// that every tread is graded by its own height, deep teal down at the spawn tile and bright mint
+// up at the landing. The air runs the opposite way, dark low and pale high, so the two gradients
+// cross rather than converge and a step never ends up the same colour as the haze behind it.
+function paintLevel(level, colors, span) {
+  const palette = {
+    floor: hexRgb(colors.floor), dead: hexRgb(colors.dead), muted: hexRgb(colors.muted),
+    high: hexRgb(colors.skyHigh),
+  };
+  const low = span[0];
+  const reach = Math.max(1, span[1] - span[0]);
+  for (let triangle = 0; triangle < level.types.length; triangle += 1) {
+    const base = triangle * 9;
+    const ny = level.normals[base + 1];
+    const warp = level.types[triangle] === level.warpType;
+    const tread = ny > 0.9;
+    let tint = palette.floor;
+    let gain = 1;
+    if (warp) {
+      tint = palette.dead;
+      gain = 1.12;
+    } else if (ny < -0.35) {
+      tint = palette.muted;
+      gain = 0.30;
+    } else if (!tread) {
+      gain = 0.78;
+    }
+    const mid = (level.positions[base + 1] + level.positions[base + 4]
+      + level.positions[base + 7]) / 3;
+    const climb = Math.min(1, Math.max(0, (mid - low) / reach));
+    const lift = warp ? 0 : climb * climb;
+    for (let corner = 0; corner < 3; corner += 1) {
+      for (let axis = 0; axis < 3; axis += 1) {
+        const deep = tint[axis] * 0.46;
+        const pale = Math.min(1, tint[axis] * 1.30 + palette.high[axis] * 0.18);
+        level.tints[base + corner * 3 + axis] = (deep + (pale - deep) * lift) * gain;
+      }
+    }
+  }
+  return level.tints;
+}
+
+
+function boxLines(low, high) {
+  const corners = [];
+  for (let i = 0; i < 8; i += 1) {
+    corners.push([i & 1 ? high[0] : low[0], i & 2 ? high[1] : low[1], i & 4 ? high[2] : low[2]]);
+  }
+  const edges = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7],
+    [0, 4], [1, 5], [2, 6], [3, 7]];
+  const out = [];
+  for (const [a, b] of edges) out.push(...corners[a], ...corners[b]);
+  return new Float32Array(out);
+}
+
+function boxFaces(low, high) {
+  const quad = (a, b, c, d) => [...a, ...b, ...c, ...a, ...c, ...d];
+  const p = (x, y, z) => [x ? high[0] : low[0], y ? high[1] : low[1], z ? high[2] : low[2]];
+  const out = [];
+  out.push(...quad(p(0, 0, 0), p(1, 0, 0), p(1, 1, 0), p(0, 1, 0)));
+  out.push(...quad(p(0, 0, 1), p(1, 0, 1), p(1, 1, 1), p(0, 1, 1)));
+  out.push(...quad(p(0, 0, 0), p(0, 0, 1), p(0, 1, 1), p(0, 1, 0)));
+  out.push(...quad(p(1, 0, 0), p(1, 0, 1), p(1, 1, 1), p(1, 1, 0)));
+  out.push(...quad(p(0, 1, 0), p(1, 1, 0), p(1, 1, 1), p(0, 1, 1)));
+  return new Float32Array(out);
+}
+
+function planeQuad(y, low, high) {
+  return new Float32Array([
+    low[0], y, low[2], high[0], y, low[2], high[0], y, high[2],
+    low[0], y, low[2], high[0], y, high[2], low[0], y, high[2],
+  ]);
+}
+
+function planeOutline(y, low, high) {
+  return new Float32Array([
+    low[0], y, low[2], high[0], y, low[2],
+    high[0], y, low[2], high[0], y, high[2],
+    high[0], y, high[2], low[0], y, high[2],
+    low[0], y, high[2], low[0], y, low[2],
+  ]);
+}
+
+// The landing is a plaque rather than a floor that runs off into the dark, so the plane stops a
+// few hundred units either side of the goal z instead of following the clip box out past the end
+// of the level. A plane whose far edge is off screen reads as a stray triangle, not as a goal.
+const GOAL_PLANE_DEPTH = [520, 340];
+
+function goalPlane(header, clip) {
+  const low = [clip.low[0], header.goal.goal_y, header.goal.goal_z - GOAL_PLANE_DEPTH[1]];
+  const high = [clip.high[0], header.goal.goal_y,
+    header.goal.goal_z + GOAL_PLANE_DEPTH[0]];
+  return { low, high };
+}
+
+
+function slotRects(atlas) {
+  const halfU = 0.5 / atlas.width;
+  const halfV = 0.5 / atlas.height;
+  return atlas.slots.map((slot) => [
+    slot.u0 + halfU, slot.v0 + halfV, slot.u1 - halfU, slot.v1 - halfV,
+  ]);
+}
+
+// A triangle's uvs are texture local until the atlas packer has moved them, so the only way back
+// to a slot is to ask which slot's sub-rectangle they already sit inside. The untextured ones are
+// flagged by a negative rectangle, which the fragment shader reads as "vertex color only".
+function slotTable(uv, variants, triangles, sentinel, rects) {
+  const table = new Float32Array(variants * triangles * 4);
+  let textured = 0;
+  for (let variant = 0; variant < variants; variant += 1) {
+    for (let triangle = 0; triangle < triangles; triangle += 1) {
+      const base = (variant * triangles + triangle) * 6;
+      const target = (variant * triangles + triangle) * 4;
+      let plain = true;
+      for (let i = 0; i < 6; i += 1) {
+        if (uv[base + i] !== sentinel) plain = false;
+      }
+      if (plain) {
+        table[target] = -1;
+        table[target + 1] = -1;
+        table[target + 2] = -1;
+        table[target + 3] = -1;
+        continue;
+      }
+      let best = 0;
+      let bestCost = Infinity;
+      for (let slot = 0; slot < rects.length; slot += 1) {
+        const rect = rects[slot];
+        let cost = 0;
+        for (let corner = 0; corner < 3; corner += 1) {
+          const u = uv[base + corner * 2];
+          const v = uv[base + corner * 2 + 1];
+          cost += Math.max(0, rect[0] - u) + Math.max(0, u - rect[2]);
+          cost += Math.max(0, rect[1] - v) + Math.max(0, v - rect[3]);
+        }
+        if (cost < bestCost) {
+          bestCost = cost;
+          best = slot;
+        }
+      }
+      textured += 1;
+      table.set(rects[best], target);
+    }
+  }
+  return { table, textured: textured / Math.max(1, variants) };
+}
+
+function dataTexture(gl, width, texels, spec, fill) {
+  const height = Math.max(1, Math.ceil(texels / width));
+  const data = new spec.Kind(width * height * spec.channels);
+  fill(data);
+  const handle = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, handle);
+  gl.texImage2D(gl.TEXTURE_2D, 0, spec.internal, width, height, 0, spec.format, spec.type, data);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return { handle, width, height, texels, bytes: data.byteLength };
+}
+
+function textureSpecs(gl) {
+  return {
+    short4: { internal: gl.RGBA16I, format: gl.RGBA_INTEGER, type: gl.SHORT,
+      Kind: Int16Array, channels: 4 },
+    byte4: { internal: gl.RGBA8I, format: gl.RGBA_INTEGER, type: gl.BYTE,
+      Kind: Int8Array, channels: 4 },
+    float2: { internal: gl.RG32F, format: gl.RG, type: gl.FLOAT,
+      Kind: Float32Array, channels: 2 },
+    float4: { internal: gl.RGBA32F, format: gl.RGBA, type: gl.FLOAT,
+      Kind: Float32Array, channels: 4 },
+    unorm4: { internal: gl.RGBA8, format: gl.RGBA, type: gl.UNSIGNED_BYTE,
+      Kind: Uint8Array, channels: 4 },
+  };
+}
+
+function spread3(source, data, texels, channels) {
+  for (let texel = 0; texel < texels; texel += 1) {
+    const from = texel * 3;
+    const to = texel * channels;
+    data[to] = source[from];
+    data[to + 1] = source[from + 1];
+    data[to + 2] = source[from + 2];
+  }
+}
+
+function buildPoseTextures(gl, header, decoded, width) {
+  const specs = textureSpecs(gl);
+  const triangles = poseTriangles(header);
+  const stride = triangles * 3;
+  const poses = header.poses.length;
+  const vertexTexels = poses * stride;
+  const positions = dataTexture(gl, width, vertexTexels, specs.short4,
+    (data) => spread3(decoded.posePositions, data, vertexTexels, 4));
+  const normals = dataTexture(gl, width, vertexTexels, specs.byte4,
+    (data) => spread3(decoded.poseNormals, data, vertexTexels, 4));
+  const meta = dataTexture(gl, width, poses, specs.short4, (data) => {
+    for (let pose = 0; pose < poses; pose += 1) {
+      data[pose * 4] = header.poses[pose][2];
+      data[pose * 4 + 1] = header.poses[pose][3];
+      data[pose * 4 + 2] = header.poses[pose][4];
+    }
+  });
+  const uvTexels = header.uv_variant_count * stride;
+  const uv = dataTexture(gl, width, uvTexels, specs.float2, (data) => {
+    for (let texel = 0; texel < uvTexels; texel += 1) {
+      data[texel * 2] = decoded.uv[texel * 2];
+      data[texel * 2 + 1] = decoded.uv[texel * 2 + 1];
+    }
+  });
+  const rects = slotTable(decoded.uv, header.uv_variant_count, triangles,
+    header.untextured_uv_sentinel, slotRects(header.atlas));
+  const slots = dataTexture(gl, width, header.uv_variant_count * triangles, specs.float4,
+    (data) => data.set(rects.table));
+  const palette = header.color_palette;
+  const colorTexels = header.color_variant_count * triangles;
+  const color = dataTexture(gl, width, colorTexels, specs.unorm4, (data) => {
+    for (let texel = 0; texel < colorTexels; texel += 1) {
+      const rgb = palette[decoded.colorIndex[texel]] || [255, 255, 255];
+      data[texel * 4] = rgb[0];
+      data[texel * 4 + 1] = rgb[1];
+      data[texel * 4 + 2] = rgb[2];
+      data[texel * 4 + 3] = 255;
+    }
+  });
+  const bytes = positions.bytes + normals.bytes + meta.bytes + uv.bytes + slots.bytes
+    + color.bytes;
+  return { positions, normals, meta, uv, slots, color, triangles, stride, poses,
+    textured: rects.textured, bytes };
+}
+
+
+// Nine bytes per Mario per frame on the wire become world space here once, because every panel on
+// the page wants the same thing: where each slot was, which way it faced, and what the status bits
+// said. The derived series are cumulative so that scrubbing backwards is a lookup, not a replay.
+// Two of them exist only so the picture can be honest. airFrames counts how long a slot has been
+// off the floor and groundY remembers the tread he left, which together put his contact shadow on
+// the step he launched from instead of in mid air under his feet.
+//
+// state is the one this page is built around. Every Mario, every frame, falls into one of four
+// bands of the stairwell: below the warp, inside it, above it, or standing on the landing. The
+// bodies, their trails and the strip's thumbnails are all tinted by the same number, so the
+// crowd's colour composition is a histogram over those bands drawn in the space they happen in,
+// and census is that histogram counted per frame. The bands come from the container header rather
+// than from anything chosen here: the warp's own y range, and the goal minus its tolerance.
+async function decodeRun(container, order) {
+  const header = container.header;
+  const population = header.population;
+  const frames = header.checkpoints[order].frames;
+  const prefix = "run" + order;
+  const poseIndex = await decodeStream(container, prefix + "/pose_index");
+  const quantised = await decodeStream(container, prefix + "/position");
+  const yawSteps = await decodeStream(container, prefix + "/yaw");
+  const status = await decodeStream(container, prefix + "/status");
+  const bits = header.status_bits;
+  const scale = 1 / header.position_scale;
+  const radians = header.yaw_radians_per_step;
+  const stride = Math.max(1, header.stride);
+
+  const position = new Float32Array(frames * population * 3);
+  for (let i = 0; i < position.length; i += 1) position[i] = quantised[i] * scale;
+  const yaw = new Float32Array(frames * population);
+  for (let i = 0; i < yaw.length; i += 1) yaw[i] = yawSteps[i] * radians;
+
+  const since = new Uint16Array(frames * population);
+  const state = new Uint8Array(frames * population);
+  const airFrames = new Uint16Array(frames * population);
+  const groundY = new Float32Array(frames * population);
+  const census = new Int32Array(frames * STATE_COUNT);
+  const runningBest = new Float32Array(frames);
+  const populationBest = new Float32Array(frames);
+  const populationMean = new Float32Array(frames);
+  const successes = new Int32Array(frames);
+  const episodes = new Int32Array(frames);
+  const warps = new Int32Array(frames);
+  const frameWarps = new Int32Array(frames);
+  const frameSpeed = new Float32Array(frames);
+  const bestSpeed = new Float32Array(frames);
+  const aboveWarp = new Int32Array(frames);
+  const bandLow = header.warp.y_range[0];
+  const bandHigh = header.warp.y_range[1];
+  const landing = header.goal.goal_y - header.goal.tolerance;
+  const wonAt = new Int32Array(population).fill(-1e9);
+  let best = -Infinity;
+  let fastest = 0;
+  let successCount = 0;
+  let episodeCount = 0;
+  let warpCount = 0;
+
+  for (let frame = 0; frame < frames; frame += 1) {
+    let top = -Infinity;
+    let total = 0;
+    let quickest = 0;
+    let above = 0;
+    let thrown = 0;
+    for (let slot = 0; slot < population; slot += 1) {
+      const at = frame * population + slot;
+      const previous = at - population;
+      const flags = status[at];
+      const height = position[at * 3 + 1];
+      if (flags & bits.reset) episodeCount += 1;
+      if (flags & bits.success) {
+        successCount += 1;
+        wonAt[slot] = frame;
+      }
+      if (flags & bits.warped) {
+        warpCount += 1;
+        thrown += 1;
+      }
+      since[at] = flags & bits.reset ? 0
+        : Math.min(65535, frame === 0 ? 65535 : since[previous] + 1);
+      let kind = STATE_BELOW;
+      if (height >= landing || frame - wonAt[slot] < WIN_FLASH_FRAMES) kind = STATE_TOP;
+      else if (height > bandHigh) kind = STATE_THROUGH;
+      else if (height >= bandLow || (flags & bits.warped)) kind = STATE_BARRIER;
+      state[at] = kind;
+      census[frame * STATE_COUNT + kind] += 1;
+      const grounded = !(flags & bits.airborne) || (flags & bits.reset);
+      if (grounded || frame === 0) {
+        airFrames[at] = 0;
+        groundY[at] = height;
+      } else {
+        airFrames[at] = Math.min(65535, airFrames[previous] + stride);
+        groundY[at] = groundY[previous];
+      }
+      if (height > top) top = height;
+      if (height > bandHigh) above += 1;
+      total += height;
+      if (frame > 0 && !(flags & (bits.reset | bits.warped))) {
+        const here = at * 3;
+        const there = previous * 3;
+        const moved = Math.hypot(position[here] - position[there],
+          position[here + 2] - position[there + 2]) / stride;
+        if (moved > quickest) quickest = moved;
+      }
+    }
+    if (top > best) best = top;
+    if (quickest > fastest) fastest = quickest;
+    runningBest[frame] = best;
+    populationBest[frame] = top;
+    populationMean[frame] = total / population;
+    successes[frame] = successCount;
+    episodes[frame] = episodeCount;
+    warps[frame] = warpCount;
+    frameWarps[frame] = thrown;
+    frameSpeed[frame] = quickest;
+    bestSpeed[frame] = fastest;
+    aboveWarp[frame] = above;
+  }
+
+  const spec = header.checkpoints[order];
+  return { order, spec, frames, population, poseIndex, position, yaw, status, since, state,
+    census, airFrames, groundY, runningBest, populationBest, populationMean, successes, episodes,
+    warps, frameWarps, frameSpeed, bestSpeed, aboveWarp, bits };
+}
+
+const INSTANCE_FLOATS = 9;
+const SHADOW_FLOATS = 5;
+const TRAIL_FRAMES = 90;
+const WIN_FLASH_FRAMES = 12;
+const CLIP_MARGIN = [30, 320, 1100];
+const FOV = (48 * Math.PI) / 180;
+const SKY_DISTANCE = 2000;
+const SHADOW_RADIUS = 96;
+const SHADOW_LIFT = 3;
+const RESEAT_MS = 540;
+const TWEEN_MS = 480;
+const BARRIER_MARGIN = 300;
+const HATCH_PERIOD = 170;
+const GAME_FPS = 30;
+
+// The four bands, low to high. The order is the ladder a Mario climbs, which is why the stacked
+// bar can be read left to right as progress and why the strip's thumbnails can stroke each
+// trail segment with the band it was in at that frame.
+const STATE_BELOW = 0;
+const STATE_BARRIER = 1;
+const STATE_THROUGH = 2;
+const STATE_TOP = 3;
+const STATE_COUNT = 4;
+
+const STATES = [
+  { token: "neutral", name: "below the warp", mix: 0.34 },
+  { token: "dead", name: "at the barrier", mix: 0.80 },
+  { token: "speed", name: "through it", mix: 0.72 },
+  { token: "floor", name: "on the landing", mix: 0.90 },
+];
+
+// The step the run's own log records as the first episode that ever stood on the landing, its
+// final success rate and the episodes it took to get there. All three are single facts about one
+// training run rather than anything this capture measured, so they are written down here and
+// named as coming from the log.
+const FIRST_SUCCESS_STEPS = 6324840;
+const RUN_SUCCESS_RATE = 0.975;
+const RUN_EPISODES = 90591;
+const RUN_RUNG = "terminal";
+const RUN_SEED = 2;
+
+// The untrained network is the point of the first panel, so the two numbers that say it really is
+// untrained travel with it. Both come from an action histogram over the same policy: it ground
+// pounds on 77.6 percent of frames against uniform random's 73.3, and long jumps on 0.0 percent
+// of frames, as does uniform random.
+const UNTRAINED_POUND = 0.776;
+const RANDOM_POUND = 0.733;
+
+const stage = document.getElementById("stage");
+const chart = document.getElementById("chart");
+const scrub = document.getElementById("scrub");
+const strip = document.getElementById("strip");
+const stripAxis = document.getElementById("stripaxis");
+const playButton = document.getElementById("play");
+const soundButton = document.getElementById("sound");
+const cameraHost = document.getElementById("cameras");
+const trailButton = document.getElementById("trails");
+const textureButton = document.getElementById("textures");
+const readout = document.getElementById("readout");
+const statusPanel = document.getElementById("status");
+const heightLabel = document.getElementById("height");
+const heightNote = document.getElementById("heightnote");
+const gaugeBest = document.getElementById("gaugebest");
+const gaugeNow = document.getElementById("gaugenow");
+const gaugeBand = document.getElementById("gaugeband");
+const hudBottom = document.getElementById("hudbottom");
+const railSteps = document.getElementById("railsteps");
+const railPhase = document.getElementById("railphase");
+const railStats = document.getElementById("railstats");
+const railVerdict = document.getElementById("railverdict");
+const censusBar = document.getElementById("censusbar");
+const censusRows = document.getElementById("censusrows");
+const stripNote = document.getElementById("stripnote");
+const stripFoot = document.getElementById("stripfoot");
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const view = {
+  order: 0,
+  frame: 0,
+  playing: false,
+  rate: 1,
+  camera: "swarm",
+  trails: true,
+  textures: true,
+  sound: false,
+  yaw: 0.46,
+  pitch: 0.30,
+  distance: 3800,
+  zoom: 1,
+  target: [0, 0, 0],
+  last: 0,
+  stamp: 0,
+  ready: false,
+  fps: 0,
+};
+
+// Moving between checkpoints is a re-seat rather than a cut. The population keeps its slots and
+// slides from where the outgoing policy had it to where the incoming one does, over half a
+// second, with the rim light pushed up while it travels. The pose index snaps on the first frame,
+// which nobody sees, because a body that is sliding and changing pose reads as a body moving.
+const morph = { active: false, from: null, started: 0, amount: 1 };
+const tweenState = { from: [], to: [], started: 0, active: false };
+
+const gl = stage.getContext("webgl2", { antialias: true, alpha: false });
+
+const viewProj = identity();
+const projection = identity();
+const camera = identity();
+
+let scene = null;
+let programs = null;
+let atlasTexture = null;
+const runs = new Map();
+const pending = new Set();
+const panels = [];
+const painted = new Set();
+let backlog = null;
+
+function current() {
+  return runs.get(view.order);
+}
+
+function ready() {
+  return view.ready && runs.has(view.order);
+}
+
+function stateColors(colors) {
+  return STATES.map((entry) => hexRgb(colors[entry.token]));
+}
+
+function stateCss(colors) {
+  return STATES.map((entry) => colors[entry.token]);
+}
+
+function makeVao(gl, setup) {
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  setup();
+  gl.bindVertexArray(null);
+  return vao;
+}
+
+// Every program is declared once, with the attribute and uniform names it promises to expose.
+// link() fails the build if the driver dropped one of them, and the spec table is what the probe
+// reads to check the other direction, that nothing declared in a shader was left off the list.
+const PROGRAM_SPECS = {
+  sky: {
+    vertex: SKY_VERTEX, fragment: SKY_FRAGMENT, attributes: ["aCorner"],
+    uniforms: ["uRayForward", "uRayRight", "uRayUp", "uEye", "uSkyDistance", "uSkyLow",
+      "uSkyHigh", "uSkyRange"],
+  },
+  level: {
+    vertex: LEVEL_VERTEX, fragment: LEVEL_FRAGMENT, attributes: ["aPos", "aNormal", "aTint"],
+    uniforms: ["uViewProj", "uEye", "uLight", "uFogRange", "uClipMin", "uClipMax", "uSkyLow",
+      "uSkyHigh", "uSkyRange"],
+  },
+  mario: {
+    vertex: MARIO_VERTEX, fragment: MARIO_FRAGMENT,
+    attributes: ["aVertex", "aInstPos", "aInstYaw", "aInstPose", "aInstTint", "aInstMix"],
+    uniforms: ["uViewProj", "uEye", "uLight", "uFogRange", "uUseAtlas", "uRimGain", "uAtlas",
+      "uPosePos", "uPoseNorm", "uPoseMeta", "uPoseUv", "uPoseSlot", "uPoseColor", "uTexWidth",
+      "uPoseStride", "uTriangles", "uPoseScale", "uNormalScale", "uSkyLow", "uSkyHigh",
+      "uSkyRange"],
+  },
+  shadow: {
+    vertex: SHADOW_VERTEX, fragment: SHADOW_FRAGMENT,
+    attributes: ["aCorner", "aDropPos", "aDropShape"],
+    uniforms: ["uViewProj", "uEye", "uColor", "uAlpha", "uFogRange"],
+  },
+  trail: {
+    vertex: TRAIL_VERTEX, fragment: TRAIL_FRAGMENT, attributes: ["aPos", "aFade", "aTint"],
+    uniforms: ["uViewProj", "uPointSize", "uAlpha"],
+  },
+  flat: {
+    vertex: FLAT_VERTEX, fragment: FLAT_FRAGMENT, attributes: ["aPos", "aFade"],
+    uniforms: ["uViewProj", "uPointSize", "uColor", "uAlpha", "uHatch"],
+  },
+};
+
+function buildPrograms() {
+  programs = {};
+  for (const name of Object.keys(PROGRAM_SPECS)) {
+    const spec = PROGRAM_SPECS[name];
+    programs[name] = link(gl, spec.vertex, spec.fragment, spec.attributes, spec.uniforms);
+  }
+}
+
+function uploadAtlas(image) {
+  atlasTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+}
+
+function loadAtlas(bytes) {
+  return new Promise((resolve) => {
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+    const image = new Image();
+    image.onload = () => {
+      uploadAtlas(image);
+      resolve(true);
+    };
+    image.onerror = () => resolve(false);
+    image.src = "data:image/png;base64," + btoa(binary);
+  });
+}
+
+function clipBox(header) {
+  const warp = header.warp;
+  const low = [
+    Math.min(warp.x_range[0], header.spawn[0]) - CLIP_MARGIN[0],
+    Math.min(header.spawn[1], warp.y_range[0]) - CLIP_MARGIN[1],
+    Math.min(header.goal.goal_z, warp.z_range[0]) - CLIP_MARGIN[2],
+  ];
+  const high = [
+    Math.max(warp.x_range[1], header.spawn[0]) + CLIP_MARGIN[0],
+    Math.max(header.goal.goal_y, warp.y_range[1]) + CLIP_MARGIN[1],
+    Math.max(header.spawn[2], warp.z_range[1]) + CLIP_MARGIN[2],
+  ];
+  return { low, high, box: [low[0], low[1], low[2], high[0], high[1], high[2]] };
+}
+
+function skySpan(header) {
+  return [header.spawn[1] - 1800, header.goal.goal_y + 1800];
+}
+
+async function buildScene() {
+  const container = openContainer(base64Bytes(SWARM.container));
+  const header = container.header;
+  const width = Math.min(2048, gl.getParameter(gl.MAX_TEXTURE_SIZE));
+  const decoded = {
+    posePositions: await decodeStream(container, "pose_positions"),
+    poseNormals: await decodeStream(container, "pose_normals"),
+    uv: await decodeStream(container, "uv"),
+    colorIndex: await decodeStream(container, "color_index"),
+    surfaceVertices: await decodeStream(container, "surface_vertices"),
+    surfaceTypes: await decodeStream(container, "surface_types"),
+    atlas: await decodeStream(container, "atlas_png"),
+  };
+  const triangles = poseTriangles(header);
+  const expected = header.poses.length * triangles * 9;
+  if (decoded.posePositions.length !== expected) {
+    throw new Error("pose geometry is " + decoded.posePositions.length + " samples, expected "
+      + expected);
+  }
+  const poseData = buildPoseTextures(gl, header, decoded, width);
+  const clip = clipBox(header);
+  const span = skySpan(header);
+  const goal = goalPlane(header, clip);
+  const level = levelMesh(decoded.surfaceVertices, decoded.surfaceTypes,
+    header.warp.surface_type, clip.box);
+  paintLevel(level, tokens(), span);
+
+  const vertices = new Float32Array(poseData.stride);
+  for (let i = 0; i < vertices.length; i += 1) vertices[i] = i;
+  const instances = new Float32Array(header.population * INSTANCE_FLOATS);
+  const drops = new Float32Array(header.population * SHADOW_FLOATS);
+  const trailPositions = new Float32Array(header.population * TRAIL_FRAMES * 6);
+  const trailFades = new Float32Array(header.population * TRAIL_FRAMES * 2);
+  const trailTints = new Float32Array(header.population * TRAIL_FRAMES * 6);
+  const ones = new Float32Array(64).fill(1);
+  const barrier = {
+    low: [clip.low[0], header.warp.y_range[1], header.warp.z_range[0] - BARRIER_MARGIN],
+    high: [clip.high[0], header.warp.y_range[1], header.warp.z_range[1] + BARRIER_MARGIN],
+  };
+
+  const buffers = {
+    levelPositions: buffer(gl, level.positions),
+    levelNormals: buffer(gl, level.normals),
+    levelTints: buffer(gl, level.tints, gl.DYNAMIC_DRAW),
+    vertices: buffer(gl, vertices),
+    instances: buffer(gl, instances, gl.DYNAMIC_DRAW),
+    drops: buffer(gl, drops, gl.DYNAMIC_DRAW),
+    trailPositions: buffer(gl, trailPositions, gl.DYNAMIC_DRAW),
+    trailFades: buffer(gl, trailFades, gl.DYNAMIC_DRAW),
+    trailTints: buffer(gl, trailTints, gl.DYNAMIC_DRAW),
+    ones: buffer(gl, ones),
+    skyCorner: buffer(gl, new Float32Array([-1, -1, 3, -1, -1, 3])),
+    dropCorner: buffer(gl, new Float32Array([-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1])),
+    goalQuad: buffer(gl, planeQuad(header.goal.goal_y, goal.low, goal.high)),
+    goalOutline: buffer(gl, planeOutline(header.goal.goal_y, goal.low, goal.high)),
+    barrierQuad: buffer(gl, planeQuad(header.warp.y_range[1], barrier.low, barrier.high)),
+    barrierOutline: buffer(gl, planeOutline(header.warp.y_range[1], barrier.low, barrier.high)),
+    warpFaces: buffer(gl, boxFaces(
+      [header.warp.x_range[0], header.warp.y_range[0], header.warp.z_range[0]],
+      [header.warp.x_range[1], header.warp.y_range[1], header.warp.z_range[1]])),
+    warpLines: buffer(gl, boxLines(
+      [header.warp.x_range[0], header.warp.y_range[0], header.warp.z_range[0]],
+      [header.warp.x_range[1], header.warp.y_range[1], header.warp.z_range[1]])),
+  };
+
+  const flat = (positions) => makeVao(gl, () => {
+    bindAttribute(gl, programs.flat.attribute.aPos, positions, 3, gl.FLOAT, false, 12, 0, 0);
+    bindAttribute(gl, programs.flat.attribute.aFade, buffers.ones, 1, gl.FLOAT, false, 4, 0, 0);
+  });
+
+  const vaos = {
+    sky: makeVao(gl, () => {
+      bindAttribute(gl, programs.sky.attribute.aCorner, buffers.skyCorner, 2, gl.FLOAT,
+        false, 8, 0, 0);
+    }),
+    level: makeVao(gl, () => {
+      bindAttribute(gl, programs.level.attribute.aPos, buffers.levelPositions, 3, gl.FLOAT,
+        false, 12, 0, 0);
+      bindAttribute(gl, programs.level.attribute.aNormal, buffers.levelNormals, 3, gl.FLOAT,
+        false, 12, 0, 0);
+      bindAttribute(gl, programs.level.attribute.aTint, buffers.levelTints, 3, gl.FLOAT,
+        false, 12, 0, 0);
+    }),
+    mario: makeVao(gl, () => {
+      const stride = INSTANCE_FLOATS * 4;
+      bindAttribute(gl, programs.mario.attribute.aVertex, buffers.vertices, 1, gl.FLOAT,
+        false, 4, 0, 0);
+      bindAttribute(gl, programs.mario.attribute.aInstPos, buffers.instances, 3, gl.FLOAT,
+        false, stride, 0, 1);
+      bindAttribute(gl, programs.mario.attribute.aInstYaw, buffers.instances, 1, gl.FLOAT,
+        false, stride, 12, 1);
+      bindAttribute(gl, programs.mario.attribute.aInstPose, buffers.instances, 1, gl.FLOAT,
+        false, stride, 16, 1);
+      bindAttribute(gl, programs.mario.attribute.aInstTint, buffers.instances, 3, gl.FLOAT,
+        false, stride, 20, 1);
+      bindAttribute(gl, programs.mario.attribute.aInstMix, buffers.instances, 1, gl.FLOAT,
+        false, stride, 32, 1);
+    }),
+    shadow: makeVao(gl, () => {
+      const stride = SHADOW_FLOATS * 4;
+      bindAttribute(gl, programs.shadow.attribute.aCorner, buffers.dropCorner, 2, gl.FLOAT,
+        false, 8, 0, 0);
+      bindAttribute(gl, programs.shadow.attribute.aDropPos, buffers.drops, 3, gl.FLOAT,
+        false, stride, 0, 1);
+      bindAttribute(gl, programs.shadow.attribute.aDropShape, buffers.drops, 2, gl.FLOAT,
+        false, stride, 12, 1);
+    }),
+    trail: makeVao(gl, () => {
+      bindAttribute(gl, programs.trail.attribute.aPos, buffers.trailPositions, 3, gl.FLOAT,
+        false, 12, 0, 0);
+      bindAttribute(gl, programs.trail.attribute.aFade, buffers.trailFades, 1, gl.FLOAT,
+        false, 4, 0, 0);
+      bindAttribute(gl, programs.trail.attribute.aTint, buffers.trailTints, 3, gl.FLOAT,
+        false, 12, 0, 0);
+    }),
+    goalQuad: flat(buffers.goalQuad),
+    goalOutline: flat(buffers.goalOutline),
+    barrierQuad: flat(buffers.barrierQuad),
+    barrierOutline: flat(buffers.barrierOutline),
+    warpFaces: flat(buffers.warpFaces),
+    warpLines: flat(buffers.warpLines),
+  };
+
+  scene = { container, header, poseData, level, clip, span, barrier, buffers, vaos, instances,
+    drops, trailPositions, trailFades, trailTints, triangles, atlasBytes: decoded.atlas,
+    texelWidth: width, trailVertices: 0, drawCalls: 0 };
+  return scene;
+}
+
+function fitCanvas() {
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const rect = stage.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width * ratio));
+  const height = Math.max(1, Math.round(rect.height * ratio));
+  if (stage.width !== width || stage.height !== height) {
+    stage.width = width;
+    stage.height = height;
+  }
+  return rect.width / Math.max(1, rect.height);
+}
+
+function leader(run, frame) {
+  let best = 0;
+  let height = -Infinity;
+  for (let slot = 0; slot < run.population; slot += 1) {
+    const value = run.position[(frame * run.population + slot) * 3 + 1];
+    if (value > height) {
+      height = value;
+      best = slot;
+    }
+  }
+  return best;
+}
+
+// The corridor camera frames the run rather than the level. Neither the clip box nor the kept
+// geometry is the right thing to fit: the box carries a thousand units of margin on each end of z
+// so the shader has something to trim, and the geometry includes the room floor at the bottom and
+// the landing floor at the top, each a slab wider than the staircase. What the picture is about is
+// the volume between the spawn tile and the landing, and those two points are in the header.
+function corridorSpan() {
+  const header = scene.header;
+  return {
+    x: [scene.clip.low[0], scene.clip.high[0]],
+    y: [header.spawn[1], header.goal.goal_y],
+    z: [header.goal.goal_z, header.spawn[2]],
+  };
+}
+
+function corridorTarget() {
+  const span = corridorSpan();
+  return [
+    (span.x[0] + span.x[1]) / 2,
+    span.y[0] + 0.46 * (span.y[1] - span.y[0]),
+    (span.z[0] + span.z[1]) / 2,
+  ];
+}
+
+function corridorDistance() {
+  const span = corridorSpan();
+  const reach = Math.hypot(span.x[1] - span.x[0], span.y[1] - span.y[0], span.z[1] - span.z[0]);
+  return Math.max(1200, reach * 0.58);
+}
+
+// A swarm needs a camera that is neither glued to one Mario nor parked on the whole stairwell.
+// The default frames the population's own extent rather than its mean, because once a few Marios
+// are chaining up the stairs and the rest are still at the spawn tile the mean sits in the empty
+// middle and points the camera at nothing. The midpoint of the extent keeps both ends in shot, and
+// the distance follows the extent, so the view tightens as they cluster and opens as they spread.
+function swarmFrame(run, frame) {
+  const population = run.population;
+  const low = [Infinity, Infinity, Infinity];
+  const high = [-Infinity, -Infinity, -Infinity];
+  for (let slot = 0; slot < population; slot += 1) {
+    const base = (frame * population + slot) * 3;
+    for (let axis = 0; axis < 3; axis += 1) {
+      const value = run.position[base + axis];
+      if (value < low[axis]) low[axis] = value;
+      if (value > high[axis]) high[axis] = value;
+    }
+  }
+  const reach = Math.hypot(high[0] - low[0], high[1] - low[1], high[2] - low[2]);
+  return {
+    target: [
+      (low[0] + high[0]) / 2,
+      (low[1] + high[1]) / 2 + 150,
+      (low[2] + high[2]) / 2,
+    ],
+    distance: Math.min(3600, Math.max(1000, reach * 0.70 + 460)),
+  };
+}
+
+function cameraFrame() {
+  const run = current();
+  if (view.camera === "corridor") {
+    return { target: corridorTarget(), distance: corridorDistance() };
+  }
+  if (view.camera === "leader") {
+    const slot = leader(run, view.frame);
+    const base = (view.frame * run.population + slot) * 3;
+    return {
+      target: [run.position[base], run.position[base + 1] + 90, run.position[base + 2]],
+      distance: 880,
+    };
+  }
+  return swarmFrame(run, view.frame);
+}
+
+function easeInOut(t) {
+  return t * t * (3 - 2 * t);
+}
+
+function morphAmount(now) {
+  if (!morph.active) return 1;
+  const t = Math.min(1, (now - morph.started) / RESEAT_MS);
+  if (t >= 1) {
+    morph.active = false;
+    morph.amount = 1;
+    return 1;
+  }
+  morph.amount = easeInOut(t);
+  return morph.amount;
+}
+
+
+// Forty-eight Marios have to read as a crowd with legible individuals, which a flat wash cannot
+// do: it throws away the one thing that makes a Mario a Mario, his own red and blue. So the
+// progress band rides mostly on a rim term. Every body gets a rim in its band's colour, faint
+// down at the spawn tile and hard once the warp is involved, plus a partial wash of the same
+// colour over the body. The composition of the crowd is then readable from any distance while a
+// single Mario up close is still recognisably himself.
+function updateInstances(now) {
+  const run = current();
+  const population = run.population;
+  const colors = tokens();
+  const bands = stateColors(colors);
+  const data = scene.instances;
+  const drops = scene.drops;
+  const blend = morphAmount(now);
+  for (let slot = 0; slot < population; slot += 1) {
+    const at = view.frame * population + slot;
+    const base = slot * INSTANCE_FLOATS;
+    let x = run.position[at * 3];
+    let y = run.position[at * 3 + 1];
+    let z = run.position[at * 3 + 2];
+    if (blend < 1 && morph.from) {
+      x += (morph.from[slot * 3] - x) * (1 - blend);
+      y += (morph.from[slot * 3 + 1] - y) * (1 - blend);
+      z += (morph.from[slot * 3 + 2] - z) * (1 - blend);
+    }
+    data[base] = x;
+    data[base + 1] = y;
+    data[base + 2] = z;
+    data[base + 3] = run.yaw[at];
+    data[base + 4] = run.poseIndex[at];
+    const kind = run.state[at];
+    const tint = bands[kind];
+    data[base + 5] = tint[0];
+    data[base + 6] = tint[1];
+    data[base + 7] = tint[2];
+    data[base + 8] = STATES[kind].mix;
+
+    const air = run.airFrames[at];
+    const drop = slot * SHADOW_FLOATS;
+    drops[drop] = x;
+    drops[drop + 1] = (blend < 1 ? y : run.groundY[at]) + SHADOW_LIFT;
+    drops[drop + 2] = z;
+    drops[drop + 3] = SHADOW_RADIUS * (1 + Math.min(1.4, air * 0.035));
+    drops[drop + 4] = blend < 1 ? 0.35 * blend : Math.exp(-air / 13);
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.buffers.instances);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, data);
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.buffers.drops);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, drops);
+}
+
+// The corridor is 372 units wide and all forty-eight spawn together, so at any moment most of
+// the bodies are behind another body. The trails are what turn that blob back into forty-eight
+// separate attempts. Each one carries its own last ninety frames, every segment tinted with the
+// band that Mario was in when he flew it, and the fade is cubic so the last dozen frames stay
+// bright while the older ones go quietly. Nobody's start frame is staggered and nobody is moved
+// off his own line: the forty-eight really are simultaneous, and a picture that pulled them apart
+// to look tidier would be saying something the capture does not.
+function updateTrails() {
+  const run = current();
+  const population = run.population;
+  const positions = scene.trailPositions;
+  const fades = scene.trailFades;
+  const tints = scene.trailTints;
+  const bands = stateColors(tokens());
+  const first = Math.max(1, view.frame - TRAIL_FRAMES + 1);
+  let vertex = 0;
+  for (let slot = 0; slot < population; slot += 1) {
+    for (let frame = first; frame <= view.frame; frame += 1) {
+      const at = frame * population + slot;
+      if (run.status[at] & (run.bits.reset | run.bits.warped)) continue;
+      const from = (at - population) * 3;
+      const to = at * 3;
+      const decay = 1 - (view.frame - frame) / TRAIL_FRAMES;
+      const fade = decay * decay * decay;
+      const tint = bands[run.state[at]];
+      for (let end = 0; end < 2; end += 1) {
+        const source = end === 0 ? from : to;
+        positions[vertex * 3] = run.position[source];
+        positions[vertex * 3 + 1] = run.position[source + 1] + 60;
+        positions[vertex * 3 + 2] = run.position[source + 2];
+        tints[vertex * 3] = tint[0];
+        tints[vertex * 3 + 1] = tint[1];
+        tints[vertex * 3 + 2] = tint[2];
+        fades[vertex] = fade;
+        vertex += 1;
+      }
+    }
+  }
+  scene.trailVertices = vertex;
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.buffers.trailPositions);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, positions);
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.buffers.trailFades);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, fades);
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.buffers.trailTints);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, tints);
+}
+
+function bindDataTexture(unit, texture, location) {
+  gl.activeTexture(gl.TEXTURE0 + unit);
+  gl.bindTexture(gl.TEXTURE_2D, texture.handle);
+  gl.uniform1i(location, unit);
+}
+
+function rayBasis(eye, target, aspect) {
+  let fx = target[0] - eye[0];
+  let fy = target[1] - eye[1];
+  let fz = target[2] - eye[2];
+  const flen = Math.hypot(fx, fy, fz) || 1;
+  fx /= flen; fy /= flen; fz /= flen;
+  const slen = Math.hypot(fz, 0, fx) || 1;
+  const sx = -fz / slen;
+  const sy = 0;
+  const sz = fx / slen;
+  const ux = sy * fz - sz * fy;
+  const uy = sz * fx - sx * fz;
+  const uz = sx * fy - sy * fx;
+  const tan = Math.tan(FOV / 2);
+  return {
+    forward: [fx, fy, fz],
+    right: [sx * tan * aspect, sy * tan * aspect, sz * tan * aspect],
+    up: [ux * tan, uy * tan, uz * tan],
+  };
+}
+
+function skyUniforms(handle, colors) {
+  gl.uniform3fv(handle.uniform.uSkyLow, hexRgb(colors.skyLow));
+  gl.uniform3fv(handle.uniform.uSkyHigh, hexRgb(colors.skyHigh));
+  gl.uniform2fv(handle.uniform.uSkyRange, scene.span);
+}
+
+function drawStage(now) {
+  const run = current();
+  const header = scene.header;
+  const aspect = fitCanvas();
+  const colors = tokens();
+  const light = [0.42, 0.80, 0.43];
+  const sky = hexRgb(colors.skyLow);
+  const stamp = now === undefined ? performance.now() : now;
+
+  const desired = cameraFrame();
+  const smooth = view.playing && !reduceMotion;
+  const blend = smooth || morph.active ? (morph.active ? 0.16 : 0.3) : 1;
+  for (let axis = 0; axis < 3; axis += 1) {
+    view.target[axis] += (desired.target[axis] - view.target[axis]) * blend;
+  }
+  const wanted = desired.distance * view.zoom;
+  view.distance += (wanted - view.distance) * (smooth || morph.active ? 0.12 : 1);
+  const eye = [
+    view.target[0] + view.distance * Math.cos(view.pitch) * Math.sin(view.yaw),
+    view.target[1] + view.distance * Math.sin(view.pitch),
+    view.target[2] + view.distance * Math.cos(view.pitch) * Math.cos(view.yaw),
+  ];
+  perspective(projection, FOV, aspect, 12, 64000);
+  lookAt(camera, eye, view.target, [0, 1, 0]);
+  multiply(viewProj, projection, camera);
+  const fogRange = [view.distance * 1.25, view.distance * 1.25 + 9500];
+  const rays = rayBasis(eye, view.target, aspect);
+  let calls = 0;
+
+  // The depth clear has to happen while the write mask is still open. Clearing with the mask shut
+  // is a silent no-op, which leaves last frame's depth in place, and with a camera that has barely
+  // moved every opaque fragment then loses the depth test against its own previous self: the
+  // staircase and the whole population vanish and only the blended passes survive.
+  gl.viewport(0, 0, stage.width, stage.height);
+  gl.depthMask(true);
+  gl.clearColor(sky[0], sky[1], sky[2], 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.disable(gl.DEPTH_TEST);
+  gl.disable(gl.CULL_FACE);
+  gl.disable(gl.BLEND);
+  gl.depthMask(false);
+  gl.useProgram(programs.sky.program);
+  gl.bindVertexArray(scene.vaos.sky);
+  gl.uniform3fv(programs.sky.uniform.uRayForward, rays.forward);
+  gl.uniform3fv(programs.sky.uniform.uRayRight, rays.right);
+  gl.uniform3fv(programs.sky.uniform.uRayUp, rays.up);
+  gl.uniform3fv(programs.sky.uniform.uEye, eye);
+  gl.uniform1f(programs.sky.uniform.uSkyDistance, SKY_DISTANCE);
+  skyUniforms(programs.sky, colors);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  calls += 1;
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.depthMask(true);
+  gl.enable(gl.CULL_FACE);
+  gl.frontFace(gl.CCW);
+  gl.cullFace(gl.BACK);
+  gl.useProgram(programs.level.program);
+  gl.bindVertexArray(scene.vaos.level);
+  gl.uniformMatrix4fv(programs.level.uniform.uViewProj, false, viewProj);
+  gl.uniform3fv(programs.level.uniform.uEye, eye);
+  gl.uniform3fv(programs.level.uniform.uLight, light);
+  gl.uniform2fv(programs.level.uniform.uFogRange, fogRange);
+  gl.uniform3fv(programs.level.uniform.uClipMin, scene.clip.low);
+  gl.uniform3fv(programs.level.uniform.uClipMax, scene.clip.high);
+  skyUniforms(programs.level, colors);
+  gl.drawArrays(gl.TRIANGLES, 0, scene.level.count);
+  calls += 1;
+
+  updateInstances(stamp);
+
+  gl.disable(gl.CULL_FACE);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.depthMask(false);
+  gl.enable(gl.POLYGON_OFFSET_FILL);
+  gl.polygonOffset(-2, -6);
+  gl.useProgram(programs.shadow.program);
+  gl.bindVertexArray(scene.vaos.shadow);
+  gl.uniformMatrix4fv(programs.shadow.uniform.uViewProj, false, viewProj);
+  gl.uniform3fv(programs.shadow.uniform.uEye, eye);
+  gl.uniform3fv(programs.shadow.uniform.uColor, hexRgb(colors.contact));
+  gl.uniform1f(programs.shadow.uniform.uAlpha, 0.52);
+  gl.uniform2fv(programs.shadow.uniform.uFogRange, fogRange);
+  gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, run.population);
+  gl.disable(gl.POLYGON_OFFSET_FILL);
+  gl.polygonOffset(0, 0);
+  calls += 1;
+
+  gl.disable(gl.BLEND);
+  gl.depthMask(true);
+  gl.enable(gl.CULL_FACE);
+  gl.useProgram(programs.mario.program);
+  gl.bindVertexArray(scene.vaos.mario);
+  gl.uniformMatrix4fv(programs.mario.uniform.uViewProj, false, viewProj);
+  gl.uniform3fv(programs.mario.uniform.uEye, eye);
+  gl.uniform3fv(programs.mario.uniform.uLight, light);
+  gl.uniform2fv(programs.mario.uniform.uFogRange, fogRange);
+  gl.uniform1f(programs.mario.uniform.uUseAtlas,
+    view.textures && atlasTexture !== null ? 1 : 0);
+  gl.uniform1f(programs.mario.uniform.uRimGain,
+    morph.active ? 1 + 2.2 * (1 - morph.amount) : 1);
+  gl.uniform1i(programs.mario.uniform.uTexWidth, scene.texelWidth);
+  gl.uniform1i(programs.mario.uniform.uPoseStride, scene.poseData.stride);
+  gl.uniform1i(programs.mario.uniform.uTriangles, scene.poseData.triangles);
+  gl.uniform1f(programs.mario.uniform.uPoseScale, header.pose_scale);
+  gl.uniform1f(programs.mario.uniform.uNormalScale, header.normal_scale);
+  skyUniforms(programs.mario, colors);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
+  gl.uniform1i(programs.mario.uniform.uAtlas, 0);
+  bindDataTexture(1, scene.poseData.positions, programs.mario.uniform.uPosePos);
+  bindDataTexture(2, scene.poseData.normals, programs.mario.uniform.uPoseNorm);
+  bindDataTexture(3, scene.poseData.meta, programs.mario.uniform.uPoseMeta);
+  bindDataTexture(4, scene.poseData.uv, programs.mario.uniform.uPoseUv);
+  bindDataTexture(5, scene.poseData.slots, programs.mario.uniform.uPoseSlot);
+  bindDataTexture(6, scene.poseData.color, programs.mario.uniform.uPoseColor);
+  gl.drawArraysInstanced(gl.TRIANGLES, 0, scene.poseData.stride, run.population);
+  calls += 1;
+
+  gl.disable(gl.CULL_FACE);
+  gl.enable(gl.BLEND);
+  gl.depthMask(false);
+  gl.useProgram(programs.flat.program);
+  gl.uniformMatrix4fv(programs.flat.uniform.uViewProj, false, viewProj);
+  gl.uniform1f(programs.flat.uniform.uPointSize, 1);
+  gl.uniform2fv(programs.flat.uniform.uHatch, [0, 0]);
+
+  gl.bindVertexArray(scene.vaos.goalQuad);
+  gl.uniform3fv(programs.flat.uniform.uColor, hexRgb(colors.floor));
+  gl.uniform1f(programs.flat.uniform.uAlpha, 0.16);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  calls += 1;
+
+  gl.bindVertexArray(scene.vaos.warpFaces);
+  gl.uniform3fv(programs.flat.uniform.uColor, hexRgb(colors.dead));
+  gl.uniform1f(programs.flat.uniform.uAlpha, 0.22);
+  gl.drawArrays(gl.TRIANGLES, 0, 30);
+  calls += 1;
+
+  gl.uniform2fv(programs.flat.uniform.uHatch, [HATCH_PERIOD, 1]);
+  gl.bindVertexArray(scene.vaos.barrierQuad);
+  gl.uniform1f(programs.flat.uniform.uAlpha, 0.30);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  gl.uniform2fv(programs.flat.uniform.uHatch, [0, 0]);
+  calls += 1;
+
+  gl.bindVertexArray(scene.vaos.goalOutline);
+  gl.uniform3fv(programs.flat.uniform.uColor, hexRgb(colors.floor));
+  gl.uniform1f(programs.flat.uniform.uAlpha, 0.9);
+  gl.drawArrays(gl.LINES, 0, 8);
+  calls += 1;
+
+  gl.bindVertexArray(scene.vaos.barrierOutline);
+  gl.uniform3fv(programs.flat.uniform.uColor, hexRgb(colors.dead));
+  gl.uniform1f(programs.flat.uniform.uAlpha, 0.55);
+  gl.drawArrays(gl.LINES, 0, 8);
+  calls += 1;
+
+  gl.bindVertexArray(scene.vaos.warpLines);
+  gl.uniform1f(programs.flat.uniform.uAlpha, 0.8);
+  gl.drawArrays(gl.LINES, 0, 24);
+  calls += 1;
+
+  if (view.trails && !morph.active) {
+    updateTrails();
+    gl.useProgram(programs.trail.program);
+    gl.bindVertexArray(scene.vaos.trail);
+    gl.uniformMatrix4fv(programs.trail.uniform.uViewProj, false, viewProj);
+    gl.uniform1f(programs.trail.uniform.uPointSize, 1);
+    gl.uniform1f(programs.trail.uniform.uAlpha, 0.80);
+    gl.drawArrays(gl.LINES, 0, scene.trailVertices);
+    gl.uniform1f(programs.trail.uniform.uPointSize, 3);
+    gl.uniform1f(programs.trail.uniform.uAlpha, 0.32);
+    gl.drawArrays(gl.POINTS, 0, scene.trailVertices);
+    calls += 2;
+  }
+
+  gl.depthMask(true);
+  gl.disable(gl.BLEND);
+  gl.bindVertexArray(null);
+  scene.drawCalls = calls;
+}
+
+function fit2d(canvas) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(1, Math.round(rect.width * ratio));
+  canvas.height = Math.max(1, Math.round(rect.height * ratio));
+  const context = canvas.getContext("2d");
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { context, width: rect.width, height: rect.height };
+}
+
+
+// The chart is expensive and almost entirely static: it walks 800 frames of three series and then
+// 800 by 48 status words to place the respawn ticks, and none of that changes while the playhead
+// moves. So it paints itself into an offscreen canvas once per checkpoint, per resize and per
+// theme change, and a moving frame costs one blit plus one line.
+const caches = new Map();
+function cachedLayer(name, canvas, key, paint) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width));
+  const height = Math.max(1, Math.round(rect.height));
+  const stamp = key + "|" + width + "x" + height + "|" + ratio;
+  let entry = caches.get(name);
+  if (!entry) {
+    entry = { canvas: document.createElement("canvas"), stamp: null };
+    caches.set(name, entry);
+  }
+  if (entry.stamp !== stamp) {
+    entry.canvas.width = Math.round(width * ratio);
+    entry.canvas.height = Math.round(height * ratio);
+    const layer = entry.canvas.getContext("2d");
+    layer.setTransform(ratio, 0, 0, ratio, 0, 0);
+    layer.clearRect(0, 0, width, height);
+    paint(layer, width, height);
+    entry.stamp = stamp;
+  }
+  canvas.width = entry.canvas.width;
+  canvas.height = entry.canvas.height;
+  const context = canvas.getContext("2d");
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(entry.canvas, 0, 0);
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { context, width, height };
+}
+
+function dropCaches() {
+  caches.clear();
+}
+
+
+// ---- the film strip ----
+//
+// The strip is the learning curve, drawn in the space the learning happened in instead of on a
+// step axis. Each panel is the same side elevation of the same stairwell, with the same barrier
+// band and the same landing line, and the only thing that differs between panels is where that
+// checkpoint's forty-eight Marios went. Every panel therefore shares one projection, computed
+// once from the container header and from the highest point any of the six checkpoints reached,
+// because six pictures on six private scales would compare nothing. x is the corridor's narrow
+// axis, 372 units of it, so it is the axis worth throwing away: the elevation keeps z across and
+// y up. z is compressed to fit a panel that is wider than it is tall, which steepens the
+// staircase but leaves every height honest, and height is what the page is about.
+const THUMB_PAD = { left: 3, right: 3, top: 5, bottom: 3 };
+
+function thumbSpan() {
+  const header = scene.header;
+  let reach = header.goal.goal_y;
+  for (const spec of header.checkpoints) {
+    reach = Math.max(reach, spec.outcome.best_height, spec.in_flight.best_height);
+  }
+  return {
+    z: [header.spawn[2] + 170, header.goal.goal_z - 170],
+    y: [header.spawn[1] - 150, reach + 170],
+  };
+}
+
+function thumbFrame(width, height) {
+  const span = scene.thumbSpan;
+  const left = THUMB_PAD.left;
+  const right = Math.max(left + 4, width - THUMB_PAD.right);
+  const top = THUMB_PAD.top;
+  const base = Math.max(top + 4, height - THUMB_PAD.bottom);
+  const zSpan = span.z[1] - span.z[0];
+  const ySpan = span.y[1] - span.y[0];
+  return {
+    left, right, top, base,
+    sz: (z) => left + ((z - span.z[0]) / zSpan) * (right - left),
+    sy: (y) => base - ((y - span.y[0]) / ySpan) * (base - top),
+  };
+}
+
+// The silhouette is the union of the collision triangles the 3D view keeps, projected flat. They
+// overlap heavily in this projection, which is the point: filled opaque and one on top of the
+// next they add up to a profile of the stairwell rather than a heap of outlines. The treads get a
+// second pass as single horizontal strokes, because from the side a tread is a line and that is
+// what makes the flight read as steps instead of as a wedge.
+function paintSilhouette(context, box) {
+  const level = scene.level;
+  const colors = tokens();
+  context.fillStyle = colors.muted;
+  context.globalAlpha = 0.22;
+  context.beginPath();
+  for (let triangle = 0; triangle < level.types.length; triangle += 1) {
+    const at = triangle * 9;
+    context.moveTo(box.sz(level.positions[at + 2]), box.sy(level.positions[at + 1]));
+    context.lineTo(box.sz(level.positions[at + 5]), box.sy(level.positions[at + 4]));
+    context.lineTo(box.sz(level.positions[at + 8]), box.sy(level.positions[at + 7]));
+    context.closePath();
+  }
+  context.fill();
+  context.globalAlpha = 1;
+  context.strokeStyle = colors.muted;
+  context.lineWidth = 0.6;
+  context.globalAlpha = 0.5;
+  context.beginPath();
+  for (let triangle = 0; triangle < level.types.length; triangle += 1) {
+    const at = triangle * 9;
+    if (level.normals[at + 1] < 0.9) continue;
+    const z0 = Math.min(level.positions[at + 2], level.positions[at + 5], level.positions[at + 8]);
+    const z1 = Math.max(level.positions[at + 2], level.positions[at + 5], level.positions[at + 8]);
+    const y = Math.round(box.sy(level.positions[at + 1])) + 0.5;
+    context.moveTo(box.sz(z0), y);
+    context.lineTo(box.sz(z1), y);
+  }
+  context.stroke();
+  context.globalAlpha = 1;
+}
+
+function paintReferences(context, box, labelled) {
+  const header = scene.header;
+  const colors = tokens();
+  const goal = box.sy(header.goal.goal_y);
+  const bandTop = box.sy(header.warp.y_range[1]);
+  const bandBase = box.sy(header.warp.y_range[0]);
+
+  if (labelled) {
+    context.font = '400 9px "IBM Plex Mono", ui-monospace, monospace';
+    context.textAlign = "right";
+    context.textBaseline = "middle";
+    context.lineWidth = 1;
+    const rows = [
+      [colors.floor, "landing " + header.goal.goal_y.toFixed(0), goal, true],
+      [colors.dead, "warp " + header.warp.y_range[1].toFixed(0), bandTop, true],
+      [colors.muted, "spawn " + header.spawn[1].toFixed(0), box.sy(header.spawn[1]), false],
+    ];
+    for (const [color, label, y, ruled] of rows) {
+      const at = Math.max(7, Math.min(y, box.base - 5));
+      if (ruled) {
+        context.strokeStyle = color;
+        context.setLineDash([3, 3]);
+        context.beginPath();
+        context.moveTo(box.right - 13, Math.round(at) + 0.5);
+        context.lineTo(box.right, Math.round(at) + 0.5);
+        context.stroke();
+        context.setLineDash([]);
+      }
+      context.fillStyle = color;
+      context.fillText(label, box.right - 18, at);
+    }
+    return;
+  }
+
+  const patch = [box.sz(header.warp.z_range[0]), bandTop,
+    Math.max(2, box.sz(header.warp.z_range[1]) - box.sz(header.warp.z_range[0])),
+    Math.max(2, bandBase - bandTop)];
+  context.fillStyle = colors.dead;
+  context.globalAlpha = 0.42;
+  context.fillRect(patch[0], patch[1], patch[2], patch[3]);
+  context.globalAlpha = 0.95;
+  context.strokeStyle = colors.dead;
+  context.lineWidth = 1;
+  context.strokeRect(Math.round(patch[0]) + 0.5, Math.round(patch[1]) + 0.5,
+    Math.round(patch[2]), Math.round(patch[3]));
+  context.globalAlpha = 1;
+
+  context.setLineDash([3, 3]);
+  context.lineWidth = 1;
+  context.strokeStyle = colors.dead;
+  context.globalAlpha = 0.75;
+  context.beginPath();
+  context.moveTo(box.left, Math.round(bandTop) + 0.5);
+  context.lineTo(box.right, Math.round(bandTop) + 0.5);
+  context.stroke();
+  context.strokeStyle = colors.floor;
+  context.globalAlpha = 0.9;
+  context.beginPath();
+  context.moveTo(box.left, Math.round(goal) + 0.5);
+  context.lineTo(box.right, Math.round(goal) + 0.5);
+  context.stroke();
+  context.setLineDash([]);
+  context.globalAlpha = 1;
+
+}
+
+// The envelope is the region of the elevation the population ever occupied, taken as the lowest
+// and highest y seen in each column of pixels over all forty-eight slots and all eight hundred
+// frames. It says how much of the stairwell the checkpoint reached at all, which is the shape
+// that changes most between panels, and the individual trails inside it say whether that reach
+// was one Mario or all of them.
+function paintEnvelope(context, box, run) {
+  const width = Math.max(1, Math.round(box.right - box.left));
+  const low = new Float32Array(width).fill(Infinity);
+  const high = new Float32Array(width).fill(-Infinity);
+  const samples = run.frames * run.population;
+  for (let i = 0; i < samples; i += 1) {
+    const column = Math.max(0, Math.min(width - 1,
+      Math.round(box.sz(run.position[i * 3 + 2]) - box.left)));
+    const y = box.sy(run.position[i * 3 + 1]);
+    if (y < low[column]) low[column] = y;
+    if (y > high[column]) high[column] = y;
+  }
+  const columns = [];
+  for (let column = 0; column < width; column += 1) {
+    if (high[column] > -Infinity) columns.push(column);
+  }
+  if (!columns.length) return;
+  context.beginPath();
+  for (let i = 0; i < columns.length; i += 1) {
+    const column = columns[i];
+    const x = box.left + column;
+    if (i === 0) context.moveTo(x, low[column]);
+    else context.lineTo(x, low[column]);
+  }
+  for (let i = columns.length - 1; i >= 0; i -= 1) {
+    const column = columns[i];
+    context.lineTo(box.left + column, high[column] + 1);
+  }
+  context.closePath();
+  context.fillStyle = tokens().neutral;
+  context.globalAlpha = 0.16;
+  context.fill();
+  context.globalAlpha = 1;
+}
+
+function paintTrails(context, box, run) {
+  const bands = stateCss(tokens());
+  const paths = STATES.map(() => new Path2D());
+  const population = run.population;
+  for (let slot = 0; slot < population; slot += 1) {
+    for (let frame = 1; frame < run.frames; frame += 1) {
+      const at = frame * population + slot;
+      if (run.status[at] & (run.bits.reset | run.bits.warped)) continue;
+      const from = (at - population) * 3;
+      const to = at * 3;
+      const path = paths[run.state[at]];
+      path.moveTo(box.sz(run.position[from + 2]), box.sy(run.position[from + 1]));
+      path.lineTo(box.sz(run.position[to + 2]), box.sy(run.position[to + 1]));
+    }
+  }
+  context.lineWidth = 0.9;
+  context.lineCap = "round";
+  for (let kind = 0; kind < STATES.length; kind += 1) {
+    context.strokeStyle = bands[kind];
+    context.globalAlpha = kind === STATE_BELOW ? 0.34 : 0.62;
+    context.stroke(paths[kind]);
+  }
+  context.globalAlpha = 1;
+}
+
+function paintThumb(canvas, run) {
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width));
+  const height = Math.max(1, Math.round(rect.height));
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+  const context = canvas.getContext("2d");
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  context.clearRect(0, 0, width, height);
+  const box = thumbFrame(width, height);
+  paintSilhouette(context, box);
+  paintReferences(context, box, false);
+  paintEnvelope(context, box, run);
+  paintTrails(context, box, run);
+  const colors = tokens();
+  context.fillStyle = colors.muted;
+  context.beginPath();
+  context.arc(box.sz(scene.header.spawn[2]), box.sy(scene.header.spawn[1]), 1.8, 0, Math.PI * 2);
+  context.fill();
+}
+
+function paintAxis() {
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const rect = stripAxis.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width));
+  const height = Math.max(1, Math.round(rect.height));
+  if (!width || !height) return;
+  stripAxis.width = Math.round(width * ratio);
+  stripAxis.height = Math.round(height * ratio);
+  const context = stripAxis.getContext("2d");
+  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  context.clearRect(0, 0, width, height);
+  paintReferences(context, thumbFrame(width, height), true);
+}
+
+function successRate(spec) {
+  return spec.outcome.episodes ? spec.outcome.successes / spec.outcome.episodes : 0;
+}
+
+function reachOf(spec) {
+  return Math.max(spec.outcome.best_height, spec.in_flight.best_height);
+}
+
+function stepParts(spec) {
+  const label = spec.steps_label || "?";
+  const match = /^([\d.]+)([kMG])$/.exec(label);
+  if (!match) return { value: label, unit: " steps" };
+  return { value: match[1], unit: match[2] + " steps" };
+}
+
+// Four phases, each decided by the checkpoint's own numbers rather than by a step count somebody
+// chose. A run that never leaves the spawn tile and a run that piles into the warp look nothing
+// alike even though neither reaches the top, which is the distinction worth naming. The untrained
+// network is named separately because it is the one panel whose label is a fact about the file
+// rather than a measurement.
+function phaseOf(spec) {
+  if (spec.steps === 0) return { key: "none", text: "untrained" };
+  const rate = successRate(spec);
+  if (rate >= 0.75) return { key: "reliable", text: "reliable" };
+  if (rate > 0) return { key: "through", text: "first through" };
+  if (spec.warps > 0 || reachOf(spec) > scene.header.warp.y_range[0]) {
+    return { key: "barrier", text: "at the barrier" };
+  }
+  return { key: "none", text: "no climb" };
+}
+
+function rateClass(rate) {
+  if (rate >= 0.75) return "most";
+  if (rate > 0) return "some";
+  return "zero";
+}
+
+function buildStrip() {
+  const header = scene.header;
+  strip.style.gridTemplateColumns = "84px repeat(" + header.checkpoints.length
+    + ", minmax(0, 1fr))";
+  for (const panel of panels) panel.button.remove();
+  panels.length = 0;
+  header.checkpoints.forEach((spec, order) => {
+    const button = document.createElement("button");
+    button.className = "frame";
+    button.type = "button";
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", "false");
+    button.id = "frame-" + order;
+
+    const head = document.createElement("span");
+    head.className = "fhead";
+    const steps = document.createElement("span");
+    steps.className = "fsteps";
+    const parts = stepParts(spec);
+    steps.append(document.createTextNode(parts.value));
+    const unit = document.createElement("em");
+    unit.textContent = parts.unit;
+    steps.append(unit);
+    const phase = document.createElement("span");
+    phase.className = "fphase";
+    phase.textContent = phaseOf(spec).text;
+    head.append(steps, phase);
+
+    const thumb = document.createElement("canvas");
+    thumb.className = "fthumb";
+
+    const rate = document.createElement("span");
+    rate.className = "frate";
+    const value = document.createElement("b");
+    const share = successRate(spec);
+    value.className = rateClass(share);
+    value.textContent = (share * 100).toFixed(share > 0 && share < 0.1 ? 1 : 0) + "%";
+    const caption = document.createElement("em");
+    caption.textContent = "reached the top";
+    rate.append(value, caption);
+
+    button.append(head, thumb, rate);
+    button.addEventListener("click", () => selectCheckpoint(order));
+    strip.append(button);
+    panels.push({ button, thumb, order });
+  });
+  strip.addEventListener("keydown", onStripKey);
+}
+
+function onStripKey(event) {
+  const jump = { ArrowLeft: -1, ArrowRight: 1 };
+  if (!(event.key in jump)) return;
+  event.preventDefault();
+  const total = panels.length;
+  const wanted = Math.max(0, Math.min(total - 1, view.order + jump[event.key]));
+  panels[wanted].button.focus();
+  selectCheckpoint(wanted);
+}
+
+function markStrip() {
+  for (const panel of panels) {
+    const chosen = panel.order === view.order;
+    panel.button.setAttribute("aria-selected", String(chosen));
+    panel.button.tabIndex = chosen ? 0 : -1;
+  }
+}
+
+// Thumbnails are painted once each, the moment that checkpoint's run finishes decoding, and then
+// only again on a resize or a theme change. A panel whose run has not arrived yet is left blank
+// rather than filled with a guess.
+function paintStrip() {
+  paintAxis();
+  for (const panel of panels) {
+    const run = runs.get(panel.order);
+    if (!run || painted.has(panel.order)) continue;
+    paintThumb(panel.thumb, run);
+    painted.add(panel.order);
+  }
+}
+
+function dropStrip() {
+  painted.clear();
+}
+
+function describeStrip() {
+  const header = scene.header;
+  stripNote.textContent = header.checkpoints.length + " checkpoints · "
+    + header.population + " rollouts each · " + header.frames + " frames each · "
+    + "one shared side elevation of the stairwell";
+  stripFoot.textContent = "Every panel is the same slice of the same corridor seen from the side, "
+    + "z across and y up, on one scale shared by all " + header.checkpoints.length
+    + " so the panels can be compared. The pale band is where the population ever went, the "
+    + "threads inside it are the " + header.population + " individual attempts tinted by the "
+    + "altitude band they were in at that frame, the red patch is the warp itself and the dashed "
+    + "red line is the ceiling it guards at y " + header.warp.y_range[1].toFixed(0)
+    + ". The teal line is the top landing at y " + header.goal.goal_y.toFixed(0) + ".";
+}
+
+const CHART_PAD = { left: 56, right: 16, top: 24, bottom: 20 };
+
+function drawChart() {
+  const { context, width, height } = cachedLayer("chart", chart, view.order, paintChart);
+  const run = current();
+  const count = run.frames;
+  const playhead = Math.round(CHART_PAD.left
+    + (view.frame / Math.max(1, count - 1)) * (width - CHART_PAD.left - CHART_PAD.right)) + 0.5;
+  context.strokeStyle = tokens().ink;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(playhead, CHART_PAD.top - 8);
+  context.lineTo(playhead, height - CHART_PAD.bottom);
+  context.stroke();
+}
+
+function paintChart(context, width, height) {
+  const run = current();
+  const header = scene.header;
+  const colors = tokens();
+
+  const count = run.frames;
+  const floorY = Math.min(header.spawn[1], run.populationMean[0]) - 80;
+  const ceilingY = Math.max(header.goal.goal_y, run.runningBest[count - 1]) + 140;
+  const sx = (index) => CHART_PAD.left
+    + (index / Math.max(1, count - 1)) * (width - CHART_PAD.left - CHART_PAD.right);
+  const sy = (value) => height - CHART_PAD.bottom
+    - ((value - floorY) / (ceilingY - floorY)) * (height - CHART_PAD.top - CHART_PAD.bottom);
+
+  context.globalAlpha = 0.16;
+  context.fillStyle = colors.dead;
+  context.fillRect(CHART_PAD.left, sy(header.warp.y_range[1]),
+    width - CHART_PAD.left - CHART_PAD.right,
+    Math.max(1.5, sy(header.warp.y_range[0]) - sy(header.warp.y_range[1])));
+  context.globalAlpha = 1;
+
+  context.font = '400 10px "IBM Plex Mono", ui-monospace, monospace';
+  context.textBaseline = "middle";
+  context.textAlign = "right";
+  for (const [value, color, dash] of [[header.goal.goal_y, colors.floor, [4, 3]],
+    [header.warp.y_range[1], colors.dead, [2, 3]], [header.spawn[1], colors.grid, []]]) {
+    const y = Math.round(sy(value)) + 0.5;
+    context.strokeStyle = color;
+    context.setLineDash(dash);
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(CHART_PAD.left, y);
+    context.lineTo(width - CHART_PAD.right, y);
+    context.stroke();
+    context.setLineDash([]);
+    context.fillStyle = color === colors.grid ? colors.muted : color;
+    context.fillText(value.toFixed(0), CHART_PAD.left - 8, y);
+  }
+
+  for (const [series, color, weight, dash] of [[run.populationMean, colors.muted, 1, []],
+    [run.populationBest, colors.speed, 1.5, []], [run.runningBest, colors.floor, 1, [2, 3]]]) {
+    context.beginPath();
+    for (let index = 0; index < count; index += 1) {
+      if (index === 0) context.moveTo(sx(index), sy(series[index]));
+      else context.lineTo(sx(index), sy(series[index]));
+    }
+    context.strokeStyle = color;
+    context.lineWidth = weight;
+    context.setLineDash(dash);
+    context.stroke();
+    context.setLineDash([]);
+  }
+
+  const population = run.population;
+  for (let index = 1; index < count; index += 1) {
+    let resets = 0;
+    let wins = 0;
+    for (let slot = 0; slot < population; slot += 1) {
+      const flags = run.status[index * population + slot];
+      if (flags & run.bits.reset) resets += 1;
+      if (flags & run.bits.success) wins += 1;
+    }
+    if (!resets && !wins) continue;
+    context.strokeStyle = wins ? colors.floor : colors.speed;
+    context.globalAlpha = wins ? 0.95 : 0.35;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(sx(index), height - CHART_PAD.bottom);
+    context.lineTo(sx(index), height - CHART_PAD.bottom - (wins ? 20 : 4 + Math.min(8, resets)));
+    context.stroke();
+    context.globalAlpha = 1;
+  }
+
+  context.textAlign = "left";
+  context.textBaseline = "top";
+  context.fillStyle = colors.muted;
+  context.fillText("height by frame · amber the highest Mario alive · grey the population mean · "
+    + "dashed teal the best so far · ticks are respawns, tall ones are successes",
+    CHART_PAD.left + 4, 3);
+}
+
+function verdictOf(spec) {
+  const outcome = spec.outcome;
+  const reach = reachOf(spec);
+  const goal = scene.header.goal.goal_y;
+  const escape = scene.header.warp.minimum_escape_speed.toFixed(0);
+  if (spec.steps === 0) {
+    return "<b>An untrained network, saved before a single gradient step.</b> Its action "
+      + "histogram is indistinguishable from uniform random: it ground pounds on "
+      + (UNTRAINED_POUND * 100).toFixed(1) + "% of frames against random's "
+      + (RANDOM_POUND * 100).toFixed(1) + "%, and long jumps on 0.0% of frames, as does random.";
+  }
+  if (outcome.successes === 0) {
+    return "<b>None of the " + outcome.episodes + " episodes reached the landing.</b> The best any "
+      + "of them managed was y " + reach.toFixed(0) + ", " + (goal - reach).toFixed(0)
+      + " short, and the warp threw the population back " + spec.warps
+      + (spec.warps === 1 ? " time." : " times.");
+  }
+  const rate = (outcome.successes / outcome.episodes * 100).toFixed(0);
+  return "<b>" + outcome.successes + " of " + outcome.episodes + " episodes reached the landing</b>"
+    + " (" + rate + "%). Peak forwardVel over the window was "
+    + outcome.best_peak_backward.toFixed(0) + ", against the " + escape
+    + " units a frame it takes to outrun the warp.";
+}
+
+const RAIL_FIELDS = [
+  { label: "reached the landing", tone: "good",
+    value: (spec) => successRate(spec) * 100,
+    format: (value) => value.toFixed(1) + "%" },
+  { label: "episodes finished", tone: "",
+    value: (spec) => spec.outcome.episodes,
+    format: (value) => Math.round(value).toString() },
+  { label: "highest y", tone: "hot",
+    value: (spec) => reachOf(spec),
+    format: (value) => value.toFixed(0) },
+  { label: "peak forwardVel", tone: "hot",
+    value: (spec) => spec.outcome.best_peak_backward,
+    format: (value) => value.toFixed(0) },
+  { label: "thrown back", tone: "bad",
+    value: (spec) => spec.warps,
+    format: (value) => Math.round(value).toString() },
+];
+
+function buildRail() {
+  railStats.innerHTML = "";
+  for (const field of RAIL_FIELDS) {
+    const term = document.createElement("dt");
+    term.textContent = field.label;
+    const value = document.createElement("dd");
+    value.className = field.tone ? field.tone : "";
+    value.textContent = "–";
+    railStats.append(term, value);
+  }
+}
+
+function paintRailStats(amount) {
+  const eased = easeInOut(Math.min(1, Math.max(0, amount)));
+  const cells = railStats.querySelectorAll("dd");
+  RAIL_FIELDS.forEach((field, index) => {
+    const from = tweenState.from[index];
+    const to = tweenState.to[index];
+    cells[index].textContent = field.format(from + (to - from) * eased);
+  });
+}
+
+// The numbers move rather than jump, because the point of the strip is that the six panels are
+// one continuous run. Under prefers-reduced-motion they are written straight in.
+function setCheckpointRail(order) {
+  const spec = scene.header.checkpoints[order];
+  const parts = stepParts(spec);
+  railSteps.innerHTML = "";
+  railSteps.append(document.createTextNode(parts.value));
+  const unit = document.createElement("em");
+  unit.textContent = parts.unit;
+  railSteps.append(unit);
+  const phase = phaseOf(spec);
+  railPhase.className = "phase " + phase.key;
+  railPhase.textContent = phase.text;
+  railVerdict.innerHTML = verdictOf(spec);
+  const target = RAIL_FIELDS.map((field) => field.value(spec));
+  if (reduceMotion || !tweenState.to.length) {
+    tweenState.from = target.slice();
+    tweenState.to = target;
+    tweenState.active = false;
+    paintRailStats(1);
+    return;
+  }
+  tweenState.from = tweenState.to.slice();
+  tweenState.to = target;
+  tweenState.started = performance.now();
+  tweenState.active = true;
+  paintRailStats(0);
+}
+
+// The population histogram. It is the same four colours as the bodies, counted over the frame on
+// screen, so the bar and the crowd are two readings of one number.
+function buildCensus() {
+  censusBar.innerHTML = "";
+  censusRows.innerHTML = "";
+  const colors = stateCss(tokens());
+  const segments = [];
+  const counts = [];
+  STATES.forEach((entry, kind) => {
+    const segment = document.createElement("i");
+    segment.style.background = colors[kind];
+    segment.style.flexBasis = "0%";
+    censusBar.append(segment);
+    segments.push(segment);
+
+    const term = document.createElement("dt");
+    term.style.color = colors[kind];
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = entry.name;
+    const count = document.createElement("span");
+    count.className = "count";
+    count.textContent = "0";
+    term.append(dot, name, count);
+    censusRows.append(term);
+    counts.push(count);
+  });
+  scene.censusCells = { segments, counts };
+}
+
+function drawCensus() {
+  const run = current();
+  const cells = scene.censusCells;
+  const base = view.frame * STATE_COUNT;
+  for (let kind = 0; kind < STATE_COUNT; kind += 1) {
+    const value = run.census[base + kind];
+    const share = (value / run.population * 100).toFixed(2) + "%";
+    if (cells.segments[kind].style.flexBasis !== share) {
+      cells.segments[kind].style.flexBasis = share;
+    }
+    const text = String(value);
+    if (cells.counts[kind].textContent !== text) cells.counts[kind].textContent = text;
+  }
+}
+
+const FIELDS = [
+  ["frame", (run) => String(view.frame).padStart(4, "0") + " / " + run.frames],
+  ["episodes done", (run) => String(run.episodes[view.frame])],
+  ["reached the top", (run) => run.episodes[view.frame]
+    ? run.successes[view.frame] + " of " + run.episodes[view.frame]
+    : "no episode done yet", "good"],
+  ["highest now", (run) => run.populationBest[view.frame].toFixed(0)],
+  ["best height", (run) => run.runningBest[view.frame].toFixed(0) + " of "
+    + scene.header.goal.goal_y.toFixed(0), "hot"],
+  ["above the warp", (run) => run.aboveWarp[view.frame] + " of " + run.population],
+  ["thrown back", (run) => String(run.warps[view.frame])],
+  ["fastest frame", (run) => run.bestSpeed[view.frame].toFixed(1) + " u/f", "hot"],
+  ["swarm", (run) => run.population + " instances, 1 call"],
+  ["mario triangles", (run) => scene.poseData.triangles + " x " + run.population],
+  ["draw calls", () => String(scene.drawCalls)],
+  ["draw rate", () => view.fps ? view.fps.toFixed(0) + " fps" : "paused"],
+];
+
+function buildReadout() {
+  readout.innerHTML = "";
+  for (const [label, , tone] of FIELDS) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    const name = document.createElement("span");
+    name.className = "label";
+    name.textContent = label;
+    const value = document.createElement("span");
+    value.className = tone ? "v " + tone : "v";
+    cell.append(name, value);
+    readout.append(cell);
+  }
+}
+
+function drawReadout() {
+  const run = current();
+  const cells = readout.querySelectorAll(".cell .v");
+  FIELDS.forEach(([, get], index) => {
+    const text = get(run);
+    if (cells[index].textContent !== text) cells[index].textContent = text;
+  });
+}
+
+function drawHud() {
+  const run = current();
+  const header = scene.header;
+  const spawn = header.spawn[1];
+  const goal = header.goal.goal_y;
+  const now = run.populationBest[view.frame];
+  const best = run.runningBest[view.frame];
+  heightLabel.textContent = now.toFixed(0);
+  const share = (value) => Math.min(100, Math.max(0, (value - spawn) / (goal - spawn) * 100));
+  gaugeBest.style.height = share(best).toFixed(1) + "%";
+  gaugeNow.style.bottom = share(now).toFixed(1) + "%";
+
+  const parts = [
+    "frame <b>" + view.frame + "</b>",
+    "episodes <b>" + run.episodes[view.frame] + "</b>",
+  ];
+  const thrown = run.frameWarps[view.frame];
+  if (thrown) {
+    parts.push('<span class="warn">' + thrown + " thrown back this frame</span>");
+  }
+  if (run.successes[view.frame]) {
+    parts.push('<span class="win">' + run.successes[view.frame] + " reached the landing</span>");
+  }
+  parts.push("<b>" + run.aboveWarp[view.frame] + "</b> above the warp");
+  hudBottom.innerHTML = parts.join(" · ");
+}
+
+// ---- sound ----
+//
+// One mp3 per checkpoint, captured off the game's own audio engine while the population ran. It
+// starts off, and nothing is even constructed until the toggle is pressed, because a browser
+// blocks autoplay without a gesture and because forty-eight Marios arriving unannounced is
+// hostile. From then on the track is a slave to the transport: currentTime is frame over thirty,
+// playbackRate is the speed control, preservesPitch is off so a fast pass pitches up the way a
+// tape would, and a pause is a pause.
+const audioTracks = new Map();
+
+function audioEntry(order) {
+  return SWARM.audio && SWARM.audio[order] ? SWARM.audio[order] : null;
+}
+
+function hasAudio() {
+  if (!SWARM.audio) return false;
+  return SWARM.audio.some((entry) => entry);
+}
+
+function audioTrack(order) {
+  if (audioTracks.has(order)) return audioTracks.get(order);
+  const entry = audioEntry(order);
+  if (!entry) {
+    audioTracks.set(order, null);
+    return null;
+  }
+  const element = new Audio("data:" + entry.mime + ";base64," + entry.data);
+  element.preload = "auto";
+  for (const name of ["preservesPitch", "mozPreservesPitch", "webkitPreservesPitch"]) {
+    if (name in element) element[name] = false;
+  }
+  audioTracks.set(order, element);
+  return element;
+}
+
+function audioSeconds() {
+  return (view.frame * Math.max(1, scene.header.stride)) / GAME_FPS;
+}
+
+function syncAudio() {
+  const wanted = view.sound && ready() ? audioTrack(view.order) : null;
+  for (const track of audioTracks.values()) {
+    if (track && track !== wanted && !track.paused) track.pause();
+  }
+  if (!wanted) return;
+  wanted.playbackRate = Math.min(4, Math.max(0.25, view.rate));
+  const at = audioSeconds();
+  if (Math.abs(wanted.currentTime - at) > 0.3) wanted.currentTime = at;
+  if (!view.playing) {
+    wanted.pause();
+    return;
+  }
+  const started = wanted.play();
+  if (started && started.catch) started.catch(() => {});
+}
+
+function setSound(on) {
+  view.sound = on && hasAudio();
+  soundButton.setAttribute("aria-pressed", String(view.sound));
+  soundButton.textContent = view.sound ? "Sound on" : "Sound off";
+  syncAudio();
+}
+
+function describeSound() {
+  const entry = audioEntry(0) || (SWARM.audio || []).find((item) => item);
+  if (!entry) {
+    document.getElementById("soundnote").textContent =
+      "This build carries no audio, so the sound toggle is disabled. Run tools/dump_swarm.py with "
+      + "--audio_dir to capture one track per checkpoint.";
+    return;
+  }
+  document.getElementById("soundnote").textContent =
+    "Sound is off until you press the toggle. Each checkpoint carries " + (entry.seconds).toFixed(1)
+    + " seconds of the game's own audio, captured with one audio tick per frame for the whole "
+    + "population, because libsm64 keeps the audio engine's state as a file scope global rather "
+    + "than in the per Mario struct, so one tick renders everybody and the game's own mixer sums "
+    + "them. It saturates at around eight simultaneous Marios: the engine has a fixed voice limit "
+    + "and drops the surplus itself, which is what the console does too. The track follows the "
+    + "transport, so a 4x pass pitches up by two octaves.";
+}
+
+function render() {
+  if (!ready()) return;
+  drawStage();
+  drawChart();
+  drawReadout();
+  drawCensus();
+  drawHud();
+  scrub.value = String(view.frame);
+}
+
+function captureMorph(run) {
+  const population = run.population;
+  if (!morph.from || morph.from.length !== population * 3) {
+    morph.from = new Float32Array(population * 3);
+  }
+  for (let slot = 0; slot < population; slot += 1) {
+    const base = slot * INSTANCE_FLOATS;
+    morph.from[slot * 3] = scene.instances[base];
+    morph.from[slot * 3 + 1] = scene.instances[base + 1];
+    morph.from[slot * 3 + 2] = scene.instances[base + 2];
+  }
+  morph.active = true;
+  morph.amount = 0;
+  morph.started = performance.now();
+}
+
+async function ensureRun(order) {
+  if (runs.has(order)) return runs.get(order);
+  if (pending.has(order)) {
+    while (pending.has(order)) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
+    return runs.get(order);
+  }
+  pending.add(order);
+  try {
+    const run = await decodeRun(scene.container, order);
+    runs.set(order, run);
+    return run;
+  } finally {
+    pending.delete(order);
+  }
+}
+
+// Every checkpoint gets decoded, nearest to the one on screen first, one per idle slice. The
+// strip needs all of them anyway, since a blank panel is a panel that says nothing, and having
+// them in memory is what makes clicking along the strip instant.
+function queueBacklog() {
+  if (backlog) return;
+  const idle = window.requestIdleCallback
+    || ((task) => setTimeout(() => task({ timeRemaining: () => 8 }), 60));
+  const step = async () => {
+    const total = scene.header.checkpoints.length;
+    let next = -1;
+    let distance = Infinity;
+    for (let order = 0; order < total; order += 1) {
+      if (runs.has(order) || pending.has(order)) continue;
+      const gap = Math.abs(order - view.order);
+      if (gap < distance) {
+        distance = gap;
+        next = order;
+      }
+    }
+    if (next < 0) {
+      backlog = null;
+      return;
+    }
+    await ensureRun(next);
+    paintStrip();
+    idle(step);
+  };
+  backlog = idle(step);
+}
+
+async function selectCheckpoint(order) {
+  const total = scene.header.checkpoints.length;
+  const wanted = Math.max(0, Math.min(total - 1, order));
+  if (wanted === view.order && runs.has(wanted)) return;
+  const had = ready();
+  if (!runs.has(wanted)) {
+    statusPanel.hidden = false;
+    statusPanel.textContent = "decoding " + scene.header.checkpoints[wanted].steps_label;
+    await ensureRun(wanted);
+    statusPanel.hidden = true;
+  }
+  if (had && !reduceMotion) captureMorph(runs.get(wanted));
+  view.order = wanted;
+  const run = current();
+  view.frame = Math.min(view.frame, run.frames - 1);
+  scrub.max = String(run.frames - 1);
+  markStrip();
+  setCheckpointRail(wanted);
+  dropCaches();
+  render();
+  syncAudio();
+  paintStrip();
+  queueBacklog();
+}
+
+function buildRates() {
+  const host = document.getElementById("rates");
+  host.innerHTML = "";
+  for (const rate of [0.25, 1, 2, 4]) {
+    const button = document.createElement("button");
+    button.className = "ctrl";
+    button.type = "button";
+    button.textContent = rate + "x";
+    button.setAttribute("aria-pressed", String(rate === view.rate));
+    button.addEventListener("click", () => {
+      view.rate = rate;
+      for (const sibling of host.children) {
+        sibling.setAttribute("aria-pressed", String(sibling === button));
+      }
+      syncAudio();
+    });
+    host.append(button);
+  }
+}
+
+function setPlaying(playing) {
+  view.playing = playing;
+  playButton.textContent = playing ? "Pause" : "Play";
+  playButton.setAttribute("aria-pressed", String(playing));
+  view.last = 0;
+  view.stamp = 0;
+  if (!playing) {
+    view.fps = 0;
+    drawReadout();
+    drawHud();
+  }
+  syncAudio();
+}
+
+function tick(now) {
+  if (tweenState.active) {
+    const amount = (now - tweenState.started) / TWEEN_MS;
+    paintRailStats(amount);
+    if (amount >= 1) tweenState.active = false;
+  }
+  if (view.playing && ready()) {
+    if (view.stamp) {
+      const delta = now - view.stamp;
+      if (delta > 0) view.fps = view.fps ? view.fps * 0.85 + (1000 / delta) * 0.15 : 1000 / delta;
+    }
+    view.stamp = now;
+    const step = 1000 / (GAME_FPS * view.rate);
+    if (!view.last) view.last = now;
+    const steps = Math.min(8, Math.floor((now - view.last) / step));
+    if (steps > 0) {
+      const before = view.frame;
+      view.last += steps * step;
+      view.frame = (view.frame + steps) % current().frames;
+      render();
+      if (view.sound && view.frame < before) syncAudio();
+    } else {
+      drawStage(now);
+    }
+  } else if (morph.active && ready()) {
+    drawStage(now);
+  }
+  requestAnimationFrame(tick);
+}
+
+playButton.addEventListener("click", () => setPlaying(!view.playing));
+soundButton.addEventListener("click", () => setSound(!view.sound));
+
+// Yaw matters more than it looks. The staircase is a slot, so an angle across it shows nothing
+// but risers edge on and the whole flight disappears into the haze; looking along it shows the
+// treads, the warp band and the landing all at once.
+const CAMERA_ANGLES = {
+  swarm: [0.52, 0.28],
+  corridor: [0.62, 0.30],
+  leader: [0.52, 0.20],
+};
+
+function buildCameras() {
+  cameraHost.innerHTML = "";
+  for (const [mode, text] of [["swarm", "Swarm"], ["corridor", "Corridor"],
+    ["leader", "Leader"]]) {
+    const button = document.createElement("button");
+    button.className = "ctrl";
+    button.type = "button";
+    button.textContent = text;
+    button.setAttribute("aria-pressed", String(mode === view.camera));
+    button.addEventListener("click", () => {
+      view.camera = mode;
+      view.zoom = 1;
+      view.yaw = CAMERA_ANGLES[mode][0];
+      view.pitch = CAMERA_ANGLES[mode][1];
+      for (const sibling of cameraHost.children) {
+        sibling.setAttribute("aria-pressed", String(sibling === button));
+      }
+      if (!ready()) return;
+      const next = cameraFrame();
+      view.target = next.target.slice();
+      view.distance = next.distance;
+      if (!view.playing) render();
+    });
+    cameraHost.append(button);
+  }
+}
+
+trailButton.addEventListener("click", () => {
+  view.trails = !view.trails;
+  trailButton.setAttribute("aria-pressed", String(view.trails));
+  if (!view.playing) render();
+});
+
+textureButton.addEventListener("click", () => {
+  view.textures = !view.textures;
+  textureButton.setAttribute("aria-pressed", String(view.textures));
+  if (!view.playing) render();
+});
+
+scrub.addEventListener("input", () => {
+  view.frame = Number(scrub.value);
+  render();
+  syncAudio();
+});
+
+chart.addEventListener("click", (event) => {
+  if (!ready()) return;
+  const rect = chart.getBoundingClientRect();
+  const count = current().frames;
+  const ratio = (event.clientX - rect.left - CHART_PAD.left)
+    / (rect.width - CHART_PAD.left - CHART_PAD.right);
+  view.frame = Math.max(0, Math.min(count - 1, Math.round(ratio * (count - 1))));
+  render();
+  syncAudio();
+});
+
+let drag = null;
+
+stage.addEventListener("pointerdown", (event) => {
+  drag = { x: event.clientX, y: event.clientY };
+  stage.classList.add("dragging");
+  stage.setPointerCapture(event.pointerId);
+});
+
+stage.addEventListener("pointermove", (event) => {
+  if (!drag) return;
+  view.yaw -= (event.clientX - drag.x) * 0.006;
+  view.pitch = Math.max(-1.35, Math.min(1.35, view.pitch + (event.clientY - drag.y) * 0.005));
+  drag = { x: event.clientX, y: event.clientY };
+  if (!view.playing) render();
+});
+
+function endDrag(event) {
+  drag = null;
+  stage.classList.remove("dragging");
+  if (stage.hasPointerCapture && stage.hasPointerCapture(event.pointerId)) {
+    stage.releasePointerCapture(event.pointerId);
+  }
+}
+
+stage.addEventListener("pointerup", endDrag);
+stage.addEventListener("pointercancel", endDrag);
+
+stage.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  view.zoom = Math.max(0.15, Math.min(8, view.zoom * Math.exp(event.deltaY * 0.0012)));
+  if (!view.playing) render();
+}, { passive: false });
+
+window.addEventListener("keydown", (event) => {
+  if (!ready()) return;
+  const target = event.target;
+  if (target && (target.tagName === "INPUT" || target.tagName === "BUTTON")) {
+    if (event.key !== " ") return;
+  }
+  if (event.key === " ") {
+    event.preventDefault();
+    setPlaying(!view.playing);
+  } else if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+    event.preventDefault();
+    const count = current().frames;
+    const delta = (event.key === "ArrowRight" ? 1 : -1) * (event.shiftKey ? 10 : 1);
+    view.frame = Math.max(0, Math.min(count - 1, view.frame + delta));
+    render();
+    syncAudio();
+  } else if (event.key === "," || event.key === ".") {
+    event.preventDefault();
+    selectCheckpoint(view.order + (event.key === "." ? 1 : -1));
+  }
+});
+
+let resizeTimer = 0;
+
+window.addEventListener("resize", () => {
+  dropCaches();
+  dropStrip();
+  if (!ready()) return;
+  render();
+  window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(paintStrip, 120);
+});
+
+function repaint() {
+  if (!ready()) return;
+  dropCaches();
+  dropStrip();
+  paintLevel(scene.level, tokens(), scene.span);
+  gl.bindBuffer(gl.ARRAY_BUFFER, scene.buffers.levelTints);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, scene.level.tints);
+  buildCensus();
+  render();
+  paintStrip();
+}
+
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
+new MutationObserver(repaint)
+  .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+function hashValue(name) {
+  const match = new RegExp("(?:^|[#&])" + name + "=([\\w.-]+)").exec(window.location.hash);
+  return match ? match[1] : null;
+}
+
+function queryFlag(name) {
+  return new RegExp("(?:^|[?&])" + name + "=1(?:&|$)").test(window.location.search);
+}
+
+function requestedCheckpoint(header) {
+  const asked = hashValue("checkpoint");
+  if (asked === null) {
+    const total = header.checkpoints.length;
+    for (let order = 0; order < total; order += 1) {
+      if (successRate(header.checkpoints[order]) > 0) return order;
+    }
+    return total - 1;
+  }
+  const byName = header.checkpoints.findIndex((spec) => spec.name === asked);
+  if (byName >= 0) return byName;
+  const order = Number(asked);
+  return Number.isInteger(order) && order >= 0 && order < header.checkpoints.length ? order : 0;
+}
+
+// The frame rate the page reports in its own readout is whatever the compositor hands it, which
+// is capped at the display's refresh. This measures the other number, the one that says whether
+// the swarm has headroom: how long a frame takes when nothing is pacing it.
+function benchmark(count) {
+  if (!ready()) return null;
+  const total = Math.max(1, count || 240);
+  const start = view.frame;
+  const frames = current().frames;
+  const began = performance.now();
+  for (let i = 0; i < total; i += 1) {
+    view.frame = (view.frame + 1) % frames;
+    drawStage();
+  }
+  gl.finish();
+  const ms = (performance.now() - began) / total;
+  view.frame = start;
+  drawStage();
+  return {
+    frames: total,
+    population: current().population,
+    msPerFrame: ms,
+    fps: 1000 / ms,
+    marioTriangles: scene.poseData.triangles,
+    marioInstances: current().population,
+    levelTriangles: scene.level.count / 3,
+    trailVertices: scene.trailVertices,
+    poseTextureBytes: scene.poseData.bytes,
+    drawCalls: scene.drawCalls,
+  };
+}
+
+function placeGaugeTicks(header) {
+  const spawn = header.spawn[1];
+  const goal = header.goal.goal_y;
+  const share = (value) => Math.min(100, Math.max(0, (value - spawn) / (goal - spawn) * 100));
+  const label = (id, text, value) => {
+    const node = document.getElementById(id);
+    node.style.bottom = share(value).toFixed(1) + "%";
+    node.firstChild.textContent = text;
+  };
+  label("tickgoal", "landing " + goal.toFixed(0), goal);
+  label("tickwarp", "warp " + header.warp.y_range[1].toFixed(0), header.warp.y_range[1]);
+  label("tickspawn", "spawn " + spawn.toFixed(0), spawn);
+  gaugeBand.style.bottom = share(header.warp.y_range[0]).toFixed(1) + "%";
+  gaugeBand.style.height = Math.max(1,
+    share(header.warp.y_range[1]) - share(header.warp.y_range[0])).toFixed(1) + "%";
+  heightNote.textContent = "top landing at y " + goal.toFixed(0) + ", spawn at "
+    + spawn.toFixed(0);
+}
+
+function drawNote() {
+  const header = scene.header;
+  document.getElementById("scenenote").textContent =
+    "Drawing " + scene.level.count / 3 + " of the area's " + scene.level.total
+    + " collision triangles, cut to the corridor so the camera can see into the stairwell, and "
+    + header.population + " Marios as " + header.population + " instances of one "
+    + scene.poseData.triangles + " triangle mesh. Each Mario picks his body out of a "
+    + header.pose_count + " entry pose dictionary in the vertex shader, which is why the whole "
+    + "swarm costs one draw call. The container spends 9 bytes per Mario per frame: a pose index, "
+    + "a position, a yaw and the status bits. All " + header.checkpoints.length + " checkpoints "
+    + "come from one training run, the " + RUN_RUNG + " rung at seed " + RUN_SEED
+    + ", whose first success was at " + FIRST_SUCCESS_STEPS.toLocaleString("en-US")
+    + " steps and which finished at " + (RUN_SUCCESS_RATE * 100).toFixed(1) + "% over "
+    + RUN_EPISODES.toLocaleString("en-US") + " episodes. Left and right step a frame, shift steps "
+    + "ten, comma and period move a checkpoint, space plays.";
+  document.getElementById("kicker").textContent = "libsm64 · " + header.population
+    + " rollouts in one process · " + header.checkpoints.length + " checkpoints from one run · "
+    + header.scene;
+}
+
+async function start() {
+  if (!gl) {
+    statusPanel.textContent = "this browser has no WebGL2 context, so the swarm cannot draw";
+    return;
+  }
+  buildPrograms();
+  await buildScene();
+  const header = scene.header;
+  scene.thumbSpan = thumbSpan();
+  view.order = requestedCheckpoint(header);
+  runs.set(view.order, await decodeRun(scene.container, view.order));
+  const loaded = await loadAtlas(scene.atlasBytes);
+  if (!loaded) {
+    view.textures = false;
+    textureButton.setAttribute("aria-pressed", "false");
+    textureButton.disabled = true;
+  }
+  const run = current();
+  const pinned = hashValue("frame");
+  if (pinned !== null) view.frame = Math.max(0, Math.min(run.frames - 1, Number(pinned)));
+  scrub.max = String(run.frames - 1);
+  view.yaw = CAMERA_ANGLES[view.camera][0];
+  view.pitch = CAMERA_ANGLES[view.camera][1];
+  const opening = cameraFrame();
+  view.target = opening.target.slice();
+  view.distance = opening.distance;
+  view.ready = true;
+  statusPanel.hidden = true;
+  buildStrip();
+  markStrip();
+  buildCensus();
+  buildRail();
+  buildReadout();
+  setCheckpointRail(view.order);
+  buildRates();
+  buildCameras();
+  placeGaugeTicks(header);
+  describeStrip();
+  describeSound();
+  drawNote();
+  soundButton.disabled = !hasAudio();
+  render();
+  paintStrip();
+  requestAnimationFrame(tick);
+  queueBacklog();
+  if (queryFlag("probe")) {
+    window.swarmProbe = { view, benchmark, render, setPlaying, select: selectCheckpoint,
+      state: () => scene, programs: () => programs, specs: PROGRAM_SPECS, runs, audioTracks,
+      states: STATES };
+  }
+  if (!reduceMotion && pinned === null) setPlaying(true);
+}
+
+start().catch((error) => {
+  statusPanel.hidden = false;
+  statusPanel.textContent = "could not decode the swarm: " + error.message;
+});
+</script>

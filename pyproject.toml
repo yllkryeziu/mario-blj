@@ -58,6 +58,7 @@ select = ["B", "D", "E", "F", "I", "N", "UP", "W"]
 "tools/dump_mesh.py" = ["E402"]
 "tools/dump_swarm.py" = ["E402"]
 "tools/make_viewer3d.py" = ["E402"]
+"tools/make_viewer_swarm.py" = ["E402"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
