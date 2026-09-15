@@ -6,7 +6,10 @@ __pycache__/
 *.so
 *.dylib
 results/replay_*.json
+results/replay_*.mp3
 results/replays.json
+results/swarm.bin
+results/transfer_journal.jsonl
 
 # tooling and build products
 .pytest_cache/
@@ -18,3 +21,6 @@ results/viewer.html
 .DS_Store
 results/viewer3d.html
 results/viewer_swarm.html
+
+# fetched cluster artefacts, not committed
+data/

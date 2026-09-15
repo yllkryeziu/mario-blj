@@ -324,6 +324,7 @@ code {
     <button class="ctrl" id="play" aria-pressed="false">Play</button>
     <input type="range" id="scrub" min="0" max="1" value="0" step="1" aria-label="Frame">
     <div class="rates" id="rates"></div>
+    <button class="ctrl" id="sound" aria-pressed="false" hidden>Sound</button>
     <button class="ctrl" id="follow" aria-pressed="true">Chase Mario</button>
     <button class="ctrl" id="textures" aria-pressed="true">Textures</button>
   </div>
@@ -930,6 +931,37 @@ const stage = document.getElementById("stage");
 const chart = document.getElementById("chart");
 const scrub = document.getElementById("scrub");
 const playButton = document.getElementById("play");
+const soundButton = document.getElementById("sound");
+
+const AUDIO = __AUDIO_DATA__;
+let audio = null;
+
+if (AUDIO && AUDIO.src) {
+  audio = new Audio(AUDIO.src);
+  audio.preload = "auto";
+  audio.loop = false;
+  soundButton.hidden = false;
+}
+
+function audioSeek() {
+  if (!audio || !AUDIO) return;
+  const seconds = view.frame / 30;
+  if (Number.isFinite(seconds) && Math.abs(audio.currentTime - seconds) > 0.08) {
+    try { audio.currentTime = Math.min(seconds, AUDIO.seconds - 0.01); } catch (error) { }
+  }
+}
+
+function audioSync() {
+  if (!audio) return;
+  audio.playbackRate = Math.max(0.25, Math.min(4, view.rate));
+  if ("preservesPitch" in audio) audio.preservesPitch = false;
+  if (view.playing && soundButton.getAttribute("aria-pressed") === "true") {
+    audioSeek();
+    audio.play().catch(() => { });
+  } else {
+    audio.pause();
+  }
+}
 const followButton = document.getElementById("follow");
 const textureButton = document.getElementById("textures");
 const readout = document.getElementById("readout");
@@ -1499,6 +1531,7 @@ function buildRates() {
     button.setAttribute("aria-pressed", String(rate === view.rate));
     button.addEventListener("click", () => {
       view.rate = rate;
+      audioSync();
       for (const sibling of host.children) {
         sibling.setAttribute("aria-pressed", String(sibling === button));
       }
@@ -1527,7 +1560,15 @@ function setPlaying(playing) {
   playButton.textContent = playing ? "Pause" : "Play";
   playButton.setAttribute("aria-pressed", String(playing));
   view.last = 0;
+  audioSync();
 }
+
+soundButton.addEventListener("click", () => {
+  const on = soundButton.getAttribute("aria-pressed") !== "true";
+  soundButton.setAttribute("aria-pressed", String(on));
+  soundButton.textContent = on ? "Sound on" : "Sound";
+  audioSync();
+});
 
 playButton.addEventListener("click", () => setPlaying(!view.playing));
 
@@ -1551,6 +1592,7 @@ textureButton.addEventListener("click", () => {
 
 scrub.addEventListener("input", () => {
   view.frame = Number(scrub.value);
+  audioSeek();
   render();
 });
 

@@ -63,6 +63,7 @@ _AREA_2_COLLISION = os.path.join(_ROOT, "third_party", "sm64-port", "levels", "c
                                  "areas", "2", "collision.inc.c")
 
 PLACEHOLDER = "__REPLAY_DATA__"
+AUDIO_PLACEHOLDER = "__AUDIO_DATA__"
 PAGE_BUDGET = 16_000_000
 
 SCENE_LABELS = {
@@ -117,6 +118,9 @@ _define(flags.DEFINE_string, "collision_path", None,
         "castle_inside/areas/2/collision.inc.c. Defaults to the module's own path.")
 _define(flags.DEFINE_string, "surface_header", None,
         "surface_terrains.h supplying the SURFACE_* constants.")
+_define(flags.DEFINE_string, "audio", None,
+        "Audio file recorded by scripts/record_episode.py --audio, inlined as a data URI and "
+        "synced to the frame scrubber.")
 _define(flags.DEFINE_string, "replay", None,
         "Replay JSON from scripts/record_episode.py. Its recorded per frame controller state is "
         "fed back through the environment, which reproduces that episode exactly and keeps the "
@@ -492,7 +496,42 @@ def build_page(template: str, payload: dict[str, Any]) -> str:
     if template.count(PLACEHOLDER) != 1:
         raise ValueError(f"template needs exactly one {PLACEHOLDER}, "
                          f"found {template.count(PLACEHOLDER)}")
-    return template.replace(PLACEHOLDER, json.dumps(payload, separators=(",", ":")))
+    filled = template.replace(PLACEHOLDER, json.dumps(payload, separators=(",", ":")))
+    return filled.replace(AUDIO_PLACEHOLDER, json.dumps(audio_payload(FLAGS.audio),
+                                                        separators=(",", ":")))
+
+
+def audio_payload(path: str | None) -> dict | None:
+    """Reads an audio file into a data URI payload the page can play.
+
+    Args:
+        path: Audio file written by scripts/record_episode.py, or None for a silent page.
+
+    Returns:
+        A dict with the data URI and the duration in seconds, or None.
+
+    Raises:
+        ValueError: If the file extension is not one a browser will decode.
+    """
+    if not path:
+        return None
+    media = {".mp3": "audio/mpeg", ".wav": "audio/wav", ".ogg": "audio/ogg"}
+    extension = os.path.splitext(path)[1].lower()
+    if extension not in media:
+        raise ValueError(f"unsupported audio extension {extension!r}")
+    with open(path, "rb") as handle:
+        raw = handle.read()
+    seconds = None
+    if extension == ".wav":
+        import wave
+        with wave.open(path, "rb") as handle:
+            seconds = handle.getnframes() / handle.getframerate()
+    logging.info("audio %s, %d bytes", path, len(raw))
+    return {
+        "src": f"data:{media[extension]};base64,{base64.b64encode(raw).decode('ascii')}",
+        "bytes": len(raw),
+        "seconds": seconds if seconds is not None else 0.0,
+    }
 
 
 def config_from_flags() -> ViewerConfig:

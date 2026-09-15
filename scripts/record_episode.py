@@ -14,6 +14,7 @@ from typing import Any
 from absl import app, flags, logging
 
 from src.agent.drivers import Driver, model_driver, scripted_driver
+from src.env.audio import AudioRecorder
 from src.env.blj_env import BljConfig, BljEnv, RewardConfig, decode_action
 from src.env.native import ACT_LONG_JUMP
 
@@ -30,9 +31,12 @@ _STOCHASTIC = flags.DEFINE_boolean("stochastic", False,
 _SEED = flags.DEFINE_integer("seed", 0, "Episode seed.")
 _SEARCH = flags.DEFINE_integer("search", 1,
                                "Try this many seeds and keep the first successful episode.")
+_AUDIO = flags.DEFINE_boolean("audio", False,
+                              "Also record the game's own audio for the kept episode.")
 
 
-def record(config: BljConfig, driver: Driver, frames: int, name: str, seed: int = 0) -> dict:
+def record(config: BljConfig, driver: Driver, frames: int, name: str, seed: int = 0,
+           audio_path: str | None = None) -> dict:
     """Runs one episode and collects the replay payload.
 
     Args:
@@ -41,11 +45,13 @@ def record(config: BljConfig, driver: Driver, frames: int, name: str, seed: int 
         frames: Frame limit.
         name: Scene name stored in the payload.
         seed: Episode seed, which fixes the spawn jitter and any sampling the driver does.
+        audio_path: Where to write the episode's audio, or None to record none.
 
     Returns:
         The replay payload, ready to serialize.
     """
     env = BljEnv(config)
+    recorder = AudioRecorder(env.game) if audio_path else None
     try:
         observation, info = env.reset(seed=seed)
         trace: list[dict[str, Any]] = []
@@ -59,6 +65,8 @@ def record(config: BljConfig, driver: Driver, frames: int, name: str, seed: int 
             action = driver(observation, info)
             stick_x, stick_y, press_a, press_z = decode_action(action)
             observation, _, terminated, truncated, info = env.step(action)
+            if recorder is not None:
+                recorder.capture()
             state = env.game.state
             mario_action = info["mario_action_id"]
 
@@ -105,6 +113,9 @@ def record(config: BljConfig, driver: Driver, frames: int, name: str, seed: int 
             "goal_y": scene.goal_y,
             "cycles": cycles,
             "frames": trace,
+            "audio": recorder.write(audio_path) if recorder is not None else None,
+            "audio_seconds": round(recorder.seconds, 3) if recorder is not None else None,
+            "audio_peak": recorder.peak if recorder is not None else None,
         }
     finally:
         env.close()
@@ -122,14 +133,17 @@ def main(argv: list[str]) -> None:
     del argv
     config = BljConfig(
         rom_path=_ROM.value,
-        reward=RewardConfig(terminal=1.0, speed_coefficient=0.01, curriculum_bonus=0.25),
+        reward=RewardConfig(terminal=1.0, speed_weight=0.25),
         max_frames=_FRAMES.value)
     payload = None
     for attempt in range(_SEARCH.value):
         seed = _SEED.value + attempt
         driver = (model_driver(_MODEL.value, deterministic=not _STOCHASTIC.value, seed=seed)
                   if _MODEL.value else scripted_driver(_APPROACH.value))
-        candidate = record(config, driver, _FRAMES.value, _NAME.value, seed=seed)
+        audio_path = (os.path.join(_ROOT, "results", f"replay_{_NAME.value}.mp3")
+                      if _AUDIO.value else None)
+        candidate = record(config, driver, _FRAMES.value, _NAME.value, seed=seed,
+                           audio_path=audio_path)
         logging.info("seed %d: peak %.2f warps %d success %s", seed,
                      candidate["peak_velocity"], candidate["warps"], candidate["success"])
         if payload is None or candidate["success"] and not payload["success"] or (
@@ -152,6 +166,10 @@ def main(argv: list[str]) -> None:
           f"peak forwardVel {payload['peak_velocity']}, warps {payload['warps']}, "
           f"success {payload['success']}")
     print(f"wrote {out} ({os.path.getsize(out) / 1024:.0f} KB)")
+    if payload.get("audio"):
+        print(f"audio {payload['audio']} "
+              f"({os.path.getsize(payload['audio']) / 1024:.0f} KB, "
+              f"{payload['audio_seconds']} s, peak {payload['audio_peak']})")
 
 
 if __name__ == "__main__":

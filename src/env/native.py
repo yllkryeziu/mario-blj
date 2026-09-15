@@ -27,6 +27,10 @@ import os
 import re
 import sys
 
+AUDIO_SAMPLES_PER_FRAME = 544
+AUDIO_BUFFER_SAMPLES = AUDIO_SAMPLES_PER_FRAME * 2 * 2 * 2
+AUDIO_SAMPLE_RATE = AUDIO_SAMPLES_PER_FRAME * 2 * 30
+
 TEXTURE_WIDTH = 64 * 11
 TEXTURE_HEIGHT = 64
 GEO_MAX_TRIANGLES = 1024
@@ -359,6 +363,13 @@ def _bind(lib: ctypes.CDLL) -> ctypes.CDLL:
     lib.sm64_set_mario_health.restype = None
     lib.sm64_mario_extra_state.argtypes = [ctypes.c_int32, ctypes.POINTER(MarioExtraState)]
     lib.sm64_mario_extra_state.restype = None
+    lib.sm64_audio_init.argtypes = [ctypes.POINTER(ctypes.c_uint8)]
+    lib.sm64_audio_init.restype = None
+    lib.sm64_audio_tick.argtypes = [ctypes.c_uint32, ctypes.c_uint32,
+                                    ctypes.POINTER(ctypes.c_int16)]
+    lib.sm64_audio_tick.restype = ctypes.c_uint32
+    lib.sm64_set_sound_volume.argtypes = [ctypes.c_float]
+    lib.sm64_set_sound_volume.restype = None
     return lib
 
 
@@ -409,8 +420,10 @@ class Sm64:
             uv=(ctypes.c_float * (6 * GEO_MAX_TRIANGLES))(),
             numTrianglesUsed=0,
         )
+        self._rom_buffer = rom_buffer
         self._state = MarioState()
         self._extra = MarioExtraState()
+        self._audio: ctypes.Array | None = None
         self._mario_id = -1
 
     def load_surfaces(self, surfaces: list[Surface]) -> None:
@@ -485,6 +498,53 @@ class Sm64:
             The state buffer this object owns, which the next tick overwrites in place.
         """
         return self._state
+
+    def audio_init(self) -> None:
+        """Loads the ROM's audio banks so ticking can synthesize sound.
+
+        The decompilation's own audio engine is compiled into libsm64, so the samples this
+        produces are the game's, driven by the same ``play_sound`` calls Mario's actions make. The
+        backwards long jump re-enters ACT_LONG_JUMP on nearly every frame, and that action plays
+        SOUND_MARIO_YAHOO, which is why a working chain sounds the way it does.
+        """
+        self._lib.sm64_audio_init(self._rom_buffer)
+        self._audio = (ctypes.c_int16 * AUDIO_BUFFER_SAMPLES)()
+
+    def set_sound_volume(self, volume: float) -> None:
+        """Sets the audio engine's master volume.
+
+        Worth turning down for a population. The game's mixer sums every Mario's voices and a
+        crowd of them clips at full scale, so a swarm wants roughly the reciprocal of however many
+        are audible at once.
+
+        Args:
+            volume: Multiplier, where 1.0 is the game's own level.
+        """
+        self._lib.sm64_set_sound_volume(volume)
+
+    def audio_tick(self, queued: int = 0, desired: int = 1) -> bytes:
+        """Synthesizes one frame of audio and returns it as interleaved stereo bytes.
+
+        libsm64 fills two stereo buffers per call and chooses their length from whether the
+        caller is starved, so passing a starved state every frame gives a constant
+        ``AUDIO_SAMPLES_PER_FRAME`` samples per channel. Declaring the resulting stream at
+        ``AUDIO_SAMPLES_PER_FRAME * 30`` Hz then makes its duration match the frame count exactly,
+        with no drift to correct.
+
+        Args:
+            queued: Samples the caller still has buffered.
+            desired: Samples the caller wants.
+
+        Returns:
+            Interleaved signed 16 bit stereo PCM for this frame.
+
+        Raises:
+            RuntimeError: If audio_init has not been called.
+        """
+        if self._audio is None:
+            raise RuntimeError("call audio_init() before audio_tick()")
+        produced = self._lib.sm64_audio_tick(queued, desired, self._audio)
+        return bytes(memoryview(self._audio).cast("B")[:produced * 2 * 2 * 2])
 
     def extra_state(self) -> MarioExtraState:
         """Reads the internal state the tick struct leaves out.
