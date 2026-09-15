@@ -160,3 +160,107 @@ def minimum_escape_speed(warp: WarpZone) -> float:
     needs a per frame displacement larger than the zone's own depth.
     """
     return warp.depth
+
+
+def synthetic_scene(rise: float, run: float,
+                    climb: float = 1792.0,
+                    warp_treads: int = 3,
+                    loop_treads: int = 8,
+                    warp_height: float = 3917.0,
+                    width: float = 6000.0,
+                    base_height: float = 3174.0,
+                    spawn: tuple[float, float, float] = (-200.0, 3204.0, 3000.0),
+                    landing_z: float = 2800.0,
+                    risers: bool = True) -> Scene:
+    """Builds an endless staircase with treads of a chosen size, for transfer tests.
+
+    The castle's staircase is one point in a two dimensional space of tread geometries, and a
+    policy trained on it cannot be asked whether it learned the chain or memorized that one
+    flight without a second flight to try. This generator makes those flights, using the same
+    :func:`src.env.geometry.staircase` the scripted geometry sweep ran on, and wraps the result
+    in a scene carrying a warp band so that success is decided the same self certifying way it is
+    on the real staircase: reach the top landing, which no ordinary movement speed can do.
+
+    Three properties of the castle are held rather than re invented, because each one is visible
+    in the observation and changing it silently would confound the test. The spawn keeps its world
+    coordinates. The climb from spawn to goal is the castle's, so a steeper flight is a shorter
+    one rather than a taller one. And the warp is self similar the way the level script's
+    ``INSTANT_WARP(0, 2, 0, -205, 410)`` is, displacing Mario by whole treads, which is what makes
+    the loop endless rather than merely obstructive. The band is ``warp_treads`` treads deep
+    because the castle's 154 unit band is three of its 51.25 unit treads, so the escape speed
+    scales with the tread depth instead of being pinned to a constant the geometry does not
+    support.
+
+    What does change with rise and run is the depth of the flight along z, since a flight that
+    climbs a fixed height with taller steps needs fewer of them. That is the geometry change under
+    test and it is reported alongside the result rather than hidden.
+
+    Args:
+        rise: Height gained per tread.
+        run: Depth of each tread along z.
+        climb: Height from the spawn to the goal, defaulting to the castle's.
+        warp_treads: Depth of the warp band in treads. Its z extent sets the escape speed.
+        loop_treads: Treads the warp displaces Mario back down, the castle's eight.
+        warp_height: Height the band starts at, defaulting to the castle's.
+        width: Extent of the flight along x, centred on the spawn's x.
+        base_height: y of the bottom landing.
+        spawn: Episode start, in the castle's own coordinates.
+        landing_z: z of the near edge of the first tread.
+        risers: Whether each tread gets the vertical face under it that the castle's has. On by
+            default because the castle has them, but a riser is as tall as the rise, so a flight
+            built from tall steps also has tall walls, and turning them off is the control that
+            separates a chain the tread size broke from one a wall stopped.
+
+    Returns:
+        A scene ascending toward negative z, like the castle's.
+
+    Raises:
+        ValueError: If the flight is too short to hold the warp band and its loop, which would
+            leave the staircase climbable and the task no longer self certifying.
+    """
+    from src.env.geometry import flat_area, staircase
+
+    steps = max(1, round(climb / rise))
+    if steps < loop_treads + warp_treads:
+        raise ValueError(
+            f"rise {rise} climbs {climb} in {steps} treads, too few for a {warp_treads} tread "
+            f"band above a {loop_treads} tread loop")
+
+    half = width / 2.0
+    goal_y = base_height + rise * steps
+    top_z = landing_z - run * steps
+    surfaces = flat_area(spawn[0] - half, spawn[0] + half, landing_z, landing_z + 3200.0,
+                         base_height)
+    surfaces += flat_area(spawn[0] - half, spawn[0] + half, top_z - 2000.0, top_z, goal_y)
+    flight = staircase(steps, rise, -run, width, base_height, landing_z, risers=risers)
+    for surface in flight:
+        surface.vertices[0][0] += int(round(spawn[0]))
+        surface.vertices[1][0] += int(round(spawn[0]))
+        surface.vertices[2][0] += int(round(spawn[0]))
+
+    first = next(index for index in range(steps) if base_height + rise * (index + 1) >= warp_height)
+    band = range(first, min(first + warp_treads, steps))
+    heights = {int(round(base_height + rise * (index + 1))) for index in band}
+    marked = [surface for surface in flight
+              if len({surface.vertices[corner][1] for corner in range(3)}) == 1
+              and surface.vertices[0][1] in heights]
+    if not marked:
+        raise ValueError(f"no treads to mark as warp triangles at heights {sorted(heights)}")
+    for surface in marked:
+        surface.type = SURFACE_INSTANT_WARP_1B
+
+    warp = WarpZone(
+        surface_type=SURFACE_INSTANT_WARP_1B,
+        displacement=(0.0, -rise * loop_treads, run * loop_treads),
+        x_range=_extent(marked, 0),
+        y_range=_extent(marked, 1),
+        z_range=_extent(marked, 2),
+    )
+    return Scene(
+        surfaces=surfaces + flight,
+        spawn=spawn,
+        goal_y=goal_y - 52.0,
+        goal_z=top_z - 91.0,
+        warp=warp,
+        ascends_toward=(0.0, -1.0),
+    )
