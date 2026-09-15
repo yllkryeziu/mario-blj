@@ -1,0 +1,6595 @@
+{
+  "rung": "terminal",
+  "frames": 1500,
+  "rollouts": 4,
+  "checkpoints_from": "data/checkpoints/terminal_seed_2",
+  "ground_pound_actions": [
+    "ground_pound",
+    "ground_pound_land"
+  ],
+  "long_jump_actions": [
+    "long_jump"
+  ],
+  "rows": [
+    {
+      "policy": "uniform random",
+      "steps": null,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 84,
+            "ground_pound": 813,
+            "ground_pound_land": 322,
+            "butt_slide_stop": 52,
+            "walking": 37,
+            "crouch_slide": 17,
+            "start_crawling": 91,
+            "crawling": 19,
+            "stop_crawling": 35,
+            "crouching": 6,
+            "backflip": 1,
+            "decelerating": 2,
+            "stop_crouching": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 59,
+            "crawling": 11,
+            "stop_crawling": 28,
+            "crouching": 4,
+            "stop_crouching": 6,
+            "backflip": 6,
+            "ground_pound": 813,
+            "ground_pound_land": 315,
+            "butt_slide_stop": 46,
+            "walking": 45,
+            "crouch_slide": 22,
+            "jump": 88,
+            "decelerating": 2,
+            "backward_air_kb": 3,
+            "backward_ground_kb": 31
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.94,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "ground_pound": 779,
+            "ground_pound_land": 301,
+            "butt_slide_stop": 46,
+            "start_crawling": 98,
+            "crawling": 22,
+            "jump": 78,
+            "walking": 35,
+            "crouch_slide": 29,
+            "stop_crawling": 63,
+            "crouching": 12,
+            "decelerating": 1,
+            "backflip": 12,
+            "stop_crouching": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.85,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "walking": 42,
+            "decelerating": 3,
+            "ground_pound": 836,
+            "ground_pound_land": 329,
+            "butt_slide_stop": 50,
+            "jump": 81,
+            "crouch_slide": 20,
+            "start_crawling": 63,
+            "crawling": 20,
+            "stop_crawling": 28,
+            "crouching": 4,
+            "backflip": 1,
+            "stop_crouching": 3
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 75.1,
+        "min": 72.0,
+        "max": 77.7
+      },
+      "long_jump": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -15.9,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3241
+        ],
+        [
+          "ground_pound_land",
+          1267
+        ],
+        [
+          "jump",
+          331
+        ],
+        [
+          "start_crawling",
+          311
+        ],
+        [
+          "butt_slide_stop",
+          194
+        ],
+        [
+          "walking",
+          159
+        ],
+        [
+          "stop_crawling",
+          154
+        ],
+        [
+          "crouch_slide",
+          88
+        ]
+      ]
+    },
+    {
+      "policy": "untrained network",
+      "steps": 0,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.98,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 60,
+            "ground_pound": 746,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 44,
+            "start_crawling": 119,
+            "crawling": 25,
+            "walking": 35,
+            "crouch_slide": 19,
+            "stop_crawling": 77,
+            "crouching": 12,
+            "backflip": 7,
+            "stop_crouching": 6,
+            "long_jump": 30,
+            "long_jump_land": 6
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 63,
+            "crawling": 14,
+            "jump": 90,
+            "ground_pound": 798,
+            "ground_pound_land": 303,
+            "butt_slide_stop": 46,
+            "walking": 39,
+            "crouch_slide": 4,
+            "long_jump": 30,
+            "long_jump_land": 6,
+            "stop_crawling": 35,
+            "crouching": 6,
+            "backflip": 11,
+            "stop_crouching": 1,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "jump": 75,
+            "ground_pound": 813,
+            "ground_pound_land": 309,
+            "butt_slide_stop": 49,
+            "start_crawling": 56,
+            "crawling": 13,
+            "walking": 48,
+            "decelerating": 1,
+            "crouch_slide": 30,
+            "stop_crawling": 28,
+            "crouching": 4,
+            "backflip": 11,
+            "stop_crouching": 8,
+            "backward_air_kb": 3,
+            "backward_ground_kb": 31
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.3,
+          "best_height": 3246.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "start_crawling": 77,
+            "crawling": 11,
+            "jump": 80,
+            "ground_pound": 811,
+            "ground_pound_land": 322,
+            "butt_slide_stop": 48,
+            "stop_crawling": 49,
+            "crouching": 7,
+            "stop_crouching": 5,
+            "walking": 44,
+            "backflip": 3,
+            "crouch_slide": 22,
+            "decelerating": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 73.3,
+        "min": 69.3,
+        "max": 75.5
+      },
+      "long_jump": {
+        "mean": 1.0,
+        "min": 0.0,
+        "max": 2.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -16.0,
+      "best_height": 3246.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3168
+        ],
+        [
+          "ground_pound_land",
+          1228
+        ],
+        [
+          "start_crawling",
+          315
+        ],
+        [
+          "jump",
+          305
+        ],
+        [
+          "stop_crawling",
+          189
+        ],
+        [
+          "butt_slide_stop",
+          187
+        ],
+        [
+          "walking",
+          166
+        ],
+        [
+          "crouch_slide",
+          75
+        ]
+      ]
+    },
+    {
+      "policy": "0.5M checkpoint",
+      "steps": 499980,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3607.4,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "start_crawling": 42,
+            "crawling": 6,
+            "stop_crawling": 28,
+            "crouching": 7,
+            "stop_crouching": 9,
+            "backflip": 15,
+            "ground_pound": 753,
+            "ground_pound_land": 287,
+            "butt_slide_stop": 47,
+            "walking": 99,
+            "crouch_slide": 29,
+            "jump": 85,
+            "turning_around": 5,
+            "long_jump": 27,
+            "long_jump_land": 6,
+            "jump_land": 6,
+            "double_jump": 8,
+            "decelerating": 1,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 18
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3405.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "walking": 98,
+            "jump": 92,
+            "ground_pound": 769,
+            "ground_pound_land": 287,
+            "butt_slide_stop": 44,
+            "crouch_slide": 10,
+            "start_crawling": 56,
+            "crawling": 10,
+            "stop_crawling": 42,
+            "crouching": 6,
+            "stop_crouching": 5,
+            "backflip": 9,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "turning_around": 4,
+            "finish_turning_around": 1,
+            "side_flip": 8,
+            "jump_land": 2,
+            "double_jump": 2,
+            "decelerating": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3609.7,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 91,
+            "crawling": 14,
+            "stop_crawling": 63,
+            "crouching": 10,
+            "backflip": 12,
+            "ground_pound": 702,
+            "ground_pound_land": 266,
+            "butt_slide_stop": 42,
+            "walking": 107,
+            "jump": 79,
+            "crouch_slide": 7,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "turning_around": 4,
+            "finish_turning_around": 3,
+            "long_jump": 35,
+            "air_hit_wall": 1,
+            "long_jump_land": 6,
+            "stop_crouching": 3,
+            "standing_against_wall": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3328.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 3,
+            "walking": 109,
+            "jump": 118,
+            "ground_pound": 754,
+            "ground_pound_land": 275,
+            "butt_slide_stop": 44,
+            "start_crawling": 49,
+            "crawling": 9,
+            "crouch_slide": 2,
+            "decelerating": 3,
+            "stop_crawling": 28,
+            "crouching": 5,
+            "backflip": 9,
+            "backward_air_kb": 5,
+            "backward_ground_kb": 62,
+            "stop_crouching": 6
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 68.2,
+        "min": 64.5,
+        "max": 70.4
+      },
+      "long_jump": {
+        "mean": 1.0,
+        "min": 0.0,
+        "max": 2.3
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -16.0,
+      "best_height": 3609.7,
+      "top_actions": [
+        [
+          "ground_pound",
+          2978
+        ],
+        [
+          "ground_pound_land",
+          1115
+        ],
+        [
+          "walking",
+          413
+        ],
+        [
+          "jump",
+          374
+        ],
+        [
+          "start_crawling",
+          238
+        ],
+        [
+          "butt_slide_stop",
+          177
+        ],
+        [
+          "stop_crawling",
+          161
+        ],
+        [
+          "backward_ground_kb",
+          142
+        ]
+      ]
+    },
+    {
+      "policy": "1.0M checkpoint",
+      "steps": 999960,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.74,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 105,
+            "ground_pound": 799,
+            "ground_pound_land": 301,
+            "butt_slide_stop": 46,
+            "walking": 43,
+            "crouch_slide": 18,
+            "start_crawling": 63,
+            "crawling": 11,
+            "stop_crawling": 49,
+            "crouching": 9,
+            "stop_crouching": 18,
+            "backflip": 17,
+            "decelerating": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "walking": 60,
+            "jump": 121,
+            "ground_pound": 725,
+            "ground_pound_land": 273,
+            "butt_slide_stop": 43,
+            "crouch_slide": 18,
+            "start_crawling": 70,
+            "crawling": 14,
+            "stop_crawling": 63,
+            "crouching": 9,
+            "backflip": 8,
+            "long_jump": 30,
+            "long_jump_land": 6,
+            "stop_crouching": 1,
+            "backward_air_kb": 3,
+            "backward_ground_kb": 31,
+            "start_crouching": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.94,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "start_crawling": 56,
+            "crawling": 10,
+            "stop_crawling": 49,
+            "crouching": 7,
+            "backflip": 17,
+            "ground_pound": 782,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 46,
+            "walking": 62,
+            "jump": 121,
+            "stop_crouching": 5,
+            "decelerating": 4,
+            "crouch_slide": 27
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.72,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 63,
+            "crawling": 10,
+            "stop_crawling": 63,
+            "crouching": 9,
+            "backflip": 14,
+            "ground_pound": 739,
+            "ground_pound_land": 280,
+            "butt_slide_stop": 43,
+            "walking": 70,
+            "crouch_slide": 27,
+            "long_jump": 30,
+            "long_jump_land": 6,
+            "turning_around": 4,
+            "finish_turning_around": 6,
+            "side_flip": 1,
+            "jump": 98,
+            "stop_crouching": 13,
+            "decelerating": 2,
+            "start_crouching": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 69.9,
+        "min": 66.5,
+        "max": 73.3
+      },
+      "long_jump": {
+        "mean": 1.0,
+        "min": 0.0,
+        "max": 2.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -15.8,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3045
+        ],
+        [
+          "ground_pound_land",
+          1148
+        ],
+        [
+          "jump",
+          445
+        ],
+        [
+          "start_crawling",
+          252
+        ],
+        [
+          "walking",
+          235
+        ],
+        [
+          "stop_crawling",
+          224
+        ],
+        [
+          "butt_slide_stop",
+          178
+        ],
+        [
+          "crouch_slide",
+          90
+        ]
+      ]
+    },
+    {
+      "policy": "1.5M checkpoint",
+      "steps": 1499940,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.5,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "walking": 47,
+            "decelerating": 7,
+            "crouch_slide": 29,
+            "jump": 107,
+            "ground_pound": 760,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 42,
+            "start_crawling": 105,
+            "crawling": 26,
+            "stop_crawling": 42,
+            "crouching": 6,
+            "stop_crouching": 6,
+            "backflip": 9
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "start_crawling": 147,
+            "crawling": 32,
+            "stop_crawling": 84,
+            "crouching": 12,
+            "stop_crouching": 4,
+            "ground_pound": 704,
+            "ground_pound_land": 266,
+            "butt_slide_stop": 38,
+            "walking": 31,
+            "crouch_slide": 35,
+            "jump": 113,
+            "decelerating": 2,
+            "jump_land": 2,
+            "double_jump": 3,
+            "backflip": 7
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "jump": 151,
+            "ground_pound": 723,
+            "ground_pound_land": 273,
+            "butt_slide_stop": 39,
+            "start_crawling": 119,
+            "crawling": 28,
+            "stop_crawling": 49,
+            "crouching": 7,
+            "walking": 30,
+            "crouch_slide": 20,
+            "decelerating": 4,
+            "backward_air_kb": 5,
+            "backward_ground_kb": 31
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 77,
+            "crawling": 23,
+            "jump": 110,
+            "ground_pound": 789,
+            "ground_pound_land": 301,
+            "butt_slide_stop": 43,
+            "walking": 33,
+            "decelerating": 1,
+            "crouch_slide": 25,
+            "stop_crawling": 35,
+            "crouching": 5,
+            "backflip": 2,
+            "backward_air_kb": 4,
+            "backward_ground_kb": 31
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 68.5,
+        "min": 64.7,
+        "max": 72.7
+      },
+      "long_jump": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -15.8,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2976
+        ],
+        [
+          "ground_pound_land",
+          1134
+        ],
+        [
+          "jump",
+          481
+        ],
+        [
+          "start_crawling",
+          448
+        ],
+        [
+          "stop_crawling",
+          210
+        ],
+        [
+          "butt_slide_stop",
+          162
+        ],
+        [
+          "walking",
+          141
+        ],
+        [
+          "crouch_slide",
+          109
+        ]
+      ]
+    },
+    {
+      "policy": "2.0M checkpoint",
+      "steps": 1999920,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 4,
+            "jump": 69,
+            "ground_pound": 787,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 43,
+            "walking": 55,
+            "crouch_slide": 21,
+            "decelerating": 1,
+            "start_crawling": 28,
+            "crawling": 7,
+            "stop_crawling": 21,
+            "crouching": 4,
+            "stop_crouching": 5,
+            "backflip": 4,
+            "long_jump": 30,
+            "long_jump_land": 6,
+            "backward_air_kb": 8,
+            "backward_ground_kb": 93,
+            "standing_against_wall": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 28,
+            "crawling": 7,
+            "jump": 91,
+            "ground_pound": 865,
+            "ground_pound_land": 329,
+            "butt_slide_stop": 49,
+            "walking": 46,
+            "decelerating": 3,
+            "crouch_slide": 14,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "crouching": 2,
+            "backflip": 5,
+            "stop_crawling": 7
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "ground_pound": 810,
+            "ground_pound_land": 315,
+            "butt_slide_stop": 48,
+            "walking": 39,
+            "jump": 81,
+            "crouch_slide": 19,
+            "start_crawling": 84,
+            "crawling": 21,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 2,
+            "backflip": 1,
+            "decelerating": 1,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "jump_land": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 126,
+            "crawling": 28,
+            "ground_pound": 750,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 46,
+            "jump": 48,
+            "walking": 35,
+            "stop_crawling": 75,
+            "crouching": 12,
+            "crouch_slide": 26,
+            "stop_crouching": 2,
+            "backflip": 4,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 74.1,
+        "min": 69.6,
+        "max": 79.6
+      },
+      "long_jump": {
+        "mean": 0.5,
+        "min": 0.0,
+        "max": 2.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -16.0,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3212
+        ],
+        [
+          "ground_pound_land",
+          1232
+        ],
+        [
+          "jump",
+          289
+        ],
+        [
+          "start_crawling",
+          266
+        ],
+        [
+          "butt_slide_stop",
+          186
+        ],
+        [
+          "backward_ground_kb",
+          186
+        ],
+        [
+          "walking",
+          175
+        ],
+        [
+          "stop_crawling",
+          124
+        ]
+      ]
+    },
+    {
+      "policy": "2.5M checkpoint",
+      "steps": 2499900,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 5,
+            "walking": 101,
+            "crouch_slide": 73,
+            "jump": 67,
+            "ground_pound": 746,
+            "ground_pound_land": 272,
+            "butt_slide_stop": 48,
+            "backward_air_kb": 8,
+            "backward_ground_kb": 124,
+            "jump_land": 5,
+            "double_jump": 6,
+            "crouching": 3,
+            "backflip": 7,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "stop_crouching": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 5,
+            "walking": 91,
+            "jump": 63,
+            "ground_pound": 723,
+            "ground_pound_land": 259,
+            "butt_slide_stop": 40,
+            "start_crawling": 35,
+            "crawling": 5,
+            "stop_crawling": 28,
+            "crouching": 7,
+            "stop_crouching": 16,
+            "backflip": 10,
+            "crouch_slide": 56,
+            "turning_around": 6,
+            "backward_air_kb": 8,
+            "backward_ground_kb": 124,
+            "start_crouching": 4,
+            "side_flip": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 6,
+            "walking": 113,
+            "jump": 40,
+            "ground_pound": 715,
+            "ground_pound_land": 245,
+            "butt_slide_stop": 38,
+            "start_crawling": 42,
+            "crawling": 13,
+            "stop_crawling": 35,
+            "crouching": 9,
+            "stop_crouching": 7,
+            "backflip": 10,
+            "crouch_slide": 36,
+            "backward_air_kb": 10,
+            "backward_ground_kb": 155,
+            "start_crouching": 3,
+            "turning_around": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 7,
+            "start_crawling": 28,
+            "crawling": 5,
+            "ground_pound": 738,
+            "ground_pound_land": 259,
+            "butt_slide_stop": 39,
+            "walking": 117,
+            "crouch_slide": 27,
+            "jump": 70,
+            "crouching": 3,
+            "stop_crouching": 4,
+            "backflip": 5,
+            "backward_air_kb": 10,
+            "backward_ground_kb": 155,
+            "stop_crawling": 14
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 66.0,
+        "min": 64.0,
+        "max": 67.9
+      },
+      "long_jump": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -16.0,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2922
+        ],
+        [
+          "ground_pound_land",
+          1035
+        ],
+        [
+          "backward_ground_kb",
+          558
+        ],
+        [
+          "walking",
+          422
+        ],
+        [
+          "jump",
+          240
+        ],
+        [
+          "crouch_slide",
+          192
+        ],
+        [
+          "butt_slide_stop",
+          165
+        ],
+        [
+          "start_crawling",
+          112
+        ]
+      ]
+    },
+    {
+      "policy": "3.0M checkpoint",
+      "steps": 2999880,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "ground_pound": 811,
+            "ground_pound_land": 318,
+            "butt_slide_stop": 48,
+            "jump": 66,
+            "walking": 72,
+            "crouch_slide": 52,
+            "stop_crouching": 5,
+            "backflip": 5,
+            "start_crawling": 49,
+            "crawling": 13,
+            "decelerating": 1,
+            "stop_crawling": 35,
+            "crouching": 5
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.15,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 33,
+            "ground_pound": 867,
+            "ground_pound_land": 350,
+            "butt_slide_stop": 53,
+            "walking": 69,
+            "crouch_slide": 9,
+            "start_crawling": 42,
+            "crawling": 7,
+            "stop_crawling": 35,
+            "crouching": 5,
+            "stop_crouching": 3,
+            "backflip": 6,
+            "decelerating": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "walking": 54,
+            "jump": 52,
+            "ground_pound": 771,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 51,
+            "start_crawling": 77,
+            "crawling": 21,
+            "stop_crawling": 49,
+            "crouching": 7,
+            "crouch_slide": 37,
+            "stop_crouching": 9,
+            "backflip": 6,
+            "long_jump": 12,
+            "air_hit_wall": 1,
+            "soft_bonk": 1,
+            "wall_kick_air": 4,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "start_crawling": 77,
+            "crawling": 25,
+            "jump": 47,
+            "ground_pound": 761,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 47,
+            "walking": 49,
+            "crouch_slide": 41,
+            "stop_crawling": 63,
+            "crouching": 10,
+            "stop_crouching": 21,
+            "backflip": 11,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 74.4,
+        "min": 70.3,
+        "max": 81.1
+      },
+      "long_jump": {
+        "mean": 0.2,
+        "min": 0.0,
+        "max": 0.8
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -15.8,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3210
+        ],
+        [
+          "ground_pound_land",
+          1256
+        ],
+        [
+          "start_crawling",
+          245
+        ],
+        [
+          "walking",
+          244
+        ],
+        [
+          "butt_slide_stop",
+          199
+        ],
+        [
+          "jump",
+          198
+        ],
+        [
+          "stop_crawling",
+          182
+        ],
+        [
+          "crouch_slide",
+          139
+        ]
+      ]
+    },
+    {
+      "policy": "3.5M checkpoint",
+      "steps": 3499860,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.15,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "start_crawling": 147,
+            "crawling": 28,
+            "stop_crawling": 84,
+            "crouching": 13,
+            "stop_crouching": 8,
+            "backflip": 8,
+            "ground_pound": 728,
+            "ground_pound_land": 287,
+            "butt_slide_stop": 43,
+            "jump": 79,
+            "walking": 35,
+            "crouch_slide": 20
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 175,
+            "ground_pound": 759,
+            "ground_pound_land": 287,
+            "butt_slide_stop": 43,
+            "walking": 39,
+            "crouch_slide": 28,
+            "start_crawling": 63,
+            "crawling": 11,
+            "stop_crawling": 35,
+            "crouching": 5,
+            "backflip": 19,
+            "jump_land": 3,
+            "decelerating": 1,
+            "stop_crouching": 4,
+            "long_jump": 1,
+            "air_hit_wall": 1,
+            "soft_bonk": 3,
+            "wall_kick_air": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.15,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "ground_pound": 758,
+            "ground_pound_land": 294,
+            "butt_slide_stop": 42,
+            "walking": 32,
+            "jump": 129,
+            "decelerating": 1,
+            "crouch_slide": 18,
+            "start_crawling": 95,
+            "crawling": 16,
+            "stop_crawling": 63,
+            "crouching": 9,
+            "backflip": 17,
+            "jump_land": 4,
+            "stop_crouching": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 3,
+            "walking": 55,
+            "crouch_slide": 20,
+            "jump": 44,
+            "ground_pound": 524,
+            "ground_pound_land": 203,
+            "butt_slide_stop": 30,
+            "start_crawling": 28,
+            "crawling": 4,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 14,
+            "backflip": 4,
+            "backward_air_kb": 4,
+            "backward_ground_kb": 31,
+            "long_jump": 456,
+            "long_jump_land": 37
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 64.0,
+        "min": 48.5,
+        "max": 70.1
+      },
+      "long_jump": {
+        "mean": 7.6,
+        "min": 0.0,
+        "max": 30.4
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -15.4,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2769
+        ],
+        [
+          "ground_pound_land",
+          1071
+        ],
+        [
+          "long_jump",
+          457
+        ],
+        [
+          "jump",
+          427
+        ],
+        [
+          "start_crawling",
+          333
+        ],
+        [
+          "stop_crawling",
+          203
+        ],
+        [
+          "walking",
+          161
+        ],
+        [
+          "butt_slide_stop",
+          158
+        ]
+      ]
+    },
+    {
+      "policy": "4.0M checkpoint",
+      "steps": 3999840,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 102,
+            "ground_pound": 765,
+            "ground_pound_land": 287,
+            "butt_slide_stop": 44,
+            "start_crawling": 91,
+            "crawling": 13,
+            "stop_crawling": 77,
+            "crouching": 12,
+            "stop_crouching": 24,
+            "backflip": 37,
+            "walking": 23,
+            "decelerating": 5
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 4,
+            "walking": 117,
+            "turning_around": 4,
+            "jump": 69,
+            "ground_pound": 752,
+            "ground_pound_land": 280,
+            "butt_slide_stop": 41,
+            "backward_air_kb": 6,
+            "backward_ground_kb": 93,
+            "start_crawling": 28,
+            "crawling": 5,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 3,
+            "crouch_slide": 12,
+            "decelerating": 4,
+            "long_jump": 30,
+            "long_jump_land": 6,
+            "long_jump_land_stop": 1,
+            "backflip": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -22.9,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "walking": 25,
+            "crouch_slide": 3,
+            "long_jump": 930,
+            "long_jump_land": 50,
+            "jump": 27,
+            "ground_pound": 282,
+            "ground_pound_land": 112,
+            "butt_slide_stop": 17,
+            "start_crawling": 14,
+            "crawling": 2,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 7,
+            "backflip": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.97,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 108,
+            "ground_pound": 828,
+            "ground_pound_land": 315,
+            "butt_slide_stop": 48,
+            "start_crawling": 63,
+            "crawling": 9,
+            "stop_crawling": 49,
+            "crouching": 7,
+            "stop_crouching": 10,
+            "backflip": 12,
+            "walking": 26,
+            "decelerating": 4,
+            "crouch_slide": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 60.4,
+        "min": 26.3,
+        "max": 76.2
+      },
+      "long_jump": {
+        "mean": 16.0,
+        "min": 0.0,
+        "max": 62.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -22.9,
+      "median_peak": -16.0,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2627
+        ],
+        [
+          "ground_pound_land",
+          994
+        ],
+        [
+          "long_jump",
+          960
+        ],
+        [
+          "jump",
+          306
+        ],
+        [
+          "start_crawling",
+          196
+        ],
+        [
+          "walking",
+          191
+        ],
+        [
+          "stop_crawling",
+          154
+        ],
+        [
+          "butt_slide_stop",
+          150
+        ]
+      ]
+    },
+    {
+      "policy": "4.5M checkpoint",
+      "steps": 4499820,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -19.73,
+          "best_height": 3942.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "jump": 82,
+            "ground_pound": 652,
+            "ground_pound_land": 245,
+            "butt_slide_stop": 41,
+            "walking": 73,
+            "crouch_slide": 29,
+            "start_crawling": 42,
+            "crawling": 7,
+            "stop_crawling": 21,
+            "crouching": 6,
+            "backflip": 5,
+            "decelerating": 4,
+            "stop_crouching": 5,
+            "long_jump": 210,
+            "long_jump_land": 14,
+            "backward_air_kb": 1,
+            "backward_ground_kb": 31,
+            "jump_land": 1,
+            "double_jump": 2,
+            "turning_around": 6,
+            "side_flip": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 6,
+            "walking": 103,
+            "jump": 39,
+            "ground_pound": 691,
+            "ground_pound_land": 238,
+            "butt_slide_stop": 35,
+            "crouch_slide": 63,
+            "start_crawling": 49,
+            "crawling": 9,
+            "backward_air_kb": 10,
+            "backward_ground_kb": 155,
+            "stop_crawling": 42,
+            "crouching": 8,
+            "stop_crouching": 10,
+            "backflip": 8,
+            "decelerating": 3,
+            "turning_around": 7,
+            "finish_turning_around": 3,
+            "side_flip": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3348.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 3,
+            "walking": 106,
+            "jump": 61,
+            "ground_pound": 694,
+            "ground_pound_land": 259,
+            "butt_slide_stop": 40,
+            "crouch_slide": 10,
+            "decelerating": 7,
+            "start_crawling": 35,
+            "crawling": 6,
+            "turning_around": 3,
+            "long_jump": 150,
+            "long_jump_land": 16,
+            "backward_air_kb": 4,
+            "backward_ground_kb": 62,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 3,
+            "jump": 97,
+            "ground_pound": 756,
+            "ground_pound_land": 280,
+            "butt_slide_stop": 41,
+            "walking": 82,
+            "crouch_slide": 55,
+            "start_crawling": 42,
+            "crawling": 6,
+            "stop_crawling": 14,
+            "crouching": 3,
+            "decelerating": 4,
+            "backward_air_kb": 6,
+            "backward_ground_kb": 78,
+            "jump_land": 2,
+            "double_jump": 5,
+            "turning_around": 4,
+            "finish_turning_around": 1,
+            "side_flip": 2
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 63.6,
+        "min": 59.8,
+        "max": 69.1
+      },
+      "long_jump": {
+        "mean": 6.0,
+        "min": 0.0,
+        "max": 14.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -19.73,
+      "median_peak": -16.0,
+      "best_height": 3942.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2793
+        ],
+        [
+          "ground_pound_land",
+          1022
+        ],
+        [
+          "walking",
+          364
+        ],
+        [
+          "long_jump",
+          360
+        ],
+        [
+          "backward_ground_kb",
+          326
+        ],
+        [
+          "jump",
+          279
+        ],
+        [
+          "start_crawling",
+          168
+        ],
+        [
+          "butt_slide_stop",
+          157
+        ]
+      ]
+    },
+    {
+      "policy": "5.0M checkpoint",
+      "steps": 4999800,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "jump": 71,
+            "ground_pound": 730,
+            "ground_pound_land": 280,
+            "butt_slide_stop": 40,
+            "walking": 91,
+            "decelerating": 14,
+            "crouch_slide": 21,
+            "start_crawling": 70,
+            "crawling": 10,
+            "stop_crawling": 61,
+            "crouching": 8,
+            "stop_crouching": 14,
+            "backflip": 7,
+            "backward_air_kb": 4,
+            "backward_ground_kb": 31,
+            "long_jump": 3,
+            "air_hit_wall": 2,
+            "wall_kick_air": 4,
+            "turning_around": 6,
+            "finish_turning_around": 8,
+            "side_flip": 2,
+            "soft_bonk": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -20.19,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "walking": 40,
+            "decelerating": 7,
+            "crouch_slide": 8,
+            "jump": 21,
+            "ground_pound": 260,
+            "ground_pound_land": 105,
+            "butt_slide_stop": 16,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 9,
+            "turning_around": 4,
+            "braking_stop": 1,
+            "long_jump": 914,
+            "long_jump_land": 76,
+            "long_jump_land_stop": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -18.64,
+          "best_height": 3282.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 100,
+            "ground_pound": 599,
+            "ground_pound_land": 238,
+            "butt_slide_stop": 34,
+            "walking": 62,
+            "decelerating": 10,
+            "crouch_slide": 16,
+            "start_crawling": 21,
+            "crawling": 3,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 6,
+            "backflip": 8,
+            "long_jump": 272,
+            "long_jump_land": 31,
+            "long_jump_land_stop": 2,
+            "butt_slide": 12,
+            "butt_slide_air": 34,
+            "jump_land": 7,
+            "double_jump": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 6,
+            "walking": 95,
+            "turning_around": 8,
+            "braking": 1,
+            "jump": 64,
+            "ground_pound": 636,
+            "ground_pound_land": 231,
+            "butt_slide_stop": 35,
+            "decelerating": 19,
+            "crouch_slide": 8,
+            "long_jump": 120,
+            "long_jump_land": 18,
+            "backward_air_kb": 6,
+            "backward_ground_kb": 90,
+            "start_crawling": 42,
+            "crawling": 6,
+            "stop_crawling": 35,
+            "crouching": 9,
+            "stop_crouching": 22,
+            "finish_turning_around": 13,
+            "backflip": 13,
+            "standing_against_wall": 2,
+            "start_crouching": 1,
+            "long_jump_land_stop": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 51.3,
+        "min": 24.3,
+        "max": 67.3
+      },
+      "long_jump": {
+        "mean": 21.8,
+        "min": 0.2,
+        "max": 60.9
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -20.19,
+      "median_peak": -17.3,
+      "best_height": 3282.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2225
+        ],
+        [
+          "long_jump",
+          1309
+        ],
+        [
+          "ground_pound_land",
+          854
+        ],
+        [
+          "walking",
+          288
+        ],
+        [
+          "jump",
+          256
+        ],
+        [
+          "start_crawling",
+          140
+        ],
+        [
+          "butt_slide_stop",
+          125
+        ],
+        [
+          "long_jump_land",
+          125
+        ]
+      ]
+    },
+    {
+      "policy": "5.5M checkpoint",
+      "steps": 5499780,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "walking": 67,
+            "jump": 69,
+            "ground_pound": 805,
+            "ground_pound_land": 310,
+            "butt_slide_stop": 47,
+            "decelerating": 7,
+            "turning_around": 3,
+            "crouch_slide": 15,
+            "stop_crouching": 6,
+            "backflip": 8,
+            "side_flip": 1,
+            "start_crawling": 56,
+            "crawling": 12,
+            "stop_crawling": 35,
+            "crouching": 5,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 5,
+            "walking": 97,
+            "jump": 68,
+            "ground_pound": 750,
+            "ground_pound_land": 273,
+            "butt_slide_stop": 44,
+            "decelerating": 1,
+            "turning_around": 5,
+            "side_flip": 1,
+            "start_crawling": 42,
+            "crawling": 6,
+            "stop_crawling": 21,
+            "crouching": 6,
+            "backflip": 7,
+            "crouch_slide": 18,
+            "stop_crouching": 3,
+            "backward_air_kb": 8,
+            "backward_ground_kb": 124,
+            "standing_against_wall": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 3,
+            "walking": 61,
+            "crouch_slide": 29,
+            "ground_pound": 812,
+            "ground_pound_land": 315,
+            "butt_slide_stop": 46,
+            "stop_crouching": 1,
+            "jump": 49,
+            "braking": 1,
+            "turning_around": 3,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "decelerating": 11,
+            "start_crawling": 49,
+            "crawling": 8,
+            "stop_crawling": 42,
+            "crouching": 6,
+            "backflip": 12
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 4,
+            "walking": 95,
+            "turning_around": 3,
+            "ground_pound": 767,
+            "ground_pound_land": 280,
+            "butt_slide_stop": 40,
+            "jump": 60,
+            "crouch_slide": 21,
+            "start_crawling": 42,
+            "crawling": 9,
+            "backward_air_kb": 8,
+            "backward_ground_kb": 106,
+            "stop_crawling": 28,
+            "crouching": 5,
+            "backflip": 10,
+            "braking": 1,
+            "decelerating": 2
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 71.9,
+        "min": 68.2,
+        "max": 75.1
+      },
+      "long_jump": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -16.0,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3134
+        ],
+        [
+          "ground_pound_land",
+          1178
+        ],
+        [
+          "walking",
+          320
+        ],
+        [
+          "backward_ground_kb",
+          292
+        ],
+        [
+          "jump",
+          246
+        ],
+        [
+          "start_crawling",
+          189
+        ],
+        [
+          "butt_slide_stop",
+          177
+        ],
+        [
+          "stop_crawling",
+          126
+        ]
+      ]
+    },
+    {
+      "policy": "6.0M checkpoint",
+      "steps": 5999760,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -1023.36,
+          "best_height": 3994.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 50,
+            "ground_pound": 561,
+            "ground_pound_land": 217,
+            "butt_slide_stop": 31,
+            "walking": 40,
+            "decelerating": 7,
+            "crouch_slide": 5,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 4,
+            "backflip": 4,
+            "long_jump": 462,
+            "long_jump_land": 81,
+            "jump_land": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -32.86,
+          "best_height": 3947.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "start_crawling": 14,
+            "crawling": 5,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 2,
+            "backflip": 2,
+            "ground_pound": 262,
+            "ground_pound_land": 105,
+            "butt_slide_stop": 15,
+            "walking": 35,
+            "crouch_slide": 8,
+            "jump": 25,
+            "decelerating": 5,
+            "long_jump": 905,
+            "long_jump_land": 89
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -29.13,
+          "best_height": 3942.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 19,
+            "ground_pound": 227,
+            "ground_pound_land": 87,
+            "butt_slide_stop": 12,
+            "start_crawling": 7,
+            "crawling": 2,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 6,
+            "walking": 22,
+            "decelerating": 9,
+            "crouch_slide": 3,
+            "long_jump": 990,
+            "long_jump_land": 88
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -38.4,
+          "best_height": 3957.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 58,
+            "ground_pound": 421,
+            "ground_pound_land": 161,
+            "butt_slide_stop": 23,
+            "walking": 42,
+            "start_crawling": 7,
+            "crawling": 2,
+            "crouch_slide": 26,
+            "long_jump": 680,
+            "long_jump_land": 51,
+            "decelerating": 9
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 34.0,
+        "min": 20.9,
+        "max": 51.9
+      },
+      "long_jump": {
+        "mean": 50.6,
+        "min": 30.8,
+        "max": 66.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -1023.36,
+      "median_peak": -35.6,
+      "best_height": 3994.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3037
+        ],
+        [
+          "ground_pound",
+          1471
+        ],
+        [
+          "ground_pound_land",
+          570
+        ],
+        [
+          "long_jump_land",
+          309
+        ],
+        [
+          "jump",
+          152
+        ],
+        [
+          "walking",
+          139
+        ],
+        [
+          "butt_slide_stop",
+          81
+        ],
+        [
+          "spawn_spin_landing",
+          64
+        ]
+      ]
+    },
+    {
+      "policy": "6.3M checkpoint",
+      "steps": 6299748,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 56,
+            "ground_pound": 859,
+            "ground_pound_land": 343,
+            "butt_slide_stop": 50,
+            "start_crawling": 42,
+            "crawling": 7,
+            "stop_crawling": 35,
+            "crouching": 5,
+            "stop_crouching": 8,
+            "backflip": 6,
+            "walking": 43,
+            "crouch_slide": 4,
+            "decelerating": 22
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "walking": 64,
+            "turning_around": 4,
+            "side_flip": 1,
+            "ground_pound": 847,
+            "ground_pound_land": 343,
+            "butt_slide_stop": 49,
+            "decelerating": 14,
+            "jump": 29,
+            "start_crawling": 54,
+            "crawling": 8,
+            "stop_crawling": 42,
+            "crouching": 6,
+            "stop_crouching": 9,
+            "backflip": 10
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -15.65,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "jump": 44,
+            "ground_pound": 882,
+            "ground_pound_land": 357,
+            "butt_slide_stop": 53,
+            "walking": 46,
+            "decelerating": 30,
+            "start_crawling": 21,
+            "crawling": 3,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 7,
+            "backflip": 9,
+            "crouch_slide": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 2,
+            "walking": 61,
+            "ground_pound": 898,
+            "ground_pound_land": 357,
+            "butt_slide_stop": 51,
+            "braking": 1,
+            "jump": 48,
+            "decelerating": 6,
+            "crouch_slide": 12,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crouching": 1,
+            "backflip": 2,
+            "backward_air_kb": 3,
+            "backward_ground_kb": 31
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 81.4,
+        "min": 79.3,
+        "max": 83.7
+      },
+      "long_jump": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "episodes": 0,
+      "successes": 0,
+      "best_peak": -16.0,
+      "median_peak": -15.7,
+      "best_height": 3204.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          3486
+        ],
+        [
+          "ground_pound_land",
+          1400
+        ],
+        [
+          "walking",
+          214
+        ],
+        [
+          "butt_slide_stop",
+          203
+        ],
+        [
+          "jump",
+          177
+        ],
+        [
+          "start_crawling",
+          124
+        ],
+        [
+          "stop_crawling",
+          98
+        ],
+        [
+          "decelerating",
+          72
+        ]
+      ]
+    },
+    {
+      "policy": "6.5M checkpoint",
+      "steps": 6499740,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -307.59,
+          "best_height": 3994.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 36,
+            "ground_pound": 435,
+            "ground_pound_land": 168,
+            "butt_slide_stop": 25,
+            "start_crawling": 35,
+            "crawling": 8,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "backflip": 11,
+            "walking": 47,
+            "decelerating": 2,
+            "crouch_slide": 8,
+            "long_jump": 586,
+            "long_jump_land": 86,
+            "jump_land": 7,
+            "double_jump_land": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 1,
+          "successes": 1,
+          "peak_backward_velocity": -1038.57,
+          "best_height": 4908.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 6,
+            "spawn_spin_landing": 32,
+            "idle": 3,
+            "walking": 81,
+            "turning_around": 2,
+            "ground_pound": 412,
+            "ground_pound_land": 161,
+            "butt_slide_stop": 24,
+            "crouch_slide": 35,
+            "jump": 48,
+            "start_crawling": 28,
+            "crawling": 5,
+            "stop_crawling": 14,
+            "crouching": 2,
+            "long_jump": 505,
+            "long_jump_land": 106,
+            "jump_land": 3,
+            "backflip": 13,
+            "stop_crouching": 17,
+            "decelerating": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -16.0,
+          "best_height": 3204.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 8,
+            "walking": 128,
+            "ground_pound": 710,
+            "ground_pound_land": 268,
+            "butt_slide_stop": 40,
+            "jump": 43,
+            "decelerating": 5,
+            "start_crawling": 70,
+            "crawling": 13,
+            "stop_crawling": 56,
+            "crouching": 12,
+            "stop_crouching": 27,
+            "start_crouching": 5,
+            "turning_around": 8,
+            "crouch_slide": 13,
+            "backward_air_kb": 4,
+            "backward_ground_kb": 62,
+            "backflip": 5,
+            "air_hit_wall": 1,
+            "soft_bonk": 2,
+            "wall_kick_air": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 0,
+          "successes": 0,
+          "peak_backward_velocity": -758.26,
+          "best_height": 4346.0,
+          "warps": 0,
+          "counts": {
+            "spawn_spin_airborne": 3,
+            "spawn_spin_landing": 16,
+            "idle": 1,
+            "jump": 53,
+            "ground_pound": 575,
+            "ground_pound_land": 229,
+            "butt_slide_stop": 35,
+            "walking": 97,
+            "decelerating": 6,
+            "crouch_slide": 26,
+            "long_jump": 267,
+            "long_jump_land": 70,
+            "start_crawling": 42,
+            "crawling": 9,
+            "stop_crouching": 16,
+            "stop_crawling": 35,
+            "crouching": 5,
+            "turning_around": 4,
+            "backflip": 6,
+            "jump_land": 2,
+            "double_jump": 3
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 49.3,
+        "min": 38.2,
+        "max": 65.2
+      },
+      "long_jump": {
+        "mean": 22.6,
+        "min": 0.0,
+        "max": 39.1
+      },
+      "episodes": 1,
+      "successes": 1,
+      "best_peak": -1038.57,
+      "median_peak": -532.9,
+      "best_height": 4908.0,
+      "top_actions": [
+        [
+          "ground_pound",
+          2132
+        ],
+        [
+          "long_jump",
+          1358
+        ],
+        [
+          "ground_pound_land",
+          826
+        ],
+        [
+          "walking",
+          353
+        ],
+        [
+          "long_jump_land",
+          262
+        ],
+        [
+          "jump",
+          180
+        ],
+        [
+          "start_crawling",
+          175
+        ],
+        [
+          "stop_crawling",
+          126
+        ]
+      ]
+    },
+    {
+      "policy": "7.0M checkpoint",
+      "steps": 6999720,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 5,
+          "successes": 5,
+          "peak_backward_velocity": -4811.74,
+          "best_height": 5018.0,
+          "warps": 29,
+          "counts": {
+            "spawn_spin_airborne": 18,
+            "spawn_spin_landing": 96,
+            "idle": 6,
+            "walking": 44,
+            "jump": 1,
+            "ground_pound": 34,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "crouch_slide": 7,
+            "long_jump": 999,
+            "long_jump_land": 277,
+            "jump_land": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 7,
+          "successes": 7,
+          "peak_backward_velocity": -820.72,
+          "best_height": 5018.0,
+          "warps": 23,
+          "counts": {
+            "spawn_spin_airborne": 24,
+            "spawn_spin_landing": 128,
+            "idle": 8,
+            "walking": 60,
+            "crouch_slide": 10,
+            "long_jump": 745,
+            "long_jump_land": 276,
+            "jump_land": 6,
+            "double_jump_land": 4,
+            "crouching": 4,
+            "backflip": 12,
+            "ground_pound": 109,
+            "ground_pound_land": 42,
+            "butt_slide_stop": 6,
+            "jump": 10,
+            "start_crawling": 21,
+            "crawling": 6,
+            "stop_crawling": 21,
+            "stop_crouching": 7,
+            "decelerating": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 5,
+          "successes": 5,
+          "peak_backward_velocity": -2294.44,
+          "best_height": 5018.0,
+          "warps": 22,
+          "counts": {
+            "spawn_spin_airborne": 18,
+            "spawn_spin_landing": 96,
+            "idle": 7,
+            "walking": 64,
+            "crouch_slide": 11,
+            "long_jump": 836,
+            "long_jump_land": 323,
+            "crouching": 1,
+            "stop_crouching": 9,
+            "jump_land": 12,
+            "double_jump_land": 5,
+            "ground_pound": 85,
+            "ground_pound_land": 29,
+            "butt_slide_stop": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 2,
+          "successes": 2,
+          "peak_backward_velocity": -736.97,
+          "best_height": 5018.0,
+          "warps": 5,
+          "counts": {
+            "spawn_spin_airborne": 9,
+            "spawn_spin_landing": 48,
+            "idle": 5,
+            "walking": 45,
+            "crouch_slide": 14,
+            "long_jump": 797,
+            "long_jump_land": 174,
+            "jump_land": 7,
+            "double_jump_land": 4,
+            "ground_pound": 140,
+            "ground_pound_land": 49,
+            "butt_slide_stop": 8,
+            "start_crawling": 21,
+            "crawling": 3,
+            "stop_crawling": 21,
+            "crouching": 3,
+            "stop_crouching": 12,
+            "backflip": 1,
+            "jump": 9,
+            "freefall": 5,
+            "backward_air_kb": 44,
+            "hard_backward_ground_kb": 81
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 8.4,
+        "min": 3.2,
+        "max": 12.6
+      },
+      "long_jump": {
+        "mean": 56.3,
+        "min": 49.7,
+        "max": 66.6
+      },
+      "episodes": 19,
+      "successes": 19,
+      "best_peak": -4811.74,
+      "median_peak": -1557.6,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3377
+        ],
+        [
+          "long_jump_land",
+          1050
+        ],
+        [
+          "spawn_spin_landing",
+          368
+        ],
+        [
+          "ground_pound",
+          368
+        ],
+        [
+          "walking",
+          213
+        ],
+        [
+          "ground_pound_land",
+          134
+        ],
+        [
+          "hard_backward_ground_kb",
+          81
+        ],
+        [
+          "spawn_spin_airborne",
+          69
+        ]
+      ]
+    },
+    {
+      "policy": "7.5M checkpoint",
+      "steps": 7499700,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 5,
+          "successes": 5,
+          "peak_backward_velocity": -555.6,
+          "best_height": 5018.0,
+          "warps": 19,
+          "counts": {
+            "spawn_spin_airborne": 18,
+            "spawn_spin_landing": 96,
+            "idle": 6,
+            "walking": 44,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "crouch_slide": 6,
+            "long_jump": 1064,
+            "long_jump_land": 233,
+            "jump_land": 7
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -746.86,
+          "best_height": 5018.0,
+          "warps": 20,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 10,
+            "walking": 62,
+            "crouch_slide": 9,
+            "long_jump": 927,
+            "long_jump_land": 295,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -614.14,
+          "best_height": 5018.0,
+          "warps": 13,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 12,
+            "walking": 69,
+            "crouch_slide": 12,
+            "long_jump": 879,
+            "long_jump_land": 298,
+            "jump_land": 11,
+            "double_jump_land": 4,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -563.99,
+          "best_height": 5018.0,
+          "warps": 15,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 9,
+            "walking": 65,
+            "crouch_slide": 12,
+            "long_jump": 917,
+            "long_jump_land": 289,
+            "jump": 6,
+            "ground_pound": 18,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "turning_around": 1,
+            "jump_land": 4
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 1.6,
+        "min": 1.6,
+        "max": 1.7
+      },
+      "long_jump": {
+        "mean": 63.1,
+        "min": 58.6,
+        "max": 70.9
+      },
+      "episodes": 30,
+      "successes": 30,
+      "best_peak": -746.86,
+      "median_peak": -589.1,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3787
+        ],
+        [
+          "long_jump_land",
+          1115
+        ],
+        [
+          "spawn_spin_landing",
+          544
+        ],
+        [
+          "walking",
+          240
+        ],
+        [
+          "spawn_spin_airborne",
+          102
+        ],
+        [
+          "ground_pound",
+          69
+        ],
+        [
+          "crouch_slide",
+          39
+        ],
+        [
+          "idle",
+          37
+        ]
+      ]
+    },
+    {
+      "policy": "8.0M checkpoint",
+      "steps": 7999680,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -563.85,
+          "best_height": 5018.0,
+          "warps": 28,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 9,
+            "walking": 84,
+            "crouch_slide": 9,
+            "long_jump": 948,
+            "long_jump_land": 279
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 6,
+          "successes": 6,
+          "peak_backward_velocity": -580.28,
+          "best_height": 5018.0,
+          "warps": 23,
+          "counts": {
+            "spawn_spin_airborne": 21,
+            "spawn_spin_landing": 112,
+            "idle": 7,
+            "walking": 43,
+            "crouch_slide": 7,
+            "long_jump": 1059,
+            "long_jump_land": 247,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -709.34,
+          "best_height": 5018.0,
+          "warps": 18,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 62,
+            "crouch_slide": 10,
+            "long_jump": 892,
+            "long_jump_land": 332,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -848.13,
+          "best_height": 5018.0,
+          "warps": 33,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 94,
+            "crouch_slide": 13,
+            "long_jump": 870,
+            "long_jump_land": 311,
+            "jump_land": 12
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "long_jump": {
+        "mean": 62.8,
+        "min": 58.0,
+        "max": 70.6
+      },
+      "episodes": 32,
+      "successes": 32,
+      "best_peak": -848.13,
+      "median_peak": -644.8,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3769
+        ],
+        [
+          "long_jump_land",
+          1169
+        ],
+        [
+          "spawn_spin_landing",
+          576
+        ],
+        [
+          "walking",
+          283
+        ],
+        [
+          "spawn_spin_airborne",
+          108
+        ],
+        [
+          "crouch_slide",
+          39
+        ],
+        [
+          "idle",
+          36
+        ],
+        [
+          "jump_land",
+          20
+        ]
+      ]
+    },
+    {
+      "policy": "8.5M checkpoint",
+      "steps": 8499660,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -597.62,
+          "best_height": 5018.0,
+          "warps": 19,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 10,
+            "walking": 53,
+            "crouch_slide": 9,
+            "long_jump": 966,
+            "long_jump_land": 287,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -584.25,
+          "best_height": 5018.0,
+          "warps": 20,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 64,
+            "crouch_slide": 11,
+            "long_jump": 844,
+            "long_jump_land": 313,
+            "jump_land": 7,
+            "double_jump_land": 4,
+            "ground_pound": 36,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "jump": 5
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -584.31,
+          "best_height": 5018.0,
+          "warps": 22,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 78,
+            "crouch_slide": 11,
+            "long_jump": 845,
+            "long_jump_land": 292,
+            "jump_land": 8,
+            "crouching": 1,
+            "backflip": 10,
+            "ground_pound": 39,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 5,
+          "successes": 5,
+          "peak_backward_velocity": -586.11,
+          "best_height": 5018.0,
+          "warps": 35,
+          "counts": {
+            "spawn_spin_airborne": 18,
+            "spawn_spin_landing": 96,
+            "idle": 6,
+            "walking": 59,
+            "crouch_slide": 7,
+            "long_jump": 935,
+            "long_jump_land": 244,
+            "jump_land": 25,
+            "double_jump_land": 13,
+            "crouching": 1,
+            "stop_crouching": 1,
+            "backflip": 1,
+            "ground_pound": 65,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "decelerating": 1,
+            "jump": 4
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 3.1,
+        "min": 0.0,
+        "max": 5.7
+      },
+      "long_jump": {
+        "mean": 59.8,
+        "min": 56.3,
+        "max": 64.4
+      },
+      "episodes": 31,
+      "successes": 31,
+      "best_peak": -597.62,
+      "median_peak": -585.2,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3590
+        ],
+        [
+          "long_jump_land",
+          1136
+        ],
+        [
+          "spawn_spin_landing",
+          560
+        ],
+        [
+          "walking",
+          254
+        ],
+        [
+          "ground_pound",
+          140
+        ],
+        [
+          "spawn_spin_airborne",
+          105
+        ],
+        [
+          "ground_pound_land",
+          49
+        ],
+        [
+          "jump_land",
+          44
+        ]
+      ]
+    },
+    {
+      "policy": "9.0M checkpoint",
+      "steps": 8999640,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 6,
+          "successes": 6,
+          "peak_backward_velocity": -556.59,
+          "best_height": 5018.0,
+          "warps": 18,
+          "counts": {
+            "spawn_spin_airborne": 21,
+            "spawn_spin_landing": 112,
+            "idle": 7,
+            "walking": 81,
+            "jump": 15,
+            "ground_pound": 159,
+            "ground_pound_land": 63,
+            "butt_slide_stop": 9,
+            "crouch_slide": 13,
+            "long_jump": 763,
+            "long_jump_land": 254,
+            "turning_around": 1,
+            "side_flip": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -571.73,
+          "best_height": 5018.0,
+          "warps": 15,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 70,
+            "crouch_slide": 10,
+            "long_jump": 882,
+            "long_jump_land": 335,
+            "jump_land": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -571.44,
+          "best_height": 5018.0,
+          "warps": 16,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 83,
+            "crouch_slide": 13,
+            "long_jump": 798,
+            "long_jump_land": 355,
+            "jump": 5,
+            "ground_pound": 18,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -576.2,
+          "best_height": 5018.0,
+          "warps": 11,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 64,
+            "crouch_slide": 10,
+            "long_jump": 885,
+            "long_jump_land": 337,
+            "jump_land": 4
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 4.1,
+        "min": 0.0,
+        "max": 14.8
+      },
+      "long_jump": {
+        "mean": 55.5,
+        "min": 50.9,
+        "max": 59.0
+      },
+      "episodes": 34,
+      "successes": 34,
+      "best_peak": -576.2,
+      "median_peak": -571.6,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3328
+        ],
+        [
+          "long_jump_land",
+          1281
+        ],
+        [
+          "spawn_spin_landing",
+          608
+        ],
+        [
+          "walking",
+          298
+        ],
+        [
+          "ground_pound",
+          177
+        ],
+        [
+          "spawn_spin_airborne",
+          114
+        ],
+        [
+          "ground_pound_land",
+          70
+        ],
+        [
+          "crouch_slide",
+          46
+        ]
+      ]
+    },
+    {
+      "policy": "9.5M checkpoint",
+      "steps": 9499620,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -574.74,
+          "best_height": 5018.0,
+          "warps": 12,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 11,
+            "walking": 67,
+            "jump": 1,
+            "ground_pound": 34,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "crouch_slide": 11,
+            "long_jump": 831,
+            "long_jump_land": 339
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -578.91,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 70,
+            "crouch_slide": 20,
+            "long_jump": 757,
+            "long_jump_land": 342,
+            "jump_land": 7,
+            "jump": 4,
+            "ground_pound": 37,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 9,
+            "backflip": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -581.44,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 74,
+            "crouch_slide": 13,
+            "long_jump": 796,
+            "long_jump_land": 368,
+            "jump_land": 9
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -592.14,
+          "best_height": 5018.0,
+          "warps": 26,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 11,
+            "walking": 82,
+            "crouch_slide": 16,
+            "long_jump": 700,
+            "long_jump_land": 352,
+            "standing_against_wall": 1,
+            "start_crawling": 7,
+            "crawling": 2,
+            "jump": 11,
+            "ground_pound": 68,
+            "backward_air_kb": 3,
+            "backward_ground_kb": 31,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "decelerating": 2
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 3.1,
+        "min": 0.0,
+        "max": 5.9
+      },
+      "long_jump": {
+        "mean": 51.4,
+        "min": 46.7,
+        "max": 55.4
+      },
+      "episodes": 39,
+      "successes": 39,
+      "best_peak": -592.14,
+      "median_peak": -580.2,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3084
+        ],
+        [
+          "long_jump_land",
+          1401
+        ],
+        [
+          "spawn_spin_landing",
+          688
+        ],
+        [
+          "walking",
+          293
+        ],
+        [
+          "ground_pound",
+          139
+        ],
+        [
+          "spawn_spin_airborne",
+          129
+        ],
+        [
+          "crouch_slide",
+          60
+        ],
+        [
+          "ground_pound_land",
+          49
+        ]
+      ]
+    },
+    {
+      "policy": "10.0M checkpoint",
+      "steps": 9999600,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -586.17,
+          "best_height": 5018.0,
+          "warps": 19,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 191,
+            "idle": 11,
+            "walking": 79,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "crouch_slide": 11,
+            "long_jump": 758,
+            "long_jump_land": 388
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -579.29,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 80,
+            "crouch_slide": 13,
+            "long_jump": 737,
+            "long_jump_land": 406,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -585.1,
+          "best_height": 5018.0,
+          "warps": 12,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 72,
+            "crouch_slide": 12,
+            "long_jump": 783,
+            "long_jump_land": 380,
+            "jump_land": 13
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -591.96,
+          "best_height": 5018.0,
+          "warps": 10,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 73,
+            "crouch_slide": 12,
+            "long_jump": 774,
+            "long_jump_land": 394,
+            "jump_land": 7
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 0.4,
+        "min": 0.0,
+        "max": 1.6
+      },
+      "long_jump": {
+        "mean": 50.9,
+        "min": 49.1,
+        "max": 52.2
+      },
+      "episodes": 45,
+      "successes": 45,
+      "best_peak": -591.96,
+      "median_peak": -585.6,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3052
+        ],
+        [
+          "long_jump_land",
+          1568
+        ],
+        [
+          "spawn_spin_landing",
+          783
+        ],
+        [
+          "walking",
+          304
+        ],
+        [
+          "spawn_spin_airborne",
+          147
+        ],
+        [
+          "idle",
+          48
+        ],
+        [
+          "crouch_slide",
+          48
+        ],
+        [
+          "jump_land",
+          24
+        ]
+      ]
+    },
+    {
+      "policy": "10.5M checkpoint",
+      "steps": 10499580,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -585.87,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 73,
+            "jump": 3,
+            "ground_pound": 51,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "crouch_slide": 20,
+            "long_jump": 779,
+            "long_jump_land": 346,
+            "jump_land": 2,
+            "double_jump_land": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -581.42,
+          "best_height": 5018.0,
+          "warps": 11,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 64,
+            "crouch_slide": 11,
+            "long_jump": 823,
+            "long_jump_land": 380,
+            "jump_land": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -719.94,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 86,
+            "crouch_slide": 15,
+            "long_jump": 739,
+            "long_jump_land": 385,
+            "jump_land": 1,
+            "jump": 7,
+            "ground_pound": 19,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -572.4,
+          "best_height": 5018.0,
+          "warps": 13,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 79,
+            "crouch_slide": 13,
+            "long_jump": 768,
+            "long_jump_land": 388,
+            "jump_land": 12
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 1.6,
+        "min": 0.0,
+        "max": 4.8
+      },
+      "long_jump": {
+        "mean": 51.8,
+        "min": 49.3,
+        "max": 54.9
+      },
+      "episodes": 41,
+      "successes": 41,
+      "best_peak": -719.94,
+      "median_peak": -583.6,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3109
+        ],
+        [
+          "long_jump_land",
+          1499
+        ],
+        [
+          "spawn_spin_landing",
+          720
+        ],
+        [
+          "walking",
+          302
+        ],
+        [
+          "spawn_spin_airborne",
+          135
+        ],
+        [
+          "ground_pound",
+          70
+        ],
+        [
+          "crouch_slide",
+          59
+        ],
+        [
+          "idle",
+          45
+        ]
+      ]
+    },
+    {
+      "policy": "11.0M checkpoint",
+      "steps": 10999560,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -594.94,
+          "best_height": 5018.0,
+          "warps": 13,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 63,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "crouch_slide": 10,
+            "long_jump": 861,
+            "long_jump_land": 340
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -681.95,
+          "best_height": 5018.0,
+          "warps": 9,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 73,
+            "crouch_slide": 15,
+            "long_jump": 730,
+            "long_jump_land": 349,
+            "crouching": 1,
+            "backflip": 5,
+            "ground_pound": 72,
+            "ground_pound_land": 28,
+            "butt_slide_stop": 4,
+            "jump": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -618.75,
+          "best_height": 5018.0,
+          "warps": 17,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 72,
+            "crouch_slide": 12,
+            "long_jump": 790,
+            "long_jump_land": 386
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -718.17,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 70,
+            "crouch_slide": 12,
+            "long_jump": 788,
+            "long_jump_land": 390
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 2.1,
+        "min": 0.0,
+        "max": 6.7
+      },
+      "long_jump": {
+        "mean": 52.8,
+        "min": 48.7,
+        "max": 57.4
+      },
+      "episodes": 41,
+      "successes": 41,
+      "best_peak": -718.17,
+      "median_peak": -650.4,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3169
+        ],
+        [
+          "long_jump_land",
+          1465
+        ],
+        [
+          "spawn_spin_landing",
+          720
+        ],
+        [
+          "walking",
+          278
+        ],
+        [
+          "spawn_spin_airborne",
+          135
+        ],
+        [
+          "ground_pound",
+          89
+        ],
+        [
+          "crouch_slide",
+          49
+        ],
+        [
+          "idle",
+          45
+        ]
+      ]
+    },
+    {
+      "policy": "11.5M checkpoint",
+      "steps": 11499540,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 7,
+          "successes": 7,
+          "peak_backward_velocity": -637.78,
+          "best_height": 5018.0,
+          "warps": 5,
+          "counts": {
+            "spawn_spin_airborne": 24,
+            "spawn_spin_landing": 128,
+            "idle": 8,
+            "walking": 84,
+            "crouch_slide": 13,
+            "long_jump": 487,
+            "long_jump_land": 248,
+            "standing_against_wall": 1,
+            "jump": 27,
+            "jump_land": 4,
+            "ground_pound": 312,
+            "ground_pound_land": 126,
+            "butt_slide_stop": 18,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 3,
+            "backflip": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -653.18,
+          "best_height": 5018.0,
+          "warps": 9,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 68,
+            "crouch_slide": 12,
+            "long_jump": 801,
+            "long_jump_land": 379
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -647.05,
+          "best_height": 5018.0,
+          "warps": 15,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 55,
+            "crouch_slide": 10,
+            "long_jump": 860,
+            "long_jump_land": 368,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -633.16,
+          "best_height": 5018.0,
+          "warps": 10,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 67,
+            "crouch_slide": 12,
+            "long_jump": 794,
+            "long_jump_land": 387
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 7.3,
+        "min": 0.0,
+        "max": 29.2
+      },
+      "long_jump": {
+        "mean": 49.0,
+        "min": 32.5,
+        "max": 57.3
+      },
+      "episodes": 39,
+      "successes": 39,
+      "best_peak": -653.18,
+      "median_peak": -642.4,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2942
+        ],
+        [
+          "long_jump_land",
+          1382
+        ],
+        [
+          "spawn_spin_landing",
+          672
+        ],
+        [
+          "ground_pound",
+          312
+        ],
+        [
+          "walking",
+          274
+        ],
+        [
+          "spawn_spin_airborne",
+          129
+        ],
+        [
+          "ground_pound_land",
+          126
+        ],
+        [
+          "crouch_slide",
+          47
+        ]
+      ]
+    },
+    {
+      "policy": "12.0M checkpoint",
+      "steps": 11999520,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -620.85,
+          "best_height": 5018.0,
+          "warps": 9,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 64,
+            "crouch_slide": 12,
+            "long_jump": 752,
+            "long_jump_land": 379,
+            "ground_pound": 35,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "jump": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -608.93,
+          "best_height": 5018.0,
+          "warps": 19,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 84,
+            "crouch_slide": 13,
+            "long_jump": 730,
+            "long_jump_land": 348,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 7,
+            "backflip": 1,
+            "ground_pound": 52,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 4,
+            "jump": 1,
+            "decelerating": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -765.75,
+          "best_height": 5018.0,
+          "warps": 10,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 77,
+            "crouch_slide": 23,
+            "long_jump": 709,
+            "long_jump_land": 350,
+            "jump_land": 4,
+            "jump": 12,
+            "ground_pound": 73,
+            "ground_pound_land": 28,
+            "butt_slide_stop": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -612.39,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 13,
+            "walking": 72,
+            "crouch_slide": 12,
+            "long_jump": 747,
+            "long_jump_land": 377,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "start_crawling": 7,
+            "crawling": 1,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 9,
+            "decelerating": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 4.1,
+        "min": 1.6,
+        "max": 6.7
+      },
+      "long_jump": {
+        "mean": 49.0,
+        "min": 47.3,
+        "max": 50.1
+      },
+      "episodes": 42,
+      "successes": 42,
+      "best_peak": -765.75,
+      "median_peak": -616.6,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2938
+        ],
+        [
+          "long_jump_land",
+          1454
+        ],
+        [
+          "spawn_spin_landing",
+          736
+        ],
+        [
+          "walking",
+          297
+        ],
+        [
+          "ground_pound",
+          177
+        ],
+        [
+          "spawn_spin_airborne",
+          138
+        ],
+        [
+          "ground_pound_land",
+          70
+        ],
+        [
+          "crouch_slide",
+          60
+        ]
+      ]
+    },
+    {
+      "policy": "12.5M checkpoint",
+      "steps": 12499500,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -614.3,
+          "best_height": 5018.0,
+          "warps": 11,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 67,
+            "crouch_slide": 12,
+            "long_jump": 790,
+            "long_jump_land": 391
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -772.62,
+          "best_height": 5018.0,
+          "warps": 10,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 10,
+            "walking": 74,
+            "crouch_slide": 12,
+            "long_jump": 625,
+            "long_jump_land": 347,
+            "standing_against_wall": 2,
+            "ground_pound": 140,
+            "ground_pound_land": 49,
+            "butt_slide_stop": 7,
+            "decelerating": 1,
+            "jump": 8,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "crouching": 2,
+            "start_crawling": 7,
+            "crawling": 3,
+            "stop_crawling": 7,
+            "stop_crouching": 1,
+            "backflip": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -907.3,
+          "best_height": 5018.0,
+          "warps": 15,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 96,
+            "crouch_slide": 11,
+            "long_jump": 815,
+            "long_jump_land": 346,
+            "freefall": 2,
+            "ground_pound": 16,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "jump_land": 6
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 4,
+          "successes": 4,
+          "peak_backward_velocity": -820.05,
+          "best_height": 5018.0,
+          "warps": 20,
+          "counts": {
+            "spawn_spin_airborne": 15,
+            "spawn_spin_landing": 80,
+            "idle": 7,
+            "walking": 96,
+            "crouch_slide": 22,
+            "long_jump": 487,
+            "long_jump_land": 196,
+            "jump_land": 10,
+            "double_jump_land": 3,
+            "freefall": 9,
+            "ground_pound": 291,
+            "hard_backward_ground_kb": 81,
+            "start_crawling": 28,
+            "crawling": 4,
+            "stop_crawling": 28,
+            "crouching": 4,
+            "backflip": 8,
+            "ground_pound_land": 91,
+            "butt_slide_stop": 13,
+            "jump": 10,
+            "stop_crouching": 17
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 9.9,
+        "min": 0.0,
+        "max": 25.5
+      },
+      "long_jump": {
+        "mean": 45.3,
+        "min": 32.5,
+        "max": 54.3
+      },
+      "episodes": 32,
+      "successes": 32,
+      "best_peak": -907.3,
+      "median_peak": -796.3,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2717
+        ],
+        [
+          "long_jump_land",
+          1280
+        ],
+        [
+          "spawn_spin_landing",
+          576
+        ],
+        [
+          "ground_pound",
+          447
+        ],
+        [
+          "walking",
+          333
+        ],
+        [
+          "ground_pound_land",
+          147
+        ],
+        [
+          "spawn_spin_airborne",
+          108
+        ],
+        [
+          "hard_backward_ground_kb",
+          81
+        ]
+      ]
+    },
+    {
+      "policy": "13.0M checkpoint",
+      "steps": 12999480,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -655.07,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 75,
+            "crouch_slide": 13,
+            "long_jump": 752,
+            "long_jump_land": 400
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -621.32,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 65,
+            "crouch_slide": 13,
+            "long_jump": 771,
+            "long_jump_land": 386,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -610.25,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 67,
+            "crouch_slide": 12,
+            "long_jump": 787,
+            "long_jump_land": 394
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -646.26,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 75,
+            "crouch_slide": 13,
+            "long_jump": 752,
+            "long_jump_land": 400
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 0.4,
+        "min": 0.0,
+        "max": 1.6
+      },
+      "long_jump": {
+        "mean": 51.0,
+        "min": 50.1,
+        "max": 52.5
+      },
+      "episodes": 46,
+      "successes": 46,
+      "best_peak": -655.07,
+      "median_peak": -633.8,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3062
+        ],
+        [
+          "long_jump_land",
+          1580
+        ],
+        [
+          "spawn_spin_landing",
+          800
+        ],
+        [
+          "walking",
+          282
+        ],
+        [
+          "spawn_spin_airborne",
+          150
+        ],
+        [
+          "crouch_slide",
+          51
+        ],
+        [
+          "idle",
+          50
+        ],
+        [
+          "ground_pound",
+          17
+        ]
+      ]
+    },
+    {
+      "policy": "13.5M checkpoint",
+      "steps": 13499460,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -619.11,
+          "best_height": 5018.0,
+          "warps": 10,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 74,
+            "crouch_slide": 13,
+            "long_jump": 748,
+            "long_jump_land": 405
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -635.41,
+          "best_height": 5018.0,
+          "warps": 23,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 64,
+            "crouch_slide": 10,
+            "long_jump": 872,
+            "long_jump_land": 354
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -619.06,
+          "best_height": 5018.0,
+          "warps": 12,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 74,
+            "crouch_slide": 12,
+            "long_jump": 767,
+            "long_jump_land": 407
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -608.83,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 65,
+            "crouch_slide": 12,
+            "long_jump": 791,
+            "long_jump_land": 392
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "long_jump": {
+        "mean": 53.0,
+        "min": 49.9,
+        "max": 58.1
+      },
+      "episodes": 43,
+      "successes": 43,
+      "best_peak": -635.41,
+      "median_peak": -619.1,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3178
+        ],
+        [
+          "long_jump_land",
+          1558
+        ],
+        [
+          "spawn_spin_landing",
+          752
+        ],
+        [
+          "walking",
+          277
+        ],
+        [
+          "spawn_spin_airborne",
+          141
+        ],
+        [
+          "idle",
+          47
+        ],
+        [
+          "crouch_slide",
+          47
+        ]
+      ]
+    },
+    {
+      "policy": "14.0M checkpoint",
+      "steps": 13999440,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -574.76,
+          "best_height": 5018.0,
+          "warps": 11,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 80,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "crouch_slide": 12,
+            "long_jump": 746,
+            "long_jump_land": 388,
+            "jump_land": 8
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -600.95,
+          "best_height": 5018.0,
+          "warps": 13,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 64,
+            "crouch_slide": 11,
+            "long_jump": 825,
+            "long_jump_land": 380
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -635.56,
+          "best_height": 5018.0,
+          "warps": 13,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 69,
+            "crouch_slide": 12,
+            "long_jump": 782,
+            "long_jump_land": 393,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 6,
+          "successes": 6,
+          "peak_backward_velocity": -603.75,
+          "best_height": 5018.0,
+          "warps": 29,
+          "counts": {
+            "spawn_spin_airborne": 21,
+            "spawn_spin_landing": 112,
+            "idle": 7,
+            "walking": 44,
+            "crouch_slide": 9,
+            "long_jump": 909,
+            "long_jump_land": 340,
+            "jump_land": 4,
+            "ground_pound": 35,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "jump": 3
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 1.2,
+        "min": 0.0,
+        "max": 3.3
+      },
+      "long_jump": {
+        "mean": 54.4,
+        "min": 49.7,
+        "max": 60.6
+      },
+      "episodes": 38,
+      "successes": 38,
+      "best_peak": -635.56,
+      "median_peak": -602.4,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3262
+        ],
+        [
+          "long_jump_land",
+          1501
+        ],
+        [
+          "spawn_spin_landing",
+          672
+        ],
+        [
+          "walking",
+          257
+        ],
+        [
+          "spawn_spin_airborne",
+          126
+        ],
+        [
+          "ground_pound",
+          52
+        ],
+        [
+          "crouch_slide",
+          44
+        ],
+        [
+          "idle",
+          42
+        ]
+      ]
+    },
+    {
+      "policy": "14.5M checkpoint",
+      "steps": 14499420,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -653.17,
+          "best_height": 5018.0,
+          "warps": 5,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 11,
+            "walking": 87,
+            "crouch_slide": 16,
+            "long_jump": 703,
+            "long_jump_land": 301,
+            "start_crawling": 14,
+            "crawling": 2,
+            "jump": 13,
+            "ground_pound": 107,
+            "ground_pound_land": 42,
+            "butt_slide_stop": 6,
+            "turning_around": 7,
+            "finish_turning_around": 3,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 9
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -736.4,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 13,
+            "long_jump": 740,
+            "long_jump_land": 417
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -649.34,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 73,
+            "crouch_slide": 13,
+            "long_jump": 737,
+            "long_jump_land": 413,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -630.31,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 73,
+            "crouch_slide": 13,
+            "long_jump": 737,
+            "long_jump_land": 414,
+            "jump_land": 3
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 2.5,
+        "min": 0.0,
+        "max": 9.9
+      },
+      "long_jump": {
+        "mean": 48.6,
+        "min": 46.9,
+        "max": 49.3
+      },
+      "episodes": 44,
+      "successes": 44,
+      "best_peak": -736.4,
+      "median_peak": -651.3,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2917
+        ],
+        [
+          "long_jump_land",
+          1545
+        ],
+        [
+          "spawn_spin_landing",
+          768
+        ],
+        [
+          "walking",
+          303
+        ],
+        [
+          "spawn_spin_airborne",
+          144
+        ],
+        [
+          "ground_pound",
+          107
+        ],
+        [
+          "crouch_slide",
+          55
+        ],
+        [
+          "idle",
+          50
+        ]
+      ]
+    },
+    {
+      "policy": "15.0M checkpoint",
+      "steps": 14999400,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 9,
+          "successes": 9,
+          "peak_backward_velocity": -623.27,
+          "best_height": 5018.0,
+          "warps": 15,
+          "counts": {
+            "spawn_spin_airborne": 30,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 67,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "crouch_slide": 10,
+            "long_jump": 834,
+            "long_jump_land": 359,
+            "jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -639.98,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 75,
+            "crouch_slide": 12,
+            "long_jump": 759,
+            "long_jump_land": 389,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -760.67,
+          "best_height": 5018.0,
+          "warps": 20,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 71,
+            "crouch_slide": 12,
+            "long_jump": 716,
+            "long_jump_land": 419,
+            "jump_land": 4,
+            "crouching": 1,
+            "backflip": 4,
+            "ground_pound": 37,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -705.85,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 9,
+            "walking": 82,
+            "crouch_slide": 25,
+            "long_jump": 632,
+            "long_jump_land": 320,
+            "crouching": 2,
+            "backflip": 7,
+            "ground_pound": 163,
+            "ground_pound_land": 63,
+            "butt_slide_stop": 11,
+            "jump": 15
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 5.4,
+        "min": 1.6,
+        "max": 15.1
+      },
+      "long_jump": {
+        "mean": 49.0,
+        "min": 42.1,
+        "max": 55.6
+      },
+      "episodes": 38,
+      "successes": 38,
+      "best_peak": -760.67,
+      "median_peak": -672.9,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2941
+        ],
+        [
+          "long_jump_land",
+          1487
+        ],
+        [
+          "spawn_spin_landing",
+          672
+        ],
+        [
+          "walking",
+          295
+        ],
+        [
+          "ground_pound",
+          234
+        ],
+        [
+          "spawn_spin_airborne",
+          126
+        ],
+        [
+          "ground_pound_land",
+          91
+        ],
+        [
+          "crouch_slide",
+          59
+        ]
+      ]
+    },
+    {
+      "policy": "15.5M checkpoint",
+      "steps": 15499380,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -830.63,
+          "best_height": 5018.0,
+          "warps": 11,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 81,
+            "jump": 1,
+            "ground_pound": 51,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "crouch_slide": 12,
+            "long_jump": 718,
+            "long_jump_land": 390,
+            "crouching": 1,
+            "stop_crouching": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 8,
+          "successes": 8,
+          "peak_backward_velocity": -646.76,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 27,
+            "spawn_spin_landing": 144,
+            "idle": 10,
+            "walking": 77,
+            "crouch_slide": 14,
+            "long_jump": 512,
+            "long_jump_land": 286,
+            "crouching": 7,
+            "stop_crouching": 10,
+            "start_crawling": 35,
+            "crawling": 5,
+            "stop_crawling": 35,
+            "backflip": 5,
+            "ground_pound": 215,
+            "ground_pound_land": 84,
+            "butt_slide_stop": 15,
+            "jump": 12,
+            "decelerating": 2,
+            "turning_around": 4,
+            "braking_stop": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -649.48,
+          "best_height": 5018.0,
+          "warps": 10,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 196,
+            "idle": 12,
+            "walking": 69,
+            "crouch_slide": 12,
+            "long_jump": 745,
+            "long_jump_land": 420,
+            "jump_land": 3,
+            "double_jump_land": 4
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -633.12,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 65,
+            "crouch_slide": 12,
+            "long_jump": 743,
+            "long_jump_land": 420
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 6.2,
+        "min": 0.0,
+        "max": 19.9
+      },
+      "long_jump": {
+        "mean": 45.3,
+        "min": 34.1,
+        "max": 49.7
+      },
+      "episodes": 42,
+      "successes": 42,
+      "best_peak": -830.63,
+      "median_peak": -648.1,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2718
+        ],
+        [
+          "long_jump_land",
+          1516
+        ],
+        [
+          "spawn_spin_landing",
+          724
+        ],
+        [
+          "walking",
+          292
+        ],
+        [
+          "ground_pound",
+          266
+        ],
+        [
+          "spawn_spin_airborne",
+          138
+        ],
+        [
+          "ground_pound_land",
+          105
+        ],
+        [
+          "crouch_slide",
+          50
+        ]
+      ]
+    },
+    {
+      "policy": "16.0M checkpoint",
+      "steps": 15999360,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -620.51,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 13,
+            "walking": 71,
+            "jump": 11,
+            "ground_pound": 69,
+            "ground_pound_land": 28,
+            "butt_slide_stop": 4,
+            "crouch_slide": 20,
+            "long_jump": 663,
+            "long_jump_land": 380,
+            "jump_land": 4,
+            "stop_crouching": 9
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -650.54,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 71,
+            "crouch_slide": 13,
+            "long_jump": 740,
+            "long_jump_land": 416
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -598.79,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 72,
+            "crouch_slide": 14,
+            "long_jump": 738,
+            "long_jump_land": 416
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -639.04,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 13,
+            "long_jump": 741,
+            "long_jump_land": 416
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 1.6,
+        "min": 0.0,
+        "max": 6.5
+      },
+      "long_jump": {
+        "mean": 48.0,
+        "min": 44.2,
+        "max": 49.4
+      },
+      "episodes": 47,
+      "successes": 47,
+      "best_peak": -650.54,
+      "median_peak": -629.8,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2882
+        ],
+        [
+          "long_jump_land",
+          1628
+        ],
+        [
+          "spawn_spin_landing",
+          816
+        ],
+        [
+          "walking",
+          284
+        ],
+        [
+          "spawn_spin_airborne",
+          153
+        ],
+        [
+          "ground_pound",
+          69
+        ],
+        [
+          "crouch_slide",
+          60
+        ],
+        [
+          "idle",
+          52
+        ]
+      ]
+    },
+    {
+      "policy": "16.5M checkpoint",
+      "steps": 16499340,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -705.61,
+          "best_height": 5018.0,
+          "warps": 9,
+          "counts": {
+            "spawn_spin_airborne": 31,
+            "spawn_spin_landing": 160,
+            "idle": 10,
+            "walking": 70,
+            "jump": 1,
+            "ground_pound": 68,
+            "ground_pound_land": 28,
+            "butt_slide_stop": 4,
+            "crouch_slide": 19,
+            "long_jump": 746,
+            "long_jump_land": 363
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -695.92,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 71,
+            "crouch_slide": 13,
+            "long_jump": 740,
+            "long_jump_land": 416
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -653.5,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 12,
+            "walking": 91,
+            "crouch_slide": 12,
+            "long_jump": 686,
+            "long_jump_land": 359,
+            "standing_against_wall": 1,
+            "start_crawling": 14,
+            "crawling": 2,
+            "jump": 3,
+            "ground_pound": 50,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "turning_around": 1,
+            "backward_air_kb": 2,
+            "backward_ground_kb": 31,
+            "stop_crawling": 7,
+            "crouching": 1,
+            "stop_crouching": 3
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -721.32,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 13,
+            "long_jump": 742,
+            "long_jump_land": 415
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 2.7,
+        "min": 0.0,
+        "max": 6.4
+      },
+      "long_jump": {
+        "mean": 48.6,
+        "min": 45.7,
+        "max": 49.7
+      },
+      "episodes": 44,
+      "successes": 44,
+      "best_peak": -721.32,
+      "median_peak": -700.8,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2914
+        ],
+        [
+          "long_jump_land",
+          1553
+        ],
+        [
+          "spawn_spin_landing",
+          752
+        ],
+        [
+          "walking",
+          302
+        ],
+        [
+          "spawn_spin_airborne",
+          142
+        ],
+        [
+          "ground_pound",
+          118
+        ],
+        [
+          "crouch_slide",
+          57
+        ],
+        [
+          "idle",
+          48
+        ]
+      ]
+    },
+    {
+      "policy": "17.0M checkpoint",
+      "steps": 16999320,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -687.1,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 72,
+            "jump": 2,
+            "ground_pound": 51,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "crouch_slide": 12,
+            "long_jump": 700,
+            "long_jump_land": 399
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -695.57,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 71,
+            "crouch_slide": 12,
+            "long_jump": 738,
+            "long_jump_land": 387,
+            "long_jump_land_stop": 1,
+            "ground_pound": 34,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "jump": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -660.75,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 71,
+            "crouch_slide": 13,
+            "long_jump": 746,
+            "long_jump_land": 410
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -647.05,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 68,
+            "crouch_slide": 13,
+            "long_jump": 748,
+            "long_jump_land": 411
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 2.0,
+        "min": 0.0,
+        "max": 4.8
+      },
+      "long_jump": {
+        "mean": 48.9,
+        "min": 46.7,
+        "max": 49.9
+      },
+      "episodes": 46,
+      "successes": 46,
+      "best_peak": -695.57,
+      "median_peak": -673.9,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2932
+        ],
+        [
+          "long_jump_land",
+          1607
+        ],
+        [
+          "spawn_spin_landing",
+          800
+        ],
+        [
+          "walking",
+          282
+        ],
+        [
+          "spawn_spin_airborne",
+          150
+        ],
+        [
+          "ground_pound",
+          85
+        ],
+        [
+          "idle",
+          50
+        ],
+        [
+          "crouch_slide",
+          50
+        ]
+      ]
+    },
+    {
+      "policy": "17.5M checkpoint",
+      "steps": 17499300,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -658.33,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 73,
+            "jump": 1,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1,
+            "crouch_slide": 12,
+            "long_jump": 721,
+            "long_jump_land": 408
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -651.09,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 69,
+            "crouch_slide": 13,
+            "long_jump": 751,
+            "long_jump_land": 407
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -696.86,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 67,
+            "crouch_slide": 13,
+            "long_jump": 750,
+            "long_jump_land": 404,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 2
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -667.3,
+          "best_height": 5018.0,
+          "warps": 7,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 68,
+            "crouch_slide": 13,
+            "long_jump": 767,
+            "long_jump_land": 387,
+            "ground_pound": 17,
+            "ground_pound_land": 7,
+            "butt_slide_stop": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 1.2,
+        "min": 0.0,
+        "max": 1.6
+      },
+      "long_jump": {
+        "mean": 49.8,
+        "min": 48.1,
+        "max": 51.1
+      },
+      "episodes": 46,
+      "successes": 46,
+      "best_peak": -696.86,
+      "median_peak": -662.8,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2989
+        ],
+        [
+          "long_jump_land",
+          1606
+        ],
+        [
+          "spawn_spin_landing",
+          800
+        ],
+        [
+          "walking",
+          277
+        ],
+        [
+          "spawn_spin_airborne",
+          150
+        ],
+        [
+          "ground_pound",
+          51
+        ],
+        [
+          "crouch_slide",
+          51
+        ],
+        [
+          "idle",
+          50
+        ]
+      ]
+    },
+    {
+      "policy": "18.0M checkpoint",
+      "steps": 17999280,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -651.63,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 176,
+            "idle": 11,
+            "walking": 67,
+            "jump": 10,
+            "ground_pound": 106,
+            "ground_pound_land": 42,
+            "butt_slide_stop": 6,
+            "start_crawling": 14,
+            "crawling": 2,
+            "stop_crawling": 14,
+            "crouching": 2,
+            "stop_crouching": 9,
+            "backflip": 3,
+            "crouch_slide": 17,
+            "long_jump": 641,
+            "long_jump_land": 347
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -667.86,
+          "best_height": 5018.0,
+          "warps": 16,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 78,
+            "crouch_slide": 12,
+            "long_jump": 743,
+            "long_jump_land": 407
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -649.71,
+          "best_height": 5018.0,
+          "warps": 9,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 62,
+            "crouch_slide": 12,
+            "long_jump": 793,
+            "long_jump_land": 393
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -685.49,
+          "best_height": 5018.0,
+          "warps": 5,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 63,
+            "crouch_slide": 12,
+            "long_jump": 788,
+            "long_jump_land": 397
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 2.5,
+        "min": 0.0,
+        "max": 9.9
+      },
+      "long_jump": {
+        "mean": 49.4,
+        "min": 42.7,
+        "max": 52.9
+      },
+      "episodes": 44,
+      "successes": 44,
+      "best_peak": -685.49,
+      "median_peak": -659.7,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2965
+        ],
+        [
+          "long_jump_land",
+          1544
+        ],
+        [
+          "spawn_spin_landing",
+          768
+        ],
+        [
+          "walking",
+          270
+        ],
+        [
+          "spawn_spin_airborne",
+          144
+        ],
+        [
+          "ground_pound",
+          106
+        ],
+        [
+          "crouch_slide",
+          53
+        ],
+        [
+          "idle",
+          48
+        ]
+      ]
+    },
+    {
+      "policy": "18.5M checkpoint",
+      "steps": 18499260,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -648.34,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 67,
+            "jump": 6,
+            "ground_pound": 54,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "crouch_slide": 14,
+            "long_jump": 697,
+            "long_jump_land": 397,
+            "crouching": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -661.36,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 66,
+            "crouch_slide": 12,
+            "long_jump": 746,
+            "long_jump_land": 415,
+            "crouching": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -655.77,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 13,
+            "long_jump": 747,
+            "long_jump_land": 410
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -650.85,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 12,
+            "long_jump": 744,
+            "long_jump_land": 414
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 1.2,
+        "min": 0.0,
+        "max": 5.0
+      },
+      "long_jump": {
+        "mean": 48.9,
+        "min": 46.5,
+        "max": 49.8
+      },
+      "episodes": 47,
+      "successes": 47,
+      "best_peak": -661.36,
+      "median_peak": -653.3,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2934
+        ],
+        [
+          "long_jump_land",
+          1636
+        ],
+        [
+          "spawn_spin_landing",
+          816
+        ],
+        [
+          "walking",
+          273
+        ],
+        [
+          "spawn_spin_airborne",
+          153
+        ],
+        [
+          "ground_pound",
+          54
+        ],
+        [
+          "idle",
+          51
+        ],
+        [
+          "crouch_slide",
+          51
+        ]
+      ]
+    },
+    {
+      "policy": "19.0M checkpoint",
+      "steps": 18999240,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -696.03,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 68,
+            "jump": 2,
+            "ground_pound": 34,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "crouch_slide": 12,
+            "long_jump": 720,
+            "long_jump_land": 408
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 10,
+          "successes": 10,
+          "peak_backward_velocity": -647.94,
+          "best_height": 5018.0,
+          "warps": 6,
+          "counts": {
+            "spawn_spin_airborne": 33,
+            "spawn_spin_landing": 168,
+            "idle": 10,
+            "walking": 89,
+            "crouch_slide": 13,
+            "long_jump": 744,
+            "long_jump_land": 367,
+            "ground_pound": 51,
+            "ground_pound_land": 21,
+            "butt_slide_stop": 3,
+            "jump": 1
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 11,
+          "successes": 11,
+          "peak_backward_velocity": -674.02,
+          "best_height": 5018.0,
+          "warps": 9,
+          "counts": {
+            "spawn_spin_airborne": 36,
+            "spawn_spin_landing": 192,
+            "idle": 12,
+            "walking": 65,
+            "crouch_slide": 12,
+            "long_jump": 789,
+            "long_jump_land": 394
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -643.44,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 79,
+            "crouch_slide": 12,
+            "long_jump": 697,
+            "long_jump_land": 399,
+            "ground_pound": 35,
+            "ground_pound_land": 11,
+            "butt_slide_stop": 1,
+            "turning_around": 4,
+            "finish_turning_around": 1,
+            "side_flip": 1
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 2.8,
+        "min": 0.0,
+        "max": 4.8
+      },
+      "long_jump": {
+        "mean": 49.2,
+        "min": 46.5,
+        "max": 52.6
+      },
+      "episodes": 44,
+      "successes": 44,
+      "best_peak": -696.03,
+      "median_peak": -661.0,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2950
+        ],
+        [
+          "long_jump_land",
+          1568
+        ],
+        [
+          "spawn_spin_landing",
+          760
+        ],
+        [
+          "walking",
+          301
+        ],
+        [
+          "spawn_spin_airborne",
+          144
+        ],
+        [
+          "ground_pound",
+          120
+        ],
+        [
+          "crouch_slide",
+          49
+        ],
+        [
+          "idle",
+          47
+        ]
+      ]
+    },
+    {
+      "policy": "19.5M checkpoint",
+      "steps": 19499220,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -648.31,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 71,
+            "jump": 2,
+            "ground_pound": 34,
+            "ground_pound_land": 14,
+            "butt_slide_stop": 2,
+            "crouch_slide": 13,
+            "long_jump": 698,
+            "long_jump_land": 406
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -632.73,
+          "best_height": 5018.0,
+          "warps": 4,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 69,
+            "crouch_slide": 13,
+            "long_jump": 750,
+            "long_jump_land": 408
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -662.04,
+          "best_height": 5018.0,
+          "warps": 8,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 73,
+            "crouch_slide": 13,
+            "long_jump": 746,
+            "long_jump_land": 408
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -616.28,
+          "best_height": 5018.0,
+          "warps": 5,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 13,
+            "long_jump": 746,
+            "long_jump_land": 411
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 0.8,
+        "min": 0.0,
+        "max": 3.2
+      },
+      "long_jump": {
+        "mean": 49.0,
+        "min": 46.5,
+        "max": 50.0
+      },
+      "episodes": 48,
+      "successes": 48,
+      "best_peak": -662.04,
+      "median_peak": -640.5,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          2940
+        ],
+        [
+          "long_jump_land",
+          1633
+        ],
+        [
+          "spawn_spin_landing",
+          832
+        ],
+        [
+          "walking",
+          283
+        ],
+        [
+          "spawn_spin_airborne",
+          156
+        ],
+        [
+          "idle",
+          52
+        ],
+        [
+          "crouch_slide",
+          52
+        ],
+        [
+          "ground_pound",
+          34
+        ]
+      ]
+    },
+    {
+      "policy": "20.0M checkpoint",
+      "steps": 19999200,
+      "rollouts": [
+        {
+          "frames": 1500,
+          "seed": 20250915,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -654.0,
+          "best_height": 5018.0,
+          "warps": 3,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 68,
+            "crouch_slide": 13,
+            "long_jump": 754,
+            "long_jump_land": 405
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250916,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -651.17,
+          "best_height": 5018.0,
+          "warps": 2,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 67,
+            "crouch_slide": 13,
+            "long_jump": 753,
+            "long_jump_land": 407
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250917,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -689.78,
+          "best_height": 5018.0,
+          "warps": 5,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 70,
+            "crouch_slide": 13,
+            "long_jump": 751,
+            "long_jump_land": 406
+          }
+        },
+        {
+          "frames": 1500,
+          "seed": 20250918,
+          "episodes": 12,
+          "successes": 12,
+          "peak_backward_velocity": -660.22,
+          "best_height": 5018.0,
+          "warps": 1,
+          "counts": {
+            "spawn_spin_airborne": 39,
+            "spawn_spin_landing": 208,
+            "idle": 13,
+            "walking": 66,
+            "crouch_slide": 13,
+            "long_jump": 750,
+            "long_jump_land": 411
+          }
+        }
+      ],
+      "ground_pound": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "long_jump": {
+        "mean": 50.1,
+        "min": 50.0,
+        "max": 50.3
+      },
+      "episodes": 48,
+      "successes": 48,
+      "best_peak": -689.78,
+      "median_peak": -657.1,
+      "best_height": 5018.0,
+      "top_actions": [
+        [
+          "long_jump",
+          3008
+        ],
+        [
+          "long_jump_land",
+          1629
+        ],
+        [
+          "spawn_spin_landing",
+          832
+        ],
+        [
+          "walking",
+          271
+        ],
+        [
+          "spawn_spin_airborne",
+          156
+        ],
+        [
+          "idle",
+          52
+        ],
+        [
+          "crouch_slide",
+          52
+        ]
+      ]
+    }
+  ]
+}
