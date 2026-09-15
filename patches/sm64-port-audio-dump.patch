@@ -1,0 +1,81 @@
+diff --git a/src/pc/pc_main.c b/src/pc/pc_main.c
+index 89aa1fa..6dd5450 100644
+--- a/src/pc/pc_main.c
++++ b/src/pc/pc_main.c
+@@ -1,4 +1,5 @@
+ #include <stdlib.h>
++#include <stdio.h>
+ 
+ #ifdef TARGET_WEB
+ #include <emscripten.h>
+@@ -78,12 +79,48 @@ void exec_display_list(struct SPTask *spTask) {
+ #define SAMPLES_LOW 528
+ #endif
+ 
++// Audio dump: set SM64_DUMP_AUDIO to a path and the generated stream lands there as raw
++// signed 16 bit little endian stereo at 32000 Hz, bounded by the same SM64_DUMP_FIRST and
++// SM64_DUMP_LAST as the frame dump. The counter below advances once per produce_one_frame,
++// exactly like the frame dumper's own counter, so audio sample block N belongs to frame N.
++//
++// The buffer size normally tracks how much the audio device has left to play, which makes it a
++// function of wall clock time and therefore useless for a dump. While dumping we override it with
++// the 528, 528, 544 cycle instead, whose mean is exactly 533.33 samples, so two blocks per frame
++// come to 32000/30 samples and the dumped audio stays locked to a 30 fps render forever.
++static FILE *sAudioDump = NULL;
++static int sAudioFrame = 0, sAudioFirst = 0, sAudioLast = -1, sAudioChecked = 0;
++static const u32 sDumpSamples[3] = { SAMPLES_LOW, SAMPLES_LOW, SAMPLES_HIGH };
++
++static void audio_dump_open(void) {
++    const char *path;
++    const char *bound;
++    if (sAudioChecked) return;
++    sAudioChecked = 1;
++    path = getenv("SM64_DUMP_AUDIO");
++    if (!path) return;
++    if ((bound = getenv("SM64_DUMP_FIRST"))) sAudioFirst = atoi(bound);
++    if ((bound = getenv("SM64_DUMP_LAST"))) sAudioLast = atoi(bound);
++    sAudioDump = fopen(path, "wb");
++    if (sAudioDump) {
++        fprintf(stderr, "audio dump: %s, frames %d..%d, 32000 Hz s16le stereo\n",
++                path, sAudioFirst, sAudioLast);
++    } else {
++        fprintf(stderr, "audio dump: cannot open %s\n", path);
++    }
++}
++
+ void produce_one_frame(void) {
++    int frame;
+     gfx_start_frame();
+     game_loop_one_iteration();
+-    
++
++    audio_dump_open();
++    frame = sAudioFrame++;
++
+     int samples_left = audio_api->buffered();
+     u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? SAMPLES_HIGH : SAMPLES_LOW;
++    if (sAudioDump) num_audio_samples = sDumpSamples[frame % 3];
+     //printf("Audio samples: %d %u\n", samples_left, num_audio_samples);
+     s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
+     for (int i = 0; i < 2; i++) {
+@@ -94,8 +131,19 @@ void produce_one_frame(void) {
+         create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
+     }
+     //printf("Audio samples before submitting: %d\n", audio_api->buffered());
++    if (sAudioDump && frame >= sAudioFirst && (sAudioLast < 0 || frame <= sAudioLast)) {
++        fwrite(audio_buffer, 1, 2 * num_audio_samples * 4, sAudioDump);
++        fflush(sAudioDump);
++    }
++    // The frame dumper is the one that ends the process when it passes SM64_DUMP_LAST, and it runs
++    // after this point in the iteration. Only stop here when no frames are being written, so an
++    // audio only pass still terminates on its own.
++    if (sAudioDump && sAudioLast >= 0 && frame >= sAudioLast && !getenv("SM64_DUMP_DIR")) {
++        fclose(sAudioDump);
++        exit(0);
++    }
+     audio_api->play((u8 *)audio_buffer, 2 * num_audio_samples * 4);
+-    
++
+     gfx_end_frame();
+ }
+ 

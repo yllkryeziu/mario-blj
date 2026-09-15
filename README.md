@@ -291,9 +291,9 @@ needs the 24 final models, `scripts/action_occupancy.py` needs a checkpoint dire
 No ROM is distributed here. `patches/` holds the changes this project makes to the vendored code,
 all applied by `setup.sh` on a fresh clone. Two are for libsm64: one exports Mario's floor and
 action detail, which the instant warp check needs, and one stops the Makefile listing its generated
-sources twice. Two more are for sm64-port, which this project uses as a renderer rather than as a
-game. One makes it build and run headless enough to be scripted on macOS. The other adds a frame
-dumper and a state injector:
+sources twice. Three more are for sm64-port, which this project uses as a renderer rather than as a
+game. One makes it build and run headless enough to be scripted on macOS. One adds a frame dumper
+and a state injector. One adds an audio dumper:
 
     PYTHONPATH=. python3 tools/export_trajectory.py \
         --replay results/replay_model_endless.json --out results/trajectory_model_endless.bin
@@ -301,7 +301,11 @@ dumper and a state injector:
     cd data/tas/replay2016M && SM64_TAS_LAST=6731 SM64_INJECT_START=6732 \
         SM64_INJECT_FILE=../../../results/trajectory_model_endless.bin \
         SM64_DUMP_DIR=/tmp/plates SM64_DUMP_FIRST=6725 SM64_DUMP_LAST=7400 \
+        SM64_DUMP_AUDIO=/tmp/plates/audio.raw \
         ../../../third_party/sm64-port/build/us_pc/sm64.us
+    PYTHONPATH=. python3 tools/make_clips.py --frames_dir /tmp/plates \
+        --replay results/replay_model_endless.json --audio /tmp/plates/audio.raw \
+        --out_dir /tmp/clips
 
 The environment drives libsm64, which returns geometry rather than pixels, so an episode can be
 measured exactly but never screenshotted. The injector closes that gap by stamping a recorded
@@ -312,13 +316,25 @@ game to the staircase first, because the environment's spawn state is not the ga
 state. `results/trajectory_model_endless.bin` is committed so the render can be reproduced without
 the policy that produced it.
 
+`SM64_DUMP_AUDIO` writes the game's own audio for the same frames, as raw signed 16 bit little
+endian stereo at 32000 Hz. Getting that locked to the video needed one change: the game sizes each
+audio block from how much the device has left to play, which makes the block count a function of
+wall clock time and useless for a dump, so while dumping the size is overridden with the
+528, 528, 544 cycle instead. That mean is exactly 533.33 samples, so two blocks per frame come to
+32000/30 samples and the stream stays locked to a 30 fps render by construction. Measured drift
+over the whole 668 frame episode is 0.3 milliseconds, so a clip needs a seek and no resampling.
+
+`tools/make_clips.py` cuts the dump into clips with `tools/make_ass.py`'s telemetry burned in, and
+`tools/render_swarm.py` rasterises a `tools/dump_swarm.py` container straight to h264 without a
+browser, which is how the per rung comparisons are drawn.
+
 ## Layout
 
     src/env/       libsm64 binding, geometry, real collision import, the staircase, the environment
     src/agent/     the scripted expert and the driver adapters
     src/train/     the ablation ladder and the PPO harness
     scripts/       setup, validation, sweeps, recording, training entry points
-    tools/         replay packing and the HTML viewers
+    tools/         replay packing, the HTML viewers, and the offline figure renderers
     cluster/       Slurm jobs
     patches/       changes to vendored third party code
     results/       measured output
