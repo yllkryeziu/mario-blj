@@ -316,13 +316,25 @@ game to the staircase first, because the environment's spawn state is not the ga
 state. `results/trajectory_model_endless.bin` is committed so the render can be reproduced without
 the policy that produced it.
 
+Injecting state is not by itself enough to keep the render in the room. A recorded chain moves
+Mario more than a thousand units in a single frame, which sweeps him through castle geometry no
+played game touches at that speed, and the triggers sitting on that geometry belong to the game's
+own level logic rather than to Mario's state: a painting warp floor, a death barrier, a level exit.
+Once one of those has fired the injected state cannot take it back, and the first dump of the
+filmed episode lost 378 of its 668 frames to a fade into Wet Dry World's course card. So
+`level_trigger_warp` and `initiate_painting_warp` return early while `SM64_INJECT_FILE` is set and
+`gGlobalTimer` has reached `SM64_INJECT_START`, which is late enough that the movie walking the
+game to the staircase still gets its warp doors. Only the render is affected; the measured episodes
+come from libsm64, which has no level logic at all, and the environment implements the one warp the
+task depends on itself.
+
 `SM64_DUMP_AUDIO` writes the game's own audio for the same frames, as raw signed 16 bit little
 endian stereo at 32000 Hz. Getting that locked to the video needed one change: the game sizes each
 audio block from how much the device has left to play, which makes the block count a function of
 wall clock time and useless for a dump, so while dumping the size is overridden with the
 528, 528, 544 cycle instead. That mean is exactly 533.33 samples, so two blocks per frame come to
 32000/30 samples and the stream stays locked to a 30 fps render by construction. Measured drift
-over the whole 668 frame episode is 0.3 milliseconds, so a clip needs a seek and no resampling.
+over the whole 668 frame dump is 0.3 milliseconds, so a clip needs a seek and no resampling.
 
 `tools/make_clips.py` cuts the dump into clips with `tools/make_ass.py`'s telemetry burned in, and
 `tools/render_swarm.py` rasterises a `tools/dump_swarm.py` container straight to h264 without a

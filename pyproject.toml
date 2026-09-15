@@ -61,6 +61,7 @@ select = ["B", "D", "E", "F", "I", "N", "UP", "W"]
 "tools/make_viewer_swarm.py" = ["E402"]
 "tools/render_swarm.py" = ["E402"]
 "tools/make_clips.py" = ["E402"]
+"tools/summarise_media.py" = ["E402"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

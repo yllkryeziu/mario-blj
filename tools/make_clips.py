@@ -12,7 +12,7 @@ an animated WebP and 148 KB as h264. GIF loses by 23x to the format every browse
 decoders for, so every clip ships as h264 and the short ones additionally ship as animated WebP,
 which is the format that still works inside a plain ``<img>`` for a reader who wants a loop with
 no player chrome. Long clips get no WebP at all: the encoder's wall clock grows fast enough that
-the 668 frame hero clip hangs for minutes, which is why ``--webp_max_frames`` exists.
+the 660 frame hero clip hangs for minutes, which is why ``--webp_max_frames`` exists.
 
 **One audio seek, no resampling.** ``patches/sm64-port-audio-dump.patch`` overrides the game's
 audio buffer size with the 528, 528, 544 cycle while dumping, whose mean is exactly 533.33 samples
@@ -46,13 +46,13 @@ from tools import make_ass
 # replay index i is rendered frame 6732 + i, and the pre-roll frames before that are what the
 # spawn clip opens on.
 DEFAULT_CLIPS = (
-    ("00-full", 6725, 7392),
+    ("00-full", 6725, 7384),
     ("01-spawn", 6725, 6762),
     ("02-approach", 6752, 6792),
     ("03-pump", 6918, 6956),
     ("04-fallback", 7038, 7150),
     ("05-launch", 7284, 7322),
-    ("06-goal", 7344, 7392),
+    ("06-goal", 7344, 7384),
 )
 
 

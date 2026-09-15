@@ -1,3 +1,72 @@
+diff --git a/src/game/level_update.c b/src/game/level_update.c
+index 907a012..bc5b95c 100644
+--- a/src/game/level_update.c
++++ b/src/game/level_update.c
+@@ -1,4 +1,5 @@
+ #include <ultra64.h>
++#include <stdlib.h>
+ 
+ #include "sm64.h"
+ #include "seq_ids.h"
+@@ -659,10 +660,47 @@ struct WarpNode *get_painting_warp_node(void) {
+     return warpNode;
+ }
+ 
++/**
++ * Whether this frame is drawing a recorded trajectory rather than playing the game.
++ *
++ * A recorded backwards long jump chain moves Mario by more than a thousand units in a single
++ * frame, which sweeps him through castle geometry that a played game never touches at that speed:
++ * painting warp floors, death barriers, level exits. Those triggers belong to the game's own level
++ * logic, and the injected state cannot undo one once it has fired, so a chain that leaves the room
++ * takes the render with it and the rest of the dump draws a course card instead of the castle.
++ *
++ * The two env vars are the injector's own, read again here rather than exported from
++ * object_list_processor.c so that neither file has to know the other is involved. Suppression
++ * starts at SM64_INJECT_START and not before, because the movie that walks the game to the
++ * staircase needs its warp doors to work.
++ *
++ * Only the render is affected. The measured episodes come from libsm64, which has no level logic
++ * at all, and the environment implements the one warp the task depends on itself.
++ */
++static s32 render_injection_active(void) {
++    static s32 checked = FALSE;
++    static s32 enabled = FALSE;
++    static u32 start = 0;
++
++    if (!checked) {
++        const char *bound;
++        checked = TRUE;
++        enabled = getenv("SM64_INJECT_FILE") != NULL;
++        if ((bound = getenv("SM64_INJECT_START")) != NULL) {
++            start = (u32) strtoul(bound, NULL, 10);
++        }
++    }
++    return enabled && gGlobalTimer >= start;
++}
++
+ /**
+  * Check is Mario has entered a painting, and if so, initiate a warp.
+  */
+ void initiate_painting_warp(void) {
++    if (render_injection_active()) {
++        return;
++    }
++
+     if (gCurrentArea->paintingWarpNodes != NULL && gMarioState->floor != NULL) {
+         struct WarpNode warpNode;
+         struct WarpNode *pWarpNode = get_painting_warp_node();
+@@ -706,6 +744,10 @@ void initiate_painting_warp(void) {
+ s16 level_trigger_warp(struct MarioState *m, s32 warpOp) {
+     s32 val04 = TRUE;
+ 
++    if (render_injection_active()) {
++        return sDelayedWarpTimer;
++    }
++
+     if (sDelayedWarpOp == WARP_OP_NONE) {
+         m->invincTimer = -1;
+         sDelayedWarpArg = 0;
 diff --git a/src/game/object_list_processor.c b/src/game/object_list_processor.c
 index 46640d4..9ec6e94 100644
 --- a/src/game/object_list_processor.c
