@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 OBSERVATION_SIZE = 24
 ACTION_COUNT = 36
-REWARD_FIELDS = ("terminal", "speed_coefficient", "curriculum_bonus", "time_penalty")
+REWARD_FIELDS = ("terminal", "speed_weight", "curriculum_weight", "height_weight", "time_penalty")
 
 
 class FakeBljEnv(gymnasium.Env):
@@ -156,11 +156,11 @@ def test_each_shaping_rung_adds_one_ingredient_to_terminal() -> None:
     """
     expected = {
         "terminal": set(),
-        "speed": {"speed_coefficient"},
-        "height": {"height_coefficient"},
-        "height_speed": {"height_coefficient", "speed_coefficient"},
-        "curriculum": {"speed_coefficient", "curriculum_bonus"},
-        "repeat": {"speed_coefficient", "curriculum_bonus"},
+        "speed": {"speed_weight"},
+        "height": {"height_weight"},
+        "height_speed": {"height_weight", "speed_weight"},
+        "curriculum": {"speed_weight", "curriculum_weight"},
+        "repeat": {"speed_weight", "curriculum_weight"},
     }
     for name, fields in expected.items():
         assert _changed_fields(ladder.RUNG_TERMINAL, ladder.RUNGS[name]) == fields, name
@@ -191,8 +191,8 @@ def _changed_fields(lower: ladder.Rung, upper: ladder.Rung) -> set[str]:
 def test_rung_zero_has_no_shaping() -> None:
     """Rung 0 is the unshaped control: terminal reward and nothing else."""
     rung = ladder.RUNG_TERMINAL
-    assert rung.speed_coefficient == 0.0
-    assert rung.curriculum_bonus == 0.0
+    assert rung.speed_weight == 0.0
+    assert rung.curriculum_weight == 0.0
     assert rung.time_penalty == 0.0
     assert rung.action_repeat == 1
 
@@ -237,7 +237,7 @@ def test_get_rung_resolves_expanded_names() -> None:
     """An expanded run name round trips back to its rung with the right repeat."""
     rung = ladder.get_rung("repeat_r3")
     assert rung.action_repeat == 3
-    assert rung.curriculum_bonus == ladder.RUNG_CURRICULUM.curriculum_bonus
+    assert rung.curriculum_weight == ladder.RUNG_CURRICULUM.curriculum_weight
     with pytest.raises(KeyError):
         ladder.get_rung("nonexistent")
 

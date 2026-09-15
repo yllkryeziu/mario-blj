@@ -76,7 +76,7 @@ def main(argv: list[str]) -> None:
     del argv
     config = BljConfig(
         rom_path=_ROM.value,
-        reward=RewardConfig(terminal=1.0, speed_coefficient=0.01, curriculum_bonus=0.25),
+        reward=RewardConfig(terminal=1.0, speed_weight=0.25),
         max_frames=_FRAMES.value)
 
     rows = []

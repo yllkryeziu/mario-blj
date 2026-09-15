@@ -72,35 +72,47 @@ _SPEED_SCALE = 200.0
 
 @dataclasses.dataclass(frozen=True)
 class RewardConfig:
-    """Weights for each reward term.
+    """Weights for each reward term, all on the same scale.
+
+    Reaching the top landing pays ``terminal``, and every shaping term is a bounded fraction of
+    that, so a return of 1.0 means the exploit was performed and nothing else can manufacture it.
+    That is what makes rungs comparable without rescaling: an earlier version paid
+    ``0.01 * record speed``, which at a peak of -6000 paid about 59 against a goal worth 1.0, so
+    the agent was being paid sixty times more for going fast than for finishing.
+
+    Every shaping term is potential based, paying only when the episode sets a new record, because
+    the instant warp throws Mario back down and any per frame progress term would pay him forever
+    for re-climbing the same steps.
 
     Attributes:
-        terminal: Paid once when Mario reaches the top landing.
-        speed_coefficient: Paid on every new record backward speed, proportional to the
-            improvement. Shaping on the record rather than on the instantaneous value keeps it
-            potential based, so an agent cannot farm it by hovering at one speed.
-        curriculum_bonus: Paid once for each curriculum stage the episode reaches for the first
-            time. This one names the method rather than the goal, so it is the most generous
-            form of help the ladder offers and the least interesting rung to succeed at.
-        height_coefficient: Paid on each new record height reached while standing on a floor,
-            scaled so that climbing the whole staircase pays exactly this much. It states the
-            goal, go up, and says nothing about how.
-
-            Two details make it honest. It pays on the record rather than per frame, because the
-            instant warp throws Mario back down and a per frame gain would pay him forever for
-            re-climbing the same steps. And it only counts height while he has a floor under him,
-            because a plain jump buys about 220 units of air that he could otherwise farm on the
-            spot. The warp trigger sits at y 3960, so this term rises smoothly until Mario hits
-            the barrier and then goes flat: every further unit of reward requires crossing the
-            warp zone inside one frame, which requires the exploit.
+        terminal: Paid once when Mario reaches the top landing. The unit of the whole scale.
+        height_weight: Total payable for climbing, spread over the distance from the spawn to the
+            goal and paid on new record height reached while standing on a floor. Only grounded
+            height counts, because a plain jump buys about 220 units of air that could otherwise
+            be farmed on the spot. It states the goal, go up, and says nothing about how. The warp
+            trigger sits at y 3960, so it rises smoothly until Mario hits the barrier and then
+            goes flat.
+        speed_weight: Total payable for backwards speed, spread over the range from zero to the
+            speed that actually defeats the loop. The reference is the warp zone's own depth, so
+            this term saturates exactly when Mario is fast enough to cross it in one frame rather
+            than rewarding unbounded speed for its own sake.
+        curriculum_weight: Total payable for advancing through the hand written stage recipe,
+            spread over the stages. This one names the method rather than the goal, so it is the
+            most generous form of help the ladder offers and the least interesting rung to
+            succeed at.
         time_penalty: Subtracted every frame.
     """
 
     terminal: float = 1.0
-    speed_coefficient: float = 0.0
-    curriculum_bonus: float = 0.0
-    height_coefficient: float = 0.0
+    height_weight: float = 0.0
+    speed_weight: float = 0.0
+    curriculum_weight: float = 0.0
     time_penalty: float = 0.0
+
+    @property
+    def maximum_return(self) -> float:
+        """Returns the largest return an episode can earn under these weights."""
+        return self.terminal + self.height_weight + self.speed_weight + self.curriculum_weight
 
 
 @dataclasses.dataclass(frozen=True)
@@ -140,6 +152,10 @@ class BljConfig:
             exploration never stumbles into, and it is the top rung of the ladder rather than a
             default, because using it is exactly the kind of help this project is measuring.
         library_path: Optional explicit path to the built libsm64 shared library.
+        scene: Optional scene to run instead of the one ``collision_path`` describes. A scene
+            built by ``src.env.geometry`` rather than loaded from the decompilation is what makes
+            a transfer test possible: the same trained policy can be dropped onto a staircase
+            whose treads it never saw. When this is set the two paths are unused.
     """
 
     rom_path: str
@@ -151,6 +167,7 @@ class BljConfig:
     spawn_jitter: float = 0.0
     reset_states: tuple[InitialState, ...] = ()
     library_path: str | None = None
+    scene: Scene | None = None
 
 
 def decode_action(action: int) -> tuple[float, float, bool, bool]:
@@ -184,7 +201,8 @@ class BljEnv(gymnasium.Env):
             config: Environment configuration.
         """
         self._config = config
-        self._scene = endless_stairs.load_scene(config.collision_path, config.header_path)
+        self._scene = config.scene or endless_stairs.load_scene(
+            config.collision_path, config.header_path)
         self._game = Sm64(config.rom_path, config.library_path)
         self._game.load_surfaces(self._scene.surfaces)
         self._inputs = MarioInputs()
@@ -206,6 +224,7 @@ class BljEnv(gymnasium.Env):
         self._success = False
         self._best_height = self._scene.spawn[1]
         self._climb = max(1.0, self._scene.goal_y - self._scene.spawn[1])
+        self._escape = max(1.0, endless_stairs.minimum_escape_speed(self._scene.warp))
 
     def reset(self, *, seed: int | None = None,
               options: dict[str, Any] | None = None) -> tuple[np.ndarray, dict[str, Any]]:
@@ -345,14 +364,15 @@ class BljEnv(gymnasium.Env):
 
         grounded = bool(extra.hasFloor) and state.position[1] - extra.floorHeight < 30.0
         if grounded and state.position[1] > self._best_height:
-            reward += weights.height_coefficient * (
-                (state.position[1] - self._best_height) / self._climb)
+            before = self._progress(self._best_height)
             self._best_height = state.position[1]
+            reward += weights.height_weight * (self._progress(self._best_height) - before)
 
         velocity = state.forwardVelocity
         if velocity < self._peak_backward:
-            reward += weights.speed_coefficient * (self._peak_backward - velocity)
+            before = self._speed_share(self._peak_backward)
             self._peak_backward = velocity
+            reward += weights.speed_weight * (self._speed_share(velocity) - before)
 
         if state.action == ACT_LONG_JUMP:
             self._air_frames += 1
@@ -361,7 +381,7 @@ class BljEnv(gymnasium.Env):
 
         stage = self._classify(state)
         if stage > self._stage:
-            reward += weights.curriculum_bonus * (stage - self._stage)
+            reward += weights.curriculum_weight * (stage - self._stage) / STAGE_CHAINED
             self._stage = stage
 
         if state.action == ACT_LONG_JUMP and self._previous_mario_action != ACT_LONG_JUMP:
@@ -373,6 +393,31 @@ class BljEnv(gymnasium.Env):
             reward += weights.terminal
 
         return reward
+
+    def _progress(self, height: float) -> float:
+        """Returns how far up the staircase a height is, clamped to [0, 1].
+
+        Args:
+            height: World y.
+
+        Returns:
+            The fraction of the climb from the spawn to the goal.
+        """
+        return min(1.0, max(0.0, (height - self._scene.spawn[1]) / self._climb))
+
+    def _speed_share(self, velocity: float) -> float:
+        """Returns backwards speed as a fraction of what defeats the loop, clamped to [0, 1].
+
+        The reference is the warp zone's depth rather than an arbitrary constant, because that is
+        the speed at which a single frame carries Mario across the trigger.
+
+        Args:
+            velocity: Signed forward velocity.
+
+        Returns:
+            The fraction of the escape speed reached.
+        """
+        return min(1.0, max(0.0, -velocity / self._escape))
 
     def _classify(self, state: Any) -> int:
         """Returns the highest curriculum stage the episode has demonstrated."""

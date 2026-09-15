@@ -40,10 +40,10 @@ class Rung:
         name: Stable identifier for the rung, used in output paths and Slurm array mapping.
         description: One line saying what this rung adds over the rung below it.
         terminal: Reward paid once for reaching the top landing.
-        speed_coefficient: Weight on backwards speed, paid densely each step.
-        curriculum_bonus: Reward paid once per curriculum stage advanced.
-        height_coefficient: Reward for new record height reached on foot, scaled so the whole
-            staircase pays this much in total.
+        speed_weight: Total payable for backwards speed, saturating at the speed that defeats
+            the loop.
+        curriculum_weight: Total payable for advancing the hand written stage recipe.
+        height_weight: Total payable for climbing the whole staircase on foot.
         time_penalty: Reward subtracted each step to discourage stalling.
         action_repeat: Environment frames each agent action is held for.
     """
@@ -51,9 +51,9 @@ class Rung:
     name: str
     description: str
     terminal: float = 1.0
-    speed_coefficient: float = 0.0
-    curriculum_bonus: float = 0.0
-    height_coefficient: float = 0.0
+    speed_weight: float = 0.0
+    curriculum_weight: float = 0.0
+    height_weight: float = 0.0
     time_penalty: float = 0.0
     action_repeat: int = 1
 
@@ -68,23 +68,23 @@ RUNG_SPEED = Rung(
     name="speed",
     description="Terminal bonus plus a dense reward on backwards speed.",
     terminal=1.0,
-    speed_coefficient=0.01,
+    speed_weight=0.25,
 )
 
 RUNG_CURRICULUM = Rung(
     name="curriculum",
     description="Speed shaping plus a bonus for advancing the action chain.",
     terminal=1.0,
-    speed_coefficient=0.01,
-    curriculum_bonus=0.25,
+    speed_weight=0.25,
+    curriculum_weight=0.25,
 )
 
 RUNG_REPEAT = Rung(
     name="repeat",
     description="Curriculum shaping with the action repeat swept over 1, 2, 3, 4.",
     terminal=1.0,
-    speed_coefficient=0.01,
-    curriculum_bonus=0.25,
+    speed_weight=0.25,
+    curriculum_weight=0.25,
     action_repeat=1,
 )
 
@@ -92,15 +92,15 @@ RUNG_HEIGHT = Rung(
     name="height",
     description="Terminal bonus plus record height climbed on foot. States the goal only.",
     terminal=1.0,
-    height_coefficient=1.0,
+    height_weight=0.25,
 )
 
 RUNG_HEIGHT_SPEED = Rung(
     name="height_speed",
     description="Height progress plus the backwards speed hint, but no action recipe.",
     terminal=1.0,
-    height_coefficient=1.0,
-    speed_coefficient=0.01,
+    height_weight=0.25,
+    speed_weight=0.25,
 )
 
 RUNGS: dict[str, Rung] = {
@@ -285,9 +285,9 @@ def build_config(
 
     reward = RewardConfig(
         terminal=rung.terminal,
-        speed_coefficient=rung.speed_coefficient,
-        curriculum_bonus=rung.curriculum_bonus,
-        height_coefficient=rung.height_coefficient,
+        speed_weight=rung.speed_weight,
+        curriculum_weight=rung.curriculum_weight,
+        height_weight=rung.height_weight,
         time_penalty=rung.time_penalty,
     )
     return BljConfig(
