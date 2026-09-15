@@ -1,0 +1,94 @@
+diff --git a/Makefile b/Makefile
+index cfac1e8..295b057 100644
+--- a/Makefile
++++ b/Makefile
+@@ -39,8 +39,9 @@ ifeq ($(TARGET_N64),0)
+   ifeq ($(TARGET_WEB),0)
+     ifeq ($(OS),Windows_NT)
+       TARGET_WINDOWS := 1
++    else ifeq ($(shell uname -s),Darwin)
++      TARGET_OSX := 1
+     else
+-      # TODO: Detect Mac OS X, BSD, etc. For now, assume Linux
+       TARGET_LINUX := 1
+     endif
+   endif
+@@ -339,6 +340,13 @@ ifneq ($(TARGET_N64),1)
+   ULTRA_C_FILES := $(addprefix lib/src/,$(ULTRA_C_FILES))
+ endif
+ 
++ifeq ($(TARGET_OSX),1)
++  # The Wii U controller backend is Linux only: controller_wup.c is wrapped in
++  # #ifdef __linux__ and compiles to an empty object, but wup.c includes
++  # <linux/input.h> unconditionally, so the wildcard has to drop it here.
++  C_FILES := $(filter-out src/pc/controller/wup.c,$(C_FILES))
++endif
++
+ # Sound files
+ SOUND_BANK_FILES    := $(wildcard sound/sound_banks/*.json)
+ SOUND_SAMPLE_DIRS   := $(wildcard sound/samples/*)
+@@ -481,6 +489,10 @@ ifeq ($(TARGET_LINUX),1)
+   PLATFORM_CFLAGS  := -DTARGET_LINUX `pkg-config --cflags libusb-1.0`
+   PLATFORM_LDFLAGS := -lm -lpthread `pkg-config --libs libusb-1.0` -lasound -lpulse -no-pie
+ endif
++ifeq ($(TARGET_OSX),1)
++  PLATFORM_CFLAGS  := -DTARGET_OSX
++  PLATFORM_LDFLAGS := -lm -lpthread
++endif
+ ifeq ($(TARGET_WEB),1)
+   PLATFORM_CFLAGS  := -DTARGET_WEB
+   PLATFORM_LDFLAGS := -lm -no-pie -s TOTAL_MEMORY=20MB -g4 --source-map-base http://localhost:8080/ -s "EXTRA_EXPORTED_RUNTIME_METHODS=['callMain']"
+@@ -500,6 +512,10 @@ ifeq ($(ENABLE_OPENGL),1)
+     GFX_CFLAGS  += $(shell sdl2-config --cflags)
+     GFX_LDFLAGS += -lGL $(shell sdl2-config --libs) -lX11 -lXrandr
+   endif
++  ifeq ($(TARGET_OSX),1)
++    GFX_CFLAGS  += $(shell sdl2-config --cflags) -I$(shell sdl2-config --prefix)/include -Wno-deprecated-declarations
++    GFX_LDFLAGS += $(shell sdl2-config --libs) -framework OpenGL
++  endif
+   ifeq ($(TARGET_WEB),1)
+     GFX_CFLAGS  += -s USE_SDL=2
+     GFX_LDFLAGS += -lGL -lSDL2
+@@ -517,7 +533,7 @@ endif
+ GFX_CFLAGS += -DWIDESCREEN
+ 
+ CC_CHECK := $(CC) -fsyntax-only -fsigned-char -Wall -Wextra -Wno-format-security -D_LANGUAGE_C $(DEF_INC_CFLAGS) $(PLATFORM_CFLAGS) $(GFX_CFLAGS)
+-CFLAGS := $(OPT_FLAGS) -D_LANGUAGE_C $(DEF_INC_CFLAGS) $(PLATFORM_CFLAGS) $(GFX_CFLAGS) -fno-strict-aliasing -fwrapv -march=native
++CFLAGS := $(OPT_FLAGS) -D_LANGUAGE_C $(DEF_INC_CFLAGS) $(PLATFORM_CFLAGS) $(GFX_CFLAGS) -fno-strict-aliasing -fwrapv
+ 
+ ASFLAGS := -I include -I $(BUILD_DIR) $(foreach d,$(DEFINES),--defsym $(d))
+ 
+diff --git a/include/PR/os_libc.h b/include/PR/os_libc.h
+index 94111c0..1b5f61b 100644
+--- a/include/PR/os_libc.h
++++ b/include/PR/os_libc.h
+@@ -4,6 +4,11 @@
+ #include "ultratypes.h"
+ 
+ // Old deprecated functions from strings.h, replaced by memcpy/memset.
++// macOS defines these as fortified builtins; undo that before redeclaring.
++#ifdef __APPLE__
++#undef bcopy
++#undef bzero
++#endif
+ extern void bcopy(const void *, void *, size_t);
+ extern void bzero(void *, size_t);
+ 
+diff --git a/src/pc/gfx/gfx_opengl.c b/src/pc/gfx/gfx_opengl.c
+index 7bc9745..e2ca872 100644
+--- a/src/pc/gfx/gfx_opengl.c
++++ b/src/pc/gfx/gfx_opengl.c
+@@ -22,8 +22,13 @@
+ #else
+ #include <SDL2/SDL.h>
+ #define GL_GLEXT_PROTOTYPES 1
++#if defined(__APPLE__)
++#include <OpenGL/gl.h>
++#include <OpenGL/glext.h>
++#else
+ #include <SDL2/SDL_opengles2.h>
+ #endif
++#endif
+ 
+ #include "gfx_cc.h"
+ #include "gfx_rendering_api.h"

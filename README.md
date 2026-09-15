@@ -288,9 +288,29 @@ Three measurements need trained policies, which are not in the repo. `scripts/tr
 needs the 24 final models, `scripts/action_occupancy.py` needs a checkpoint directory, and
 `scripts/transfer_expert.py` needs neither and can be run on a fresh clone.
 
-No ROM is distributed here. `patches/` holds the changes this project makes to libsm64, applied by
-`setup.sh` on a fresh clone: one to export Mario's floor and action detail, which the instant warp
-check needs, and one to stop the Makefile listing its generated sources twice.
+No ROM is distributed here. `patches/` holds the changes this project makes to the vendored code,
+all applied by `setup.sh` on a fresh clone. Two are for libsm64: one exports Mario's floor and
+action detail, which the instant warp check needs, and one stops the Makefile listing its generated
+sources twice. Two more are for sm64-port, which this project uses as a renderer rather than as a
+game. One makes it build and run headless enough to be scripted on macOS. The other adds a frame
+dumper and a state injector:
+
+    PYTHONPATH=. python3 tools/export_trajectory.py \
+        --replay results/replay_model_endless.json --out results/trajectory_model_endless.bin
+    cp data/tas/tas_validation/sm64-0star-2016M.m64 data/tas/replay2016M/cont.m64
+    cd data/tas/replay2016M && SM64_TAS_LAST=6731 SM64_INJECT_START=6732 \
+        SM64_INJECT_FILE=../../../results/trajectory_model_endless.bin \
+        SM64_DUMP_DIR=/tmp/plates SM64_DUMP_FIRST=6725 SM64_DUMP_LAST=7400 \
+        ../../../third_party/sm64-port/build/us_pc/sm64.us
+
+The environment drives libsm64, which returns geometry rather than pixels, so an episode can be
+measured exactly but never screenshotted. The injector closes that gap by stamping a recorded
+trajectory over `gMarioState` after physics has run, which draws the recorded episode with the
+game's own camera, model and HUD. Nothing is re-simulated from inputs, so the rendered path cannot
+drift from the measured one. `SM64_TAS_LAST` hands the movie in `data/tas/` the job of walking the
+game to the staircase first, because the environment's spawn state is not the game's power on
+state. `results/trajectory_model_endless.bin` is committed so the render can be reproduced without
+the policy that produced it.
 
 ## Layout
 

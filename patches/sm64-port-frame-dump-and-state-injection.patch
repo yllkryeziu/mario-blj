@@ -1,0 +1,329 @@
+diff --git a/src/game/object_list_processor.c b/src/game/object_list_processor.c
+index 46640d4..9ec6e94 100644
+--- a/src/game/object_list_processor.c
++++ b/src/game/object_list_processor.c
+@@ -1,4 +1,7 @@
+ #include <PR/ultratypes.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
+ 
+ #include "sm64.h"
+ #include "area.h"
+@@ -9,6 +12,8 @@
+ #include "engine/graph_node.h"
+ #include "engine/surface_collision.h"
+ #include "engine/surface_load.h"
++#include "engine/math_util.h"
++#include "game_init.h"
+ #include "interaction.h"
+ #include "level_update.h"
+ #include "mario.h"
+@@ -263,6 +268,135 @@ void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *beh
+     }
+ }
+ 
++/**
++ * A recorded state trajectory, stamped over Mario after physics has run.
++ *
++ * The reinforcement learning project this build serves drives libsm64, which hands back geometry
++ * rather than pixels, so an episode can be measured exactly but never screenshotted. This build is
++ * the same decompilation with the real renderer attached, and its Mario is driven by a controller
++ * rather than by a policy. Overwriting gMarioState from a file bridges the two: the recorded
++ * episode is drawn with the game's own camera, model and HUD, and because every frame is replaced
++ * with the measured state instead of being re-simulated from recorded inputs, the drawn path
++ * cannot drift away from the measured one the way an open loop input replay would.
++ *
++ * The record is the little endian layout tools/export_trajectory.py writes, 64 bytes per frame.
++ */
++struct InjectRecord {
++    f32 pos[3];
++    f32 vel[3];
++    f32 forwardVel;
++    s32 faceAngle[3];
++    u32 action;
++    u32 actionState;
++    u32 actionTimer;
++    u32 actionArg;
++    s32 animID;
++    s32 animFrame;
++};
++
++static struct InjectRecord *sInjectRecords = NULL;
++static u32 sInjectCount = 0;
++static u32 sInjectStart = 0;
++static s32 sInjectChecked = FALSE;
++static s32 sInjectAnnounced = FALSE;
++
++/**
++ * Reads SM64_INJECT_FILE once, if it is set, and keeps the whole trajectory in memory.
++ *
++ * SM64_INJECT_START is the value of gGlobalTimer at which the first record applies, which is how
++ * a trajectory recorded in one room is lined up with a movie that walks the game to that room
++ * first. A malformed or missing file leaves injection off rather than failing the run, so the
++ * binary stays usable as an ordinary build.
++ */
++static void inject_load(void) {
++    char magic[8];
++    u32 header[2];
++    FILE *fp;
++    const char *start;
++    const char *path;
++
++    sInjectChecked = TRUE;
++    path = getenv("SM64_INJECT_FILE");
++    if (path == NULL) {
++        return;
++    }
++    start = getenv("SM64_INJECT_START");
++    if (start != NULL) {
++        sInjectStart = (u32) strtoul(start, NULL, 10);
++    }
++    fp = fopen(path, "rb");
++    if (fp == NULL) {
++        fprintf(stderr, "inject: cannot open %s\n", path);
++        return;
++    }
++    if (fread(magic, 1, sizeof(magic), fp) != sizeof(magic)
++        || memcmp(magic, "MBLJTRJ1", sizeof(magic)) != 0
++        || fread(header, sizeof(u32), 2, fp) != 2
++        || header[1] != sizeof(struct InjectRecord)) {
++        fprintf(stderr, "inject: %s is not a %u byte record trajectory\n", path,
++                (u32) sizeof(struct InjectRecord));
++        fclose(fp);
++        return;
++    }
++    sInjectRecords = malloc(header[0] * sizeof(struct InjectRecord));
++    if (sInjectRecords != NULL
++        && fread(sInjectRecords, sizeof(struct InjectRecord), header[0], fp) == header[0]) {
++        sInjectCount = header[0];
++        fprintf(stderr, "inject: %u frames from %s, starting at global timer %u\n", sInjectCount,
++                path, sInjectStart);
++    }
++    fclose(fp);
++}
++
++/**
++ * Stamps this frame's recorded state over Mario, leaving everything else the game decided alone.
++ *
++ * The call sits between Mario's action update and the copy into his object, so the object, the
++ * graphics node and the camera all read the recorded state. The action is only re-entered when it
++ * differs from the recorded one, which keeps set_mario_action's entry sounds and animation choice
++ * intact instead of restarting them every frame.
++ */
++static void inject_mario_state(void) {
++    const struct InjectRecord *record;
++    struct MarioState *m = gMarioState;
++    u32 index;
++
++    if (!sInjectChecked) {
++        inject_load();
++    }
++    if (sInjectCount == 0 || gGlobalTimer < sInjectStart) {
++        return;
++    }
++    index = gGlobalTimer - sInjectStart;
++    if (index >= sInjectCount) {
++        return;
++    }
++    record = &sInjectRecords[index];
++    if (!sInjectAnnounced) {
++        sInjectAnnounced = TRUE;
++        fprintf(stderr, "inject: first frame at global timer %u, y %.1f\n", gGlobalTimer,
++                (double) record->pos[1]);
++    }
++    if (m->action != record->action) {
++        set_mario_action(m, record->action, record->actionArg);
++    }
++    m->actionState = (u16) record->actionState;
++    m->actionTimer = (u16) record->actionTimer;
++    m->pos[0] = record->pos[0];
++    m->pos[1] = record->pos[1];
++    m->pos[2] = record->pos[2];
++    m->vel[0] = record->vel[0];
++    m->vel[1] = record->vel[1];
++    m->vel[2] = record->vel[2];
++    m->forwardVel = record->forwardVel;
++    m->faceAngle[0] = (s16) record->faceAngle[0];
++    m->faceAngle[1] = (s16) record->faceAngle[1];
++    m->faceAngle[2] = (s16) record->faceAngle[2];
++    m->marioObj->header.gfx.animInfo.animFrame = (s16) record->animFrame;
++    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
++    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
++}
++
+ /**
+  * Mario's primary behavior update function.
+  */
+@@ -273,6 +407,8 @@ void bhv_mario_update(void) {
+     particleFlags = execute_mario_action(gCurrentObject);
+     gCurrentObject->oMarioParticleFlags = particleFlags;
+ 
++    inject_mario_state();
++
+     // Mario code updates MarioState's versions of position etc, so we need
+     // to sync it with the Mario object
+     copy_mario_state_to_object();
+diff --git a/src/pc/controller/controller_recorded_tas.c b/src/pc/controller/controller_recorded_tas.c
+index 4f5c1bb..3465db2 100644
+--- a/src/pc/controller/controller_recorded_tas.c
++++ b/src/pc/controller/controller_recorded_tas.c
+@@ -1,11 +1,18 @@
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <ultra64.h>
+ 
+ #include "controller_api.h"
+ 
+ static FILE *fp;
++static unsigned int frame = 0;
++static long last = -1;
+ 
+ static void tas_init(void) {
++    const char *stop = getenv("SM64_TAS_LAST");
++    if (stop != NULL) {
++        last = strtol(stop, NULL, 10);
++    }
+     fp = fopen("cont.m64", "rb");
+     if (fp != NULL) {
+         uint8_t buf[0x400];
+@@ -14,6 +21,16 @@ static void tas_init(void) {
+ }
+ 
+ static void tas_read(OSContPad *pad) {
++    // SM64_TAS_LAST releases the controller after a given frame, so a movie can walk the game to
++    // a room and then stop steering. The state injector takes over from there, and leaving the
++    // movie's own inputs running would have it fighting the injected action every frame.
++    if (last >= 0 && (long) frame > last) {
++        pad->button = 0;
++        pad->stick_x = 0;
++        pad->stick_y = 0;
++        return;
++    }
++    frame++;
+     if (fp != NULL) {
+         uint8_t bytes[4] = {0};
+         fread(bytes, 1, 4, fp);
+diff --git a/src/pc/gfx/gfx_sdl2.c b/src/pc/gfx/gfx_sdl2.c
+index 4fd5c43..ebbca7d 100644
+--- a/src/pc/gfx/gfx_sdl2.c
++++ b/src/pc/gfx/gfx_sdl2.c
+@@ -1,3 +1,6 @@
++#include <stdio.h>
++#include <stdlib.h>
++
+ #include "../compat.h"
+ 
+ #if !defined(__linux__) && !defined(__BSD__) && defined(ENABLE_OPENGL)
+@@ -16,8 +19,13 @@
+ #else
+ #include <SDL2/SDL.h>
+ #define GL_GLEXT_PROTOTYPES 1
++#if defined(__APPLE__)
++#include <OpenGL/gl.h>
++#include <OpenGL/glext.h>
++#else
+ #include <SDL2/SDL_opengles2.h>
+ #endif
++#endif
+ 
+ #include "gfx_window_manager_api.h"
+ #include "gfx_screen_config.h"
+@@ -29,6 +37,15 @@ static int inverted_scancode_table[512];
+ static int vsync_enabled = 0;
+ static unsigned int window_width = DESIRED_SCREEN_WIDTH;
+ static unsigned int window_height = DESIRED_SCREEN_HEIGHT;
++
++// The renderer draws at whatever size the framebuffer is, so SM64_WINDOW_W and
++// SM64_WINDOW_H buy a sharper plate without touching the game's own aspect.
++static void read_window_size_override(void) {
++    const char *w = getenv("SM64_WINDOW_W");
++    const char *h = getenv("SM64_WINDOW_H");
++    if (w && atoi(w) > 0) window_width = (unsigned int) atoi(w);
++    if (h && atoi(h) > 0) window_height = (unsigned int) atoi(h);
++}
+ static bool fullscreen_state;
+ static void (*on_fullscreen_changed_callback)(bool is_now_fullscreen);
+ static bool (*on_key_down_callback)(int scancode);
+@@ -164,6 +181,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
+     char title[512];
+     int len = sprintf(title, "%s (%s)", game_name, GFX_API_NAME);
+ 
++    read_window_size_override();
++
+     wnd = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+             window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+ 
+@@ -187,8 +206,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
+     }
+ 
+     for (size_t i = 0; i < sizeof(scancode_rmapping_nonextended) / sizeof(scancode_rmapping_nonextended[0]); i++) {
+-        inverted_scancode_table[scancode_rmapping_extended[i][0]] = inverted_scancode_table[scancode_rmapping_extended[i][1]];
+-        inverted_scancode_table[scancode_rmapping_extended[i][1]] += 0x100;
++        inverted_scancode_table[scancode_rmapping_nonextended[i][0]] = inverted_scancode_table[scancode_rmapping_nonextended[i][1]];
++        inverted_scancode_table[scancode_rmapping_nonextended[i][1]] += 0x100;
+     }
+ }
+ 
+@@ -283,11 +302,61 @@ static void sync_framerate_with_timer(void) {
+     last_time += FRAME_TIME;
+ }
+ 
++// Frame dump: set SM64_DUMP_DIR to a directory and every SM64_DUMP_EVERY'th
++// frame lands there as a binary PPM read straight off the GL back buffer.
++//
++// SM64_DUMP_FIRST and SM64_DUMP_LAST bound the range, because a full 8772 frame
++// TAS at 640x480 is 6 GB of PPM and a figure needs eighty frames of it. The file
++// name carries the buffer swap index rather than a count of what was written, so
++// it lines up with the frame column of a trace no matter what the bounds were.
++// SM64_DUMP_LAST also ends the process, so a dump of one sequence does not sit
++// waiting on a window nobody is watching.
++static void dump_frame_if_requested(void) {
++    static const char *dir = NULL;
++    static int every = 1, checked = 0, counter = 0;
++    static int first = 0, last = -1;
++    if (!checked) {
++        checked = 1;
++        dir = getenv("SM64_DUMP_DIR");
++        const char *e = getenv("SM64_DUMP_EVERY");
++        if (e) every = atoi(e) > 0 ? atoi(e) : 1;
++        const char *f = getenv("SM64_DUMP_FIRST");
++        if (f) first = atoi(f);
++        const char *l = getenv("SM64_DUMP_LAST");
++        if (l) last = atoi(l);
++    }
++    if (!dir) return;
++    const int frame = counter++;
++    if (last >= 0 && frame > last) {
++        exit(0);
++    }
++    if (frame < first) return;
++    if ((frame - first) % every) return;
++    int w, h;
++    SDL_GL_GetDrawableSize(wnd, &w, &h);
++    unsigned char *px = malloc((size_t) w * h * 3);
++    if (!px) return;
++    glPixelStorei(GL_PACK_ALIGNMENT, 1);
++    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, px);
++    char path[1024];
++    snprintf(path, sizeof(path), "%s/frame_%06d.ppm", dir, frame);
++    FILE *f = fopen(path, "wb");
++    if (f) {
++        fprintf(f, "P6\n%d %d\n255\n", w, h);
++        for (int y = h - 1; y >= 0; y--) {
++            fwrite(px + (size_t) y * w * 3, 1, (size_t) w * 3, f);
++        }
++        fclose(f);
++    }
++    free(px);
++}
++
+ static void gfx_sdl_swap_buffers_begin(void) {
+     if (!vsync_enabled) {
+         sync_framerate_with_timer();
+     }
+ 
++    dump_frame_if_requested();
+     SDL_GL_SwapWindow(wnd);
+ }
+ 
