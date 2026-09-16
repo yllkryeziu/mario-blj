@@ -289,11 +289,18 @@ needs the 24 final models, `scripts/action_occupancy.py` needs a checkpoint dire
 `scripts/transfer_expert.py` needs neither and can be run on a fresh clone.
 
 No ROM is distributed here. `patches/` holds the changes this project makes to the vendored code,
-all applied by `setup.sh` on a fresh clone. Two are for libsm64: one exports Mario's floor and
-action detail, which the instant warp check needs, and one stops the Makefile listing its generated
-sources twice. Three more are for sm64-port, which this project uses as a renderer rather than as a
-game. One makes it build and run headless enough to be scripted on macOS. One adds a frame dumper
-and a state injector. One adds an audio dumper:
+all applied by `scripts/setup.sh` on a fresh clone, which re-runs as a no-op because a patch that
+applies in reverse is taken as already applied. One patch is for libsm64: it exports Mario's floor
+and action detail, which the instant warp check needs, and stops the Makefile listing its generated
+sources twice. Four are for sm64-port, which this project uses as a renderer rather than as a game.
+One makes it build and run headless enough to be scripted on macOS. One adds an audio dumper. One
+adds a frame dumper and a state injector, plus the uncapped render mode a scripted dump needs and
+the two calls that drive the extra renderers, because the file that already carries the injector is
+where those calls belong. The fourth adds those renderers: a population of up to 64 recorded Marios
+drawn as bare graphics nodes in a single pass, the instant warp collision triangles painted so a
+camera can see the trap, and a camera that can be placed or made to chase, because the game's own
+camera cannot film an injected run without putting itself inside a wall. All four apply to
+sm64-port at `2b17d08` and reproduce this tree byte for byte:
 
     PYTHONPATH=. python3 tools/export_trajectory.py \
         --replay results/replay_model_endless.json --out results/trajectory_model_endless.bin

@@ -68,7 +68,7 @@ index 907a012..bc5b95c 100644
          m->invincTimer = -1;
          sDelayedWarpArg = 0;
 diff --git a/src/game/object_list_processor.c b/src/game/object_list_processor.c
-index 46640d4..9ec6e94 100644
+index 46640d4..c81f4c0 100644
 --- a/src/game/object_list_processor.c
 +++ b/src/game/object_list_processor.c
 @@ -1,4 +1,7 @@
@@ -88,7 +88,16 @@ index 46640d4..9ec6e94 100644
  #include "interaction.h"
  #include "level_update.h"
  #include "mario.h"
-@@ -263,6 +268,135 @@ void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *beh
+@@ -19,6 +24,8 @@
+ #include "platform_displacement.h"
+ #include "profiler.h"
+ #include "spawn_object.h"
++#include "swarm_render.h"
++#include "warp_band.h"
+ 
+ 
+ /**
+@@ -263,6 +270,135 @@ void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *beh
      }
  }
  
@@ -224,7 +233,7 @@ index 46640d4..9ec6e94 100644
  /**
   * Mario's primary behavior update function.
   */
-@@ -273,6 +407,8 @@ void bhv_mario_update(void) {
+@@ -273,10 +409,17 @@ void bhv_mario_update(void) {
      particleFlags = execute_mario_action(gCurrentObject);
      gCurrentObject->oMarioParticleFlags = particleFlags;
  
@@ -233,6 +242,15 @@ index 46640d4..9ec6e94 100644
      // Mario code updates MarioState's versions of position etc, so we need
      // to sync it with the Mario object
      copy_mario_state_to_object();
+ 
++    // A whole recorded population, drawn after the single Mario's graphics node has been synced so
++    // that the two never disagree about which frame they are on.
++    swarm_render_update();
++    warp_band_update();
++
+     i = 0;
+     while (sParticleTypes[i].particleFlag != 0) {
+         if (particleFlags & sParticleTypes[i].particleFlag) {
 diff --git a/src/pc/controller/controller_recorded_tas.c b/src/pc/controller/controller_recorded_tas.c
 index 4f5c1bb..3465db2 100644
 --- a/src/pc/controller/controller_recorded_tas.c
@@ -274,7 +292,7 @@ index 4f5c1bb..3465db2 100644
          uint8_t bytes[4] = {0};
          fread(bytes, 1, 4, fp);
 diff --git a/src/pc/gfx/gfx_sdl2.c b/src/pc/gfx/gfx_sdl2.c
-index 4fd5c43..ebbca7d 100644
+index 4fd5c43..855db81 100644
 --- a/src/pc/gfx/gfx_sdl2.c
 +++ b/src/pc/gfx/gfx_sdl2.c
 @@ -1,3 +1,6 @@
@@ -298,8 +316,19 @@ index 4fd5c43..ebbca7d 100644
  
  #include "gfx_window_manager_api.h"
  #include "gfx_screen_config.h"
-@@ -29,6 +37,15 @@ static int inverted_scancode_table[512];
+@@ -27,8 +35,26 @@
+ static SDL_Window *wnd;
+ static int inverted_scancode_table[512];
  static int vsync_enabled = 0;
++// SM64_FAST detaches the render from the display clock, which a scripted dump needs for two
++// separate reasons. The swap interval this file picks makes SDL_GL_SwapWindow block on the
++// monitor's refresh, so a run started while the screen is asleep stops at the first swap and
++// never reaches the frame it was asked for. And even awake, the fallback timer holds the loop
++// to thirty frames a second, so walking the movie to the staircase costs almost four minutes
++// of wall clock before a single wanted frame is drawn, once per shot. Neither has anything to
++// do with what lands in the PPM files, so this mode drops both and renders as fast as the
++// machine can.
++static int fast_mode = 0;
  static unsigned int window_width = DESIRED_SCREEN_WIDTH;
  static unsigned int window_height = DESIRED_SCREEN_HEIGHT;
 +
@@ -314,7 +343,7 @@ index 4fd5c43..ebbca7d 100644
  static bool fullscreen_state;
  static void (*on_fullscreen_changed_callback)(bool is_now_fullscreen);
  static bool (*on_key_down_callback)(int scancode);
-@@ -164,6 +181,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
+@@ -164,6 +190,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
      char title[512];
      int len = sprintf(title, "%s (%s)", game_name, GFX_API_NAME);
  
@@ -323,7 +352,29 @@ index 4fd5c43..ebbca7d 100644
      wnd = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
              window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
  
-@@ -187,8 +206,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
+@@ -173,10 +201,17 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
+ 
+     SDL_GL_CreateContext(wnd);
+ 
+-    SDL_GL_SetSwapInterval(1);
+-    test_vsync();
+-    if (!vsync_enabled)
+-        puts("Warning: VSync is not enabled or not working. Falling back to timer for synchronization");
++    fast_mode = getenv("SM64_FAST") != NULL;
++    if (fast_mode) {
++        SDL_GL_SetSwapInterval(0);
++        vsync_enabled = 0;
++        fprintf(stderr, "render: uncapped, no vsync and no frame timer\n");
++    } else {
++        SDL_GL_SetSwapInterval(1);
++        test_vsync();
++        if (!vsync_enabled)
++            puts("Warning: VSync is not enabled or not working. Falling back to timer for synchronization");
++    }
+ 
+     for (size_t i = 0; i < sizeof(windows_scancode_table) / sizeof(SDL_Scancode); i++) {
+         inverted_scancode_table[windows_scancode_table[i]] = i;
+@@ -187,8 +222,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
      }
  
      for (size_t i = 0; i < sizeof(scancode_rmapping_nonextended) / sizeof(scancode_rmapping_nonextended[0]); i++) {
@@ -334,7 +385,7 @@ index 4fd5c43..ebbca7d 100644
      }
  }
  
-@@ -283,11 +302,61 @@ static void sync_framerate_with_timer(void) {
+@@ -283,11 +318,61 @@ static void sync_framerate_with_timer(void) {
      last_time += FRAME_TIME;
  }
  
@@ -388,7 +439,8 @@ index 4fd5c43..ebbca7d 100644
 +}
 +
  static void gfx_sdl_swap_buffers_begin(void) {
-     if (!vsync_enabled) {
+-    if (!vsync_enabled) {
++    if (!vsync_enabled && !fast_mode) {
          sync_framerate_with_timer();
      }
  

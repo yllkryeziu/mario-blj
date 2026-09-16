@@ -1,0 +1,909 @@
+diff --git a/src/game/area.c b/src/game/area.c
+index c5660ca..4fdcd6a 100644
+--- a/src/game/area.c
++++ b/src/game/area.c
+@@ -168,7 +168,10 @@ void load_obj_warp_nodes(void) {
+     do {
+         struct Object *sp1C = sp20;
+ 
+-        if (sp1C->activeFlags != ACTIVE_FLAG_DEACTIVATED && get_mario_spawn_type(sp1C) != 0) {
++        // The swarm renderer hangs bare graphics nodes off this same parent, and they have no
++        // Object fields past the header to read, so only walk the real objects.
++        if (sp1C->header.gfx.node.type == GRAPH_NODE_TYPE_OBJECT
++            && sp1C->activeFlags != ACTIVE_FLAG_DEACTIVATED && get_mario_spawn_type(sp1C) != 0) {
+             sp24 = area_get_warp_node_from_params(sp1C);
+             if (sp24 != NULL) {
+                 sp24->object = sp1C;
+diff --git a/src/game/camera.c b/src/game/camera.c
+index e2fb175..3d8596e 100644
+--- a/src/game/camera.c
++++ b/src/game/camera.c
+@@ -19,6 +19,7 @@
+ #include "ingame_menu.h"
+ #include "mario_actions_cutscene.h"
+ #include "save_file.h"
++#include "shot_camera.h"
+ #include "object_helpers.h"
+ #include "print.h"
+ #include "spawn_sound.h"
+@@ -3526,6 +3527,12 @@ void update_graph_node_camera(struct GraphNodeCamera *gc) {
+     vec3f_copy(gc->pos, gLakituState.pos);
+     vec3f_copy(gc->focus, gLakituState.focus);
+     zoom_out_if_paused_and_outside(gc);
++
++    // A locked shot camera replaces the result rather than the logic, so the camera relative
++    // control frame a recorded trajectory was produced under is still the one it replays under.
++    if (shot_camera_view(gc->pos, gc->focus)) {
++        gc->rollScreen = 0;
++    }
+ }
+ 
+ Gfx *geo_camera_main(s32 callContext, struct GraphNode *g, void *context) {
+@@ -11470,6 +11477,7 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context)
+ 
+     perspective->fov = sFOVState.fov;
+     shake_camera_fov(perspective);
++    shot_camera_fov(&perspective->fov);
+     return NULL;
+ }
+ 
+diff --git a/src/game/hud.c b/src/game/hud.c
+index 8c7de52..35d80f2 100644
+--- a/src/game/hud.c
++++ b/src/game/hud.c
+@@ -10,6 +10,7 @@
+ #include "ingame_menu.h"
+ #include "hud.h"
+ #include "segment2.h"
++#include "swarm_render.h"
+ #include "area.h"
+ #include "save_file.h"
+ #include "print.h"
+@@ -426,6 +427,13 @@ void render_hud(void) {
+ 
+     hudDisplayFlags = gHudDisplay.flags;
+ 
++    // A population of sixty four Marios has no single health, coin count or life count, and the
++    // shot is of the staircase rather than of a game being played, so the HUD is suppressed for the
++    // whole of a swarm render rather than showing the parked Mario's own numbers.
++    if (swarm_render_active()) {
++        hudDisplayFlags = HUD_DISPLAY_NONE;
++    }
++
+     if (hudDisplayFlags == HUD_DISPLAY_NONE) {
+         sPowerMeterHUD.animation = POWER_METER_HIDDEN;
+         sPowerMeterStoredHealth = 8;
+diff --git a/src/game/shot_camera.c b/src/game/shot_camera.c
+new file mode 100644
+index 0000000..7c6281f
+--- /dev/null
++++ b/src/game/shot_camera.c
+@@ -0,0 +1,145 @@
++/**
++ * Pins the camera to one fixed vantage for a render, so separate shots can be compared.
++ *
++ * The blog these renders serve shows the same staircase at four training checkpoints side by side,
++ * and the only way a reader can read improvement off four videos is if nothing else about them
++ * differs. The game's camera makes that impossible on its own: it is a Lakitu that orbits, leads,
++ * and reacts to the player, so two runs of the same scene frame it differently and the difference
++ * in framing swamps the difference in behaviour.
++ *
++ * So when SM64_CAM is set, the camera stops being a camera and becomes a tripod. The variable
++ * carries seven comma separated numbers, an eye, a target and a field of view in degrees:
++ *
++ *     SM64_CAM=-1000,4200,3400,-200,4600,1500,60
++ *
++ * Both of the game's own camera outputs are overridden, and both have to be: the eye and target
++ * that update_graph_node_camera copies out of gLakituState set where the shot is taken from, and
++ * the field of view that geo_camera_fov writes decides how much of the staircase fits in it. The
++ * camera logic upstream of these two points still runs, because it also drives Mario's control
++ * frame -- the stick is camera relative -- and a recorded trajectory that was produced under a
++ * live camera has to be replayed under the same one to land in the same places.
++ *
++ * SM64_CAM_CHASE is the other half of the same idea, for the shots that follow one Mario instead of
++ * framing a room. The game's own camera cannot film an injected trajectory: it is written around a
++ * Mario who moves at most a few dozen units a frame and whose position it can predict, and the
++ * final chain moves him more than eleven hundred units in one frame. What comes out is a camera
++ * that spends whole seconds inside the staircase's walls, where back face culling leaves a black
++ * wedge across the frame, and then snaps to a close up of Mario's face when it catches him. A rigid
++ * offset has neither failure: it is always the same distance behind and above him, always inside
++ * the corridor because he is, and it makes a thousand unit frame read as the world streaking past
++ * rather than as a cut.
++ *
++ *     SM64_CAM_CHASE=0,260,760,60,55        dx, dy, dz, look dy, fov
++ *
++ * The eye sits at Mario plus the offset, the target at Mario plus the look height, so the shot
++ * holds its framing for the whole episode whatever he does. SM64_CAM wins if both are set, because
++ * a tripod is the more specific request.
++ */
++
++#include <PR/ultratypes.h>
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "engine/math_util.h"
++#include "level_update.h"
++#include "shot_camera.h"
++#include "types.h"
++
++static Vec3f sShotPos;
++static Vec3f sShotFocus;
++static f32 sShotFov;
++static s32 sShotChecked = FALSE;
++static s32 sShotEnabled = FALSE;
++static Vec3f sChaseOffset;
++static f32 sChaseLookUp;
++static f32 sChaseFov;
++static s32 sChaseEnabled = FALSE;
++
++/**
++ * Parses SM64_CAM and SM64_CAM_CHASE once.
++ *
++ * A variable that is present but the wrong length is a typo in a render script rather than a
++ * request for the default camera, so it is reported and ignored instead of half applied.
++ */
++static void shot_camera_load(void) {
++    const char *spec;
++
++    sShotChecked = TRUE;
++    if ((spec = getenv("SM64_CAM")) != NULL) {
++        if (sscanf(spec, "%f,%f,%f,%f,%f,%f,%f", &sShotPos[0], &sShotPos[1], &sShotPos[2],
++                   &sShotFocus[0], &sShotFocus[1], &sShotFocus[2], &sShotFov) == 7) {
++            sShotEnabled = TRUE;
++            fprintf(stderr,
++                    "camera: locked at (%.0f %.0f %.0f) looking at (%.0f %.0f %.0f), fov %.0f\n",
++                    sShotPos[0], sShotPos[1], sShotPos[2], sShotFocus[0], sShotFocus[1],
++                    sShotFocus[2], sShotFov);
++        } else {
++            fprintf(stderr, "camera: SM64_CAM=\"%s\" is not eye,target,fov as seven numbers\n",
++                    spec);
++        }
++    }
++    if ((spec = getenv("SM64_CAM_CHASE")) != NULL) {
++        if (sscanf(spec, "%f,%f,%f,%f,%f", &sChaseOffset[0], &sChaseOffset[1], &sChaseOffset[2],
++                   &sChaseLookUp, &sChaseFov) == 5) {
++            sChaseEnabled = TRUE;
++            fprintf(stderr, "camera: chasing Mario at (%.0f %.0f %.0f), looking %.0f up, fov %.0f\n",
++                    sChaseOffset[0], sChaseOffset[1], sChaseOffset[2], sChaseLookUp, sChaseFov);
++        } else {
++            fprintf(stderr, "camera: SM64_CAM_CHASE=\"%s\" is not dx,dy,dz,lookdy,fov as five "
++                            "numbers\n", spec);
++        }
++    }
++}
++
++/**
++ * Replaces the rendered eye and target when a shot camera is set.
++ *
++ * Args:
++ *     pos: Receives the eye position.
++ *     focus: Receives the point the camera looks at.
++ *
++ * Returns:
++ *     TRUE when the values were written, FALSE to leave the game's camera alone.
++ */
++s32 shot_camera_view(Vec3f pos, Vec3f focus) {
++    if (!sShotChecked) {
++        shot_camera_load();
++    }
++    if (sShotEnabled) {
++        vec3f_copy(pos, sShotPos);
++        vec3f_copy(focus, sShotFocus);
++        return TRUE;
++    }
++    if (sChaseEnabled && gMarioState != NULL) {
++        vec3f_set(pos, gMarioState->pos[0] + sChaseOffset[0], gMarioState->pos[1] + sChaseOffset[1],
++                  gMarioState->pos[2] + sChaseOffset[2]);
++        vec3f_set(focus, gMarioState->pos[0], gMarioState->pos[1] + sChaseLookUp,
++                  gMarioState->pos[2]);
++        return TRUE;
++    }
++    return FALSE;
++}
++
++/**
++ * Replaces the rendered field of view when a shot camera is set.
++ *
++ * Args:
++ *     fov: Receives the field of view in degrees.
++ *
++ * Returns:
++ *     TRUE when the value was written, FALSE to leave the game's own fov alone.
++ */
++s32 shot_camera_fov(f32 *fov) {
++    if (!sShotChecked) {
++        shot_camera_load();
++    }
++    if (sShotEnabled) {
++        *fov = sShotFov;
++        return TRUE;
++    }
++    if (sChaseEnabled) {
++        *fov = sChaseFov;
++        return TRUE;
++    }
++    return FALSE;
++}
+diff --git a/src/game/shot_camera.h b/src/game/shot_camera.h
+new file mode 100644
+index 0000000..7a5909c
+--- /dev/null
++++ b/src/game/shot_camera.h
+@@ -0,0 +1,10 @@
++#ifndef SHOT_CAMERA_H
++#define SHOT_CAMERA_H
++
++#include <PR/ultratypes.h>
++#include "types.h"
++
++s32 shot_camera_view(Vec3f pos, Vec3f focus);
++s32 shot_camera_fov(f32 *fov);
++
++#endif // SHOT_CAMERA_H
+diff --git a/src/game/swarm_render.c b/src/game/swarm_render.c
+new file mode 100644
+index 0000000..633f0cb
+--- /dev/null
++++ b/src/game/swarm_render.c
+@@ -0,0 +1,346 @@
++/**
++ * Draws a whole population of Marios in one render pass.
++ *
++ * The reinforcement learning project this build serves trains 64 policies at a time against
++ * libsm64, which returns geometry rather than pixels. Showing what a population has learned
++ * therefore means putting all 64 of them back into the real castle at once, and the obvious way to
++ * do that -- render each policy separately and composite the results -- costs 64 passes per shot
++ * and gets occlusion wrong, because a keyed sprite has no depth.
++ *
++ * The decompilation already solves this. The mirror room in Cool Cool Mountain draws Mario twice
++ * by keeping a second standalone struct GraphNodeObject, gMirrorMario, that borrows Mario's geo
++ * layout through sharedChild and carries its own position, angle and animation state. Nothing in
++ * that mechanism is specific to mirrors or to the number two, so this file generalises it to N:
++ * SWARM_MAX_MARIOS graph nodes hung off gObjParentGraphNode, each with a recorded position, facing
++ * and animation frame, all drawn by the game's own renderer with real depth.
++ *
++ * Animation is the one part that needs care. set_mario_animation copies the requested clip into a
++ * single buffer, gMarioAnimsBuf's bufTarget, and then rewrites the clip's values and index fields
++ * from file offsets into absolute addresses inside that buffer. One buffer means one clip, so 64
++ * Marios sharing it could only ever strike the same pose. This file keeps a small pool of buffers
++ * instead, each with its own DmaHandlerList, and hands out a slot per distinct clip the frame
++ * needs. The pool works because segmented_to_virtual is the identity function on this target, so a
++ * clip patched into one buffer resolves to that buffer and not through a shared segment base.
++ *
++ * Cosmetic detail stays global by design. geo_switch_mario_cap_on_off, geo_switch_mario_eyes and
++ * geo_switch_mario_hand all read gBodyStates rather than the node being drawn, so every Mario in
++ * the population wears the same cap and blinks on the same frame. Limb motion, which is what makes
++ * a crowd read as a crowd, is per node and correct.
++ *
++ * The population's audio is not produced here. The game's sounds come from the play_sound calls
++ * Mario's actions make, and these Marios are drawn rather than simulated, so this render is silent
++ * and the swarm's real audio is captured from libsm64 and muxed in afterwards.
++ */
++
++#include <PR/ultratypes.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "sm64.h"
++#include "engine/geo_layout.h"
++#include "engine/graph_node.h"
++#include "engine/math_util.h"
++#include "game_init.h"
++#include "level_update.h"
++#include "macros.h"
++#include "memory.h"
++#include "swarm_render.h"
++
++#define SWARM_MAGIC "MBLJSWR2"
++#define SWARM_MAX_MARIOS 64
++#define SWARM_ANIM_SLOTS 64
++#define SWARM_ANIM_BUF_SIZE 0x4000
++
++/**
++ * One Mario for one frame, the little endian layout tools/export_swarm_render.py writes.
++ *
++ * Twenty bytes, naturally aligned, so the file is a flat frames * marios array that can be read
++ * in one call. Only the facing yaw is stored: a Mario on the staircase never pitches or rolls, and
++ * the graphics node only ever receives yaw anyway.
++ */
++struct SwarmRecord {
++    f32 pos[3];
++    s16 angleY;
++    s16 animID;
++    s16 animFrame;
++    s16 flags;
++};
++
++#define SWARM_FLAG_VISIBLE 1
++
++/** One animation clip, loaded and pointer patched, ready for any node to point at. */
++struct SwarmAnimSlot {
++    struct DmaHandlerList list;
++    s32 animID;
++    s32 claimed;
++};
++
++static struct GraphNodeObject sSwarmNodes[SWARM_MAX_MARIOS];
++static struct SwarmAnimSlot sSwarmSlots[SWARM_ANIM_SLOTS];
++static struct SwarmRecord *sSwarmRecords = NULL;
++static u32 sSwarmFrames = 0;
++static u32 sSwarmMarios = 0;
++static u32 sSwarmStart = 0;
++static s32 sSwarmChecked = FALSE;
++static s32 sSwarmMounted = FALSE;
++static s32 sSwarmOverflowed = FALSE;
++
++/**
++ * Where the real Mario is held while a population is on screen: the castle's bottom landing, the
++ * same coordinates src/env/endless_stairs.py spawns an episode at. SM64_SWARM_PARK overrides it.
++ */
++static Vec3f sSwarmPark = { -200.0f, 3204.0f, 3000.0f };
++
++/**
++ * Reads SM64_SWARM_FILE once, if it is set, and keeps the whole population in memory.
++ *
++ * A shot is at most a few hundred frames of at most SWARM_MAX_MARIOS Marios, so the largest file
++ * this ever sees is a couple of megabytes and streaming it would buy nothing. SM64_SWARM_START is
++ * the value of gGlobalTimer at which the first frame applies, which is how the movie that walks
++ * the game to the staircase gets to run first. A malformed or missing file leaves the swarm off
++ * rather than failing the run.
++ */
++static void swarm_load(void) {
++    char magic[8];
++    u32 header[2];
++    const char *path;
++    const char *start;
++    size_t wanted;
++    FILE *fp;
++
++    sSwarmChecked = TRUE;
++    path = getenv("SM64_SWARM_FILE");
++    if (path == NULL) {
++        return;
++    }
++    if ((start = getenv("SM64_SWARM_START")) != NULL) {
++        sSwarmStart = (u32) strtoul(start, NULL, 10);
++    }
++    if ((start = getenv("SM64_SWARM_PARK")) != NULL
++        && sscanf(start, "%f,%f,%f", &sSwarmPark[0], &sSwarmPark[1], &sSwarmPark[2]) != 3) {
++        fprintf(stderr, "swarm: SM64_SWARM_PARK=\"%s\" is not three numbers\n", start);
++    }
++    if ((fp = fopen(path, "rb")) == NULL) {
++        fprintf(stderr, "swarm: cannot open %s\n", path);
++        return;
++    }
++    if (fread(magic, 1, sizeof(magic), fp) != sizeof(magic)
++        || memcmp(magic, SWARM_MAGIC, sizeof(magic)) != 0
++        || fread(header, sizeof(u32), 2, fp) != 2) {
++        fprintf(stderr, "swarm: %s is not a %s container\n", path, SWARM_MAGIC);
++        fclose(fp);
++        return;
++    }
++    if (header[1] == 0 || header[1] > SWARM_MAX_MARIOS) {
++        fprintf(stderr, "swarm: %s declares %u Marios, the limit is %u\n", path, header[1],
++                SWARM_MAX_MARIOS);
++        fclose(fp);
++        return;
++    }
++    wanted = (size_t) header[0] * header[1];
++    sSwarmRecords = malloc(wanted * sizeof(struct SwarmRecord));
++    if (sSwarmRecords != NULL
++        && fread(sSwarmRecords, sizeof(struct SwarmRecord), wanted, fp) == wanted) {
++        sSwarmFrames = header[0];
++        sSwarmMarios = header[1];
++        fprintf(stderr, "swarm: %u Marios over %u frames from %s, starting at global timer %u\n",
++                sSwarmMarios, sSwarmFrames, path, sSwarmStart);
++    } else {
++        free(sSwarmRecords);
++        sSwarmRecords = NULL;
++        fprintf(stderr, "swarm: %s is short of its declared %u by %u records\n", path, header[0],
++                header[1]);
++    }
++    fclose(fp);
++}
++
++/**
++ * Hangs the population's graph nodes off the object parent and sets up the animation pool.
++ *
++ * Deferred until Mario himself has a geo layout, because every node in the population borrows it
++ * through sharedChild rather than owning a copy. The nodes are mounted on gObjParentGraphNode,
++ * which is where spawn_object puts a real object's graphics node, so they are processed by the
++ * same traversal at the same point in the frame and need no behaviour, object slot or collision.
++ *
++ * The pool shares one DMA table with the game's own animation list and gives each slot its own
++ * target buffer, which is the whole trick: load_patchable_table only copies when the slot's
++ * currentAddr changes, so a slot holding a stable clip costs nothing per frame.
++ */
++static void swarm_mount(void) {
++    struct Object *mario = gMarioState->marioObj;
++    s32 i;
++
++    sSwarmMounted = TRUE;
++    for (i = 0; i < SWARM_ANIM_SLOTS; i++) {
++        sSwarmSlots[i].list.dmaTable = gMarioAnimsBuf.dmaTable;
++        sSwarmSlots[i].list.currentAddr = NULL;
++        sSwarmSlots[i].list.bufTarget = malloc(SWARM_ANIM_BUF_SIZE);
++        sSwarmSlots[i].animID = -1;
++        sSwarmSlots[i].claimed = FALSE;
++    }
++    for (i = 0; i < (s32) sSwarmMarios; i++) {
++        init_graph_node_object(NULL, &sSwarmNodes[i], NULL, gVec3fZero, gVec3sZero, gVec3fOne);
++        sSwarmNodes[i].sharedChild = mario->header.gfx.sharedChild;
++        sSwarmNodes[i].areaIndex = mario->header.gfx.areaIndex;
++        // init_graph_node_object sets GRAPH_RENDER_HAS_ANIMATION, which makes
++        // geo_set_animation_globals advance animFrame itself. Clear it: the frame is recorded, not
++        // derived, and letting the renderer step it would fight the record written in below.
++        sSwarmNodes[i].node.flags &= ~GRAPH_RENDER_HAS_ANIMATION;
++        geo_add_child(&gObjParentGraphNode, &sSwarmNodes[i].node);
++    }
++    fprintf(stderr, "swarm: mounted %u nodes with %u animation slots\n", sSwarmMarios,
++            SWARM_ANIM_SLOTS);
++}
++
++/**
++ * Returns a pool slot holding the given clip, loading it if no slot has it yet.
++ *
++ * Claimed slots are never evicted, and the pool holds one slot per Mario, which makes running out
++ * impossible rather than unlikely: a population that has learned the exploit spends its frames
++ * spread across long jump, dive, brake, land and slide variants, and a real capture put more than
++ * sixteen distinct clips on screen at once.
++ *
++ * An id the animation table does not hold gets NULL rather than a buffer. libsm64 reports -1 for a
++ * Mario who has been created but has not yet been given a pose, which is every Mario on the frame
++ * his episode restarts, and load_patchable_table answers an out of range index by loading nothing
++ * at all and leaving the slot's buffer as it found it. Handing that buffer out would have the
++ * renderer read whatever malloc last left there as an animation, which is a crash rather than a
++ * wrong pose.
++ *
++ * Args:
++ *     animID: Mario animation id, an index into the shared DMA table.
++ *
++ * Returns:
++ *     The patched animation ready to assign to a node's curAnim, or NULL if there is none.
++ */
++static struct Animation *swarm_anim(s32 animID) {
++    struct Animation *target;
++    s32 i;
++    s32 free = -1;
++
++    if (animID < 0 || (u32) animID >= gMarioAnimsBuf.dmaTable->count) {
++        return NULL;
++    }
++    for (i = 0; i < SWARM_ANIM_SLOTS; i++) {
++        if (sSwarmSlots[i].animID == animID) {
++            sSwarmSlots[i].claimed = TRUE;
++            return sSwarmSlots[i].list.bufTarget;
++        }
++        if (free < 0 && !sSwarmSlots[i].claimed) {
++            free = i;
++        }
++    }
++    if (free < 0) {
++        if (!sSwarmOverflowed) {
++            sSwarmOverflowed = TRUE;
++            fprintf(stderr, "swarm: more than %u distinct animations in one frame\n",
++                    SWARM_ANIM_SLOTS);
++        }
++        return NULL;
++    }
++    target = sSwarmSlots[free].list.bufTarget;
++    if (load_patchable_table(&sSwarmSlots[free].list, animID)) {
++        target->values =
++            (void *) VIRTUAL_TO_PHYSICAL((u8 *) target + (uintptr_t) target->values);
++        target->index = (void *) VIRTUAL_TO_PHYSICAL((u8 *) target + (uintptr_t) target->index);
++    }
++    sSwarmSlots[free].animID = animID;
++    sSwarmSlots[free].claimed = TRUE;
++    return target;
++}
++
++/**
++ * True while a swarm file is loaded and its first frame has been reached.
++ *
++ * The camera override and the warp band both key off this, and so does hiding the real Mario,
++ * whose own state is still simulated so that the area stays loaded and the level logic stays
++ * quiet, but who would otherwise stand in the shot as a sixty fifth Mario.
++ */
++s32 swarm_render_active(void) {
++    if (!sSwarmChecked) {
++        swarm_load();
++    }
++    return sSwarmFrames != 0 && gGlobalTimer >= sSwarmStart;
++}
++
++/**
++ * Writes this frame's population onto the graph nodes.
++ *
++ * Called once per frame after Mario's own action has run, which is the same point the single Mario
++ * injection writes at, so both see a fully updated world. A Mario whose record is not flagged
++ * visible has its node deactivated rather than moved off screen, which keeps it out of
++ * obj_is_in_view entirely.
++ */
++void swarm_render_update(void) {
++    const struct SwarmRecord *frame;
++    struct Animation *anim;
++    u32 index;
++    s32 i;
++
++    if (!swarm_render_active()) {
++        return;
++    }
++    index = gGlobalTimer - sSwarmStart;
++    if (index >= sSwarmFrames) {
++        return;
++    }
++    if (!sSwarmMounted) {
++        if (gMarioState->marioObj == NULL
++            || gMarioState->marioObj->header.gfx.sharedChild == NULL) {
++            return;
++        }
++        swarm_mount();
++    }
++
++    // The real Mario keeps being simulated so the area stays loaded, but he is not part of the
++    // population and must not be drawn beside it, and he must not touch anything either. Left to
++    // stand where the movie dropped him he would eventually find an instant warp floor, and
++    // check_instant_warp would call change_area, which changes gCurGraphNodeRoot->areaIndex and
++    // makes every node in the population fail geo_process_object's area test at once: a shot that
++    // silently empties halfway through. So he is pinned to the bottom landing, which is the
++    // position episodes start from and therefore known to be warp free, and held still there.
++    gMarioState->marioObj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
++    vec3f_copy(gMarioState->pos, sSwarmPark);
++    vec3f_copy(gMarioState->vel, gVec3fZero);
++    gMarioState->forwardVel = 0.0f;
++    vec3f_copy(gMarioState->marioObj->header.gfx.pos, sSwarmPark);
++    gMarioState->marioObj->oPosX = sSwarmPark[0];
++    gMarioState->marioObj->oPosY = sSwarmPark[1];
++    gMarioState->marioObj->oPosZ = sSwarmPark[2];
++
++    for (i = 0; i < SWARM_ANIM_SLOTS; i++) {
++        sSwarmSlots[i].claimed = FALSE;
++    }
++    frame = &sSwarmRecords[(size_t) index * sSwarmMarios];
++    for (i = 0; i < (s32) sSwarmMarios; i++) {
++        const struct SwarmRecord *record = &frame[i];
++        struct GraphNodeObject *node = &sSwarmNodes[i];
++
++        if (!(record->flags & SWARM_FLAG_VISIBLE)) {
++            node->node.flags |= GRAPH_RENDER_INVISIBLE;
++            continue;
++        }
++        // A Mario whose recorded clip cannot be resolved is left out of the frame rather than drawn
++        // in some other Mario's pose. In practice that is the single frame an episode restarts on,
++        // before the game has given the new Mario an animation, so what the shot shows is a Mario
++        // blinking out at the bottom of the stairs and back in on the next frame.
++        anim = swarm_anim(record->animID);
++        if (anim == NULL) {
++            node->node.flags |= GRAPH_RENDER_INVISIBLE;
++            continue;
++        }
++        node->node.flags &= ~GRAPH_RENDER_INVISIBLE;
++        vec3f_copy(node->pos, (f32 *) record->pos);
++        vec3s_set(node->angle, 0, record->angleY, 0);
++        node->animInfo.animID = record->animID;
++        node->animInfo.curAnim = anim;
++        node->animInfo.animFrame = record->animFrame;
++        node->animInfo.animAccel = 0;
++        // Mario's own animYTrans is the constant mario.c sets from m->unkB0, and the renderer
++        // divides it by the clip's animYTransDivisor to scale the root translation inside the
++        // clip. Passing the same constant is what makes a recorded pose sit on its recorded
++        // position exactly the way libsm64 drew it when the pose was captured.
++        node->animInfo.animYTrans = 0xBD;
++    }
++}
+diff --git a/src/game/swarm_render.h b/src/game/swarm_render.h
+new file mode 100644
+index 0000000..ba987ea
+--- /dev/null
++++ b/src/game/swarm_render.h
+@@ -0,0 +1,9 @@
++#ifndef SWARM_RENDER_H
++#define SWARM_RENDER_H
++
++#include <PR/ultratypes.h>
++
++void swarm_render_update(void);
++s32 swarm_render_active(void);
++
++#endif // SWARM_RENDER_H
+diff --git a/src/game/warp_band.c b/src/game/warp_band.c
+new file mode 100644
+index 0000000..06bed2f
+--- /dev/null
++++ b/src/game/warp_band.c
+@@ -0,0 +1,280 @@
++/**
++ * Paints the endless staircase's instant warp floors red, so the trap is visible in a render.
++ *
++ * The task the policies in this project learn is to escape the endless staircase, and the thing
++ * that makes it a trap is invisible. Walking up the stairs past a certain depth puts Mario on a
++ * floor whose surface type is SURFACE_INSTANT_WARP_1B, and check_instant_warp then displaces him
++ * by the area's instant warp vector once per frame, which in the castle is (0, -205, +410): down
++ * one flight and back to the bottom. On screen nothing happens at all. Mario walks up a staircase
++ * and stays where he is, and a viewer who does not already know the trick sees a treadmill with no
++ * mechanism.
++ *
++ * This file draws the mechanism. It does not draw a hand placed marker at a z range copied out of
++ * a level script -- it walks the surfaces the collision loader actually built, keeps every one
++ * whose type is in the instant warp range, and emits those exact triangles. In the castle that is
++ * twelve triangles making three steps: six treads and the six risers under them. check_instant_warp
++ * reads the floor Mario is standing on, so it is the treads that fire; the risers are typed the
++ * same way by the level and are painted with them because they are the face of those steps a camera
++ * standing below the flight can actually see. Nothing red is outside the level's own marking, and
++ * no marked triangle is left unpainted.
++ *
++ * Each triangle is offset a few units along its own normal and drawn in the transparent layer
++ * rather than decalled onto the surface, because collision geometry in this game is its own mesh
++ * and is not guaranteed coplanar with the visible geometry over it. Offsetting along the normal
++ * rather than along y keeps a riser standing where it is instead of sliding it up its own step. A
++ * few units on a Mario who is 160 units tall reads as paint; a decal that loses the depth fight
++ * reads as nothing.
++ */
++
++#include <PR/ultratypes.h>
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "sm64.h"
++#include "area.h"
++#include "engine/geo_layout.h"
++#include "engine/graph_node.h"
++#include "engine/surface_load.h"
++#include "game_init.h"
++#include "surface_terrains.h"
++#include "warp_band.h"
++
++/** Room for the largest instant warp floor set in the game, with the castle's at 12 triangles. */
++#define WARP_BAND_MAX_TRIS 64
++/** Offset along the surface normal, enough to clear visible geometry sitting over the collision. */
++#define WARP_BAND_LIFT 6.0f
++// Cyan rather than the obvious red, because the endless staircase is carpeted in red and a red
++// band on it is invisible. The alpha is high enough to hold its colour over the carpet and low
++// enough that the step edges under it still read. SM64_WARP_BAND may carry "r,g,b,a" to override.
++#define WARP_BAND_R 40
++#define WARP_BAND_G 225
++#define WARP_BAND_B 255
++#define WARP_BAND_A 190
++
++// The vertex cache holds 32 entries, so triangles are emitted in batches of ten and their three
++// vertices are written out per triangle rather than shared. Sharing would save a third of the
++// vertices and cost the guarantee that each drawn triangle is exactly one collision triangle.
++#define WARP_BAND_BATCH 10
++
++static struct GraphNodeGenerated sWarpBandNode;
++static Vtx sWarpBandVerts[WARP_BAND_MAX_TRIS * 3];
++static Gfx sWarpBandList[WARP_BAND_MAX_TRIS / WARP_BAND_BATCH * 2 + WARP_BAND_MAX_TRIS + 8];
++static struct Surface *sWarpBandSurfaces[WARP_BAND_MAX_TRIS];
++static s32 sWarpBandTris = 0;
++static s32 sWarpBandChecked = FALSE;
++static s32 sWarpBandEnabled = FALSE;
++static s32 sWarpBandSaidEmpty = FALSE;
++static u8 sWarpBandColor[4] = { WARP_BAND_R, WARP_BAND_G, WARP_BAND_B, WARP_BAND_A };
++static s16 sWarpBandLevel = -1;
++static s16 sWarpBandArea = -1;
++
++/**
++ * Whether a surface type is one check_instant_warp acts on.
++ *
++ * Args:
++ *     type: A struct Surface's type field.
++ *
++ * Returns:
++ *     TRUE for the four instant warp types.
++ */
++static s32 warp_band_is_trap(s16 type) {
++    return type >= SURFACE_INSTANT_WARP_1B && type <= SURFACE_INSTANT_WARP_1E;
++}
++
++/**
++ * Adds one collision triangle to the band, ignoring a surface already collected.
++ *
++ * Args:
++ *     surface: A floor whose type warp_band_is_trap accepted.
++ */
++static void warp_band_add(struct Surface *surface) {
++    Vtx *vtx = &sWarpBandVerts[sWarpBandTris * 3];
++    s16 *source[3];
++    s32 i;
++
++    for (i = 0; i < sWarpBandTris; i++) {
++        if (sWarpBandSurfaces[i] == surface) {
++            return;
++        }
++    }
++    if (sWarpBandTris >= WARP_BAND_MAX_TRIS) {
++        return;
++    }
++    source[0] = surface->vertex1;
++    source[1] = surface->vertex2;
++    source[2] = surface->vertex3;
++    for (i = 0; i < 3; i++) {
++        vtx[i].v.ob[0] = source[i][0] + (s16) (surface->normal.x * WARP_BAND_LIFT);
++        vtx[i].v.ob[1] = source[i][1] + (s16) (surface->normal.y * WARP_BAND_LIFT);
++        vtx[i].v.ob[2] = source[i][2] + (s16) (surface->normal.z * WARP_BAND_LIFT);
++    }
++    for (i = 0; i < 3; i++) {
++        vtx[i].v.flag = 0;
++        vtx[i].v.tc[0] = 0;
++        vtx[i].v.tc[1] = 0;
++        vtx[i].v.cn[0] = sWarpBandColor[0];
++        vtx[i].v.cn[1] = sWarpBandColor[1];
++        vtx[i].v.cn[2] = sWarpBandColor[2];
++        vtx[i].v.cn[3] = sWarpBandColor[3];
++    }
++    sWarpBandSurfaces[sWarpBandTris++] = surface;
++}
++
++/**
++ * Collects the loaded instant warp triangles and assembles their display list.
++ *
++ * Called once per loaded area, on the first frame after its collision is in. Within an area the
++ * whole list is static because the geometry is: these are static surfaces, so nothing about them
++ * changes and rebuilding per frame would only cost time.
++ */
++static void warp_band_build(void) {
++    Gfx *head = sWarpBandList;
++    s32 cellX;
++    s32 cellZ;
++    s32 list;
++    s32 i;
++    s32 batch;
++    s32 emitted;
++
++    // This build allocates surfaces out of a pool that cannot be indexed, so the collected set
++    // comes from the collision partition instead. All three lists are walked, because the loader
++    // files a surface by its normal and an instant warp step contributes a tread to the floors and
++    // a riser to the walls. A surface spanning a cell boundary is filed in every cell it touches,
++    // hence the dedup by address in warp_band_add.
++    for (cellZ = 0; cellZ < NUM_CELLS; cellZ++) {
++        for (cellX = 0; cellX < NUM_CELLS; cellX++) {
++            for (list = 0; list < 3; list++) {
++                struct SurfaceNode *node = gStaticSurfacePartition[cellZ][cellX][list].next;
++
++                for (; node != NULL; node = node->next) {
++                    if (warp_band_is_trap(node->surface->type)) {
++                        warp_band_add(node->surface);
++                    }
++                }
++            }
++        }
++    }
++    if (sWarpBandTris == 0) {
++        if (!sWarpBandSaidEmpty) {
++            sWarpBandSaidEmpty = TRUE;
++            fprintf(stderr, "warp band: level %d area %d has no instant warp floors\n",
++                    gCurrLevelNum, gCurrAreaIndex);
++        }
++        return;
++    }
++
++    // Vertex colours reach the framebuffer only with lighting off and the shade-only combiner, and
++    // back face culling off keeps the band visible from a camera set below the staircase.
++    gDPPipeSync(head++);
++    gSPClearGeometryMode(head++, G_LIGHTING | G_CULL_BACK);
++    gDPSetCombineMode(head++, G_CC_SHADE, G_CC_SHADE);
++    gSPTexture(head++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
++    for (emitted = 0; emitted < sWarpBandTris; emitted += batch) {
++        batch = sWarpBandTris - emitted;
++        if (batch > WARP_BAND_BATCH) {
++            batch = WARP_BAND_BATCH;
++        }
++        gSPVertex(head++, &sWarpBandVerts[emitted * 3], batch * 3, 0);
++        for (i = 0; i < batch; i++) {
++            gSP1Triangle(head++, i * 3, i * 3 + 1, i * 3 + 2, 0);
++        }
++    }
++    gDPPipeSync(head++);
++    gSPSetGeometryMode(head++, G_LIGHTING | G_CULL_BACK);
++    gSPEndDisplayList(head);
++    fprintf(stderr, "warp band: %d instant warp triangles painted in level %d area %d\n",
++            sWarpBandTris, gCurrLevelNum, gCurrAreaIndex);
++}
++
++/**
++ * Graph node callback that hands the assembled band to the renderer.
++ *
++ * Args:
++ *     callContext: The geo layout call context; only GEO_CONTEXT_RENDER draws.
++ *     node: Unused; the band's geometry is in world space and needs no node state.
++ *     context: Unused matrix pointer.
++ *
++ * Returns:
++ *     The band's display list, or NULL when there is nothing to draw.
++ */
++static Gfx *warp_band_geo(s32 callContext, UNUSED struct GraphNode *node, UNUSED void *context) {
++    if (callContext != GEO_CONTEXT_RENDER || sWarpBandTris == 0) {
++        return NULL;
++    }
++    return sWarpBandList;
++}
++
++/**
++ * Puts the band's node on the object parent, taking it out of that list first if it is still in it.
++ *
++ * Remounting is needed because the band is rebuilt per area, and the two ways an area can change
++ * differ in what they leave behind. A level load reinitialises gObjParentGraphNode and drops every
++ * child without telling the children, which leaves this node holding sibling pointers into a list
++ * nobody walks any more, so unlinking through them would corrupt whatever occupies the list now.
++ * change_area leaves the list alone, so the node is still in it and adding it again would splice it
++ * into its own list twice. Walking the parent's children and unlinking only when the node is
++ * actually found there covers both cases without having to guess which one happened.
++ */
++static void warp_band_mount(void) {
++    struct GraphNode *node = &sWarpBandNode.fnNode.node;
++    struct GraphNode *child = gObjParentGraphNode.children;
++
++    if (child != NULL) {
++        do {
++            if (child == node) {
++                geo_remove_child(node);
++                break;
++            }
++            child = child->next;
++        } while (child != gObjParentGraphNode.children);
++    }
++    init_graph_node_generated(NULL, &sWarpBandNode, warp_band_geo, 0);
++    // The high bits of the flags carry the layer geo_append_display_list files the list under.
++    // Layer 5 is the z-buffered transparent pass, which is what a lifted translucent overlay wants.
++    sWarpBandNode.fnNode.node.flags = (sWarpBandNode.fnNode.node.flags & 0xFF) | (5 << 8);
++    geo_add_child(&gObjParentGraphNode, node);
++}
++
++/**
++ * Rebuilds and mounts the band whenever the loaded area changes.
++ *
++ * Called from Mario's update, which is late enough that collision is loaded. Keying on the area
++ * rather than building once is what makes the band describe the room on screen: the movie that
++ * walks the game to the staircase passes through several other areas first, two of which have
++ * instant warp floors of their own, and a band built on the first frame Mario exists would be the
++ * wrong room's, or empty.
++ *
++ * The node goes on the object parent, which is under the area's own root transform, so the
++ * triangles are drawn in the world coordinates the collision loader stored them in with no matrix
++ * work of their own.
++ */
++void warp_band_update(void) {
++    if (!sWarpBandChecked) {
++        const char *setting = getenv("SM64_WARP_BAND");
++        s32 rgba[4];
++
++        sWarpBandChecked = TRUE;
++        sWarpBandEnabled = setting != NULL;
++        if (setting != NULL
++            && sscanf(setting, "%d,%d,%d,%d", &rgba[0], &rgba[1], &rgba[2], &rgba[3]) == 4) {
++            s32 channel;
++
++            for (channel = 0; channel < 4; channel++) {
++                sWarpBandColor[channel] = (u8) (rgba[channel] < 0 ? 0
++                                                : rgba[channel] > 255 ? 255 : rgba[channel]);
++            }
++        }
++    }
++    if (!sWarpBandEnabled
++        || (gCurrLevelNum == sWarpBandLevel && gCurrAreaIndex == sWarpBandArea)) {
++        return;
++    }
++    sWarpBandLevel = gCurrLevelNum;
++    sWarpBandArea = gCurrAreaIndex;
++    sWarpBandTris = 0;
++    warp_band_build();
++    if (sWarpBandTris == 0) {
++        return;
++    }
++    warp_band_mount();
++}
+diff --git a/src/game/warp_band.h b/src/game/warp_band.h
+new file mode 100644
+index 0000000..bb8b168
+--- /dev/null
++++ b/src/game/warp_band.h
+@@ -0,0 +1,8 @@
++#ifndef WARP_BAND_H
++#define WARP_BAND_H
++
++#include <PR/ultratypes.h>
++
++void warp_band_update(void);
++
++#endif // WARP_BAND_H
