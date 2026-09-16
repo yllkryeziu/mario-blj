@@ -1,0 +1,36 @@
+{
+ "machine": {
+  "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "cores": 8
+ },
+ "trainEnvs": 8,
+ "environment": {
+  "steps": 20000,
+  "seconds": 2.593,
+  "stepsPerSecond": 7711.7
+ },
+ "loop": {
+  "runs": [
+   {
+    "steps": 16384,
+    "seconds": 4.11,
+    "stepsPerSecond": 3986.7
+   },
+   {
+    "steps": 40960,
+    "seconds": 7.186,
+    "stepsPerSecond": 5699.9
+   },
+   {
+    "steps": 122880,
+    "seconds": 19.112,
+    "stepsPerSecond": 6429.6
+   }
+  ],
+  "stepsPerSecond": 7098.8,
+  "startupSeconds": 1.8,
+  "fitResidualSeconds": 0.386,
+  "fitCheckedRuns": 1
+ }
+}

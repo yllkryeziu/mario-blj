@@ -29,7 +29,7 @@ An agent found the backwards long jump with no reward shaping at all.
 | fidelity | the BLJ chain is byte identical to upstream `n64decomp/sm64` @`9921382a`, and a real TAS chain replays through it 45 frames bit-identically |
 | task | the real endless staircase, 1923 collision triangles from `castle_inside` area 2 |
 | expert result | reaches the top landing, peak `forwardVel` **-1543.88**, 37 warp resets survived |
-| throughput | 7,700 environment steps per second in one process |
+| throughput | 7,712 environment steps per second in one process, and 7,099 in the training loop across eight of them on eight cores |
 | PPO result | terminal reward alone reaches a **100% success rate**, first success at **6.3M steps** |
 
 The headline is the last row. The rung that pays nothing except for standing on the top landing,
