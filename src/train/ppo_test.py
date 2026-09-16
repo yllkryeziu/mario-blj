@@ -393,6 +393,19 @@ def test_metrics_capture_the_headline_numbers(tmp_path: pathlib.Path) -> None:
     assert json.loads(path.read_text(encoding="utf-8")) == payload
 
 
+def test_metrics_record_the_environment_count() -> None:
+    """The env count reaches the metrics file, because a throughput figure needs its divisor.
+
+    The published ladder runs predate this field, so their environment count is recoverable
+    only from the Slurm script that launched them. Every run written from here on states it.
+    """
+    recorder = ppo.EpisodeRecorder(pathlib.Path("unused.csv"), action_repeat=1)
+    assert recorder.summarize("terminal", seed=0, total_timesteps=0).num_envs == 1
+    metrics = recorder.summarize("terminal", seed=0, total_timesteps=4096, num_envs=8)
+    assert metrics.num_envs == 8
+    assert metrics.as_dict()["num_envs"] == 8
+
+
 def test_metrics_survive_a_run_with_no_finished_episode() -> None:
     """A job killed before any episode ended still summarizes without dividing by zero."""
     recorder = ppo.EpisodeRecorder(pathlib.Path("unused.csv"), action_repeat=1)

@@ -179,12 +179,17 @@ class RunMetrics:
         max_curriculum_stage: Furthest curriculum stage reached.
         frames_to_first_success: Environment frames before the first success, or None.
         timesteps_to_first_success: Agent steps before the first success, or None.
+        num_envs: Parallel environments the run used. Recorded because it was not, and a throughput
+            figure quoted from an undocumented environment count later turned out to describe a
+            configuration no published run ever used. It is also the divisor between agent steps
+            and rollout length, so a run is not reproducible without it.
     """
 
     rung: str
     seed: int
     action_repeat: int
     total_timesteps: int
+    num_envs: int
     episodes: int
     successes: int
     success_rate: float
@@ -309,13 +314,16 @@ class EpisodeRecorder(BaseCallback):
             self._handle = None
             self._writer = None
 
-    def summarize(self, rung: str, seed: int, total_timesteps: int) -> RunMetrics:
+    def summarize(self, rung: str, seed: int, total_timesteps: int,
+                  num_envs: int = 1) -> RunMetrics:
         """Builds the run summary from what was recorded.
 
         Args:
             rung: Run name.
             seed: Seed the run used.
             total_timesteps: Agent steps requested.
+            num_envs: Parallel environments the run used. The recorder sees one stream of finished
+                episodes and cannot tell how many workers produced it, so the caller supplies it.
 
         Returns:
             The run metrics. Rates are zero and first success fields are None when no
@@ -329,6 +337,7 @@ class EpisodeRecorder(BaseCallback):
             seed=seed,
             action_repeat=self._action_repeat,
             total_timesteps=total_timesteps,
+            num_envs=num_envs,
             episodes=episodes,
             successes=self._successes,
             success_rate=self._successes / episodes if episodes else 0.0,
@@ -603,6 +612,8 @@ def train(
         )
 
     model = build_model(vec_env, seed=seed, hyperparameters=hyperparameters)
+    # Read before the close below, rather than off a closed vector env afterwards.
+    worker_count = vec_env.num_envs
     try:
         model.learn(
             total_timesteps=total_timesteps,
@@ -613,7 +624,7 @@ def train(
     finally:
         vec_env.close()
 
-    metrics = recorder.summarize(rung.name, seed, total_timesteps)
+    metrics = recorder.summarize(rung.name, seed, total_timesteps, worker_count)
     write_metrics(directory / "metrics.json", metrics, rung)
     logging.info(
         "rung %s seed %d done: %d episodes, success_rate=%.3f, peak_vel=%.2f",

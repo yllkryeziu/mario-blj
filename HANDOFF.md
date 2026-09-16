@@ -144,8 +144,18 @@ Gymnasium environment, `src/env/blj_env.py`.
 - Action: `Discrete(36)`, nine stick directions at full deflection crossed with A and Z. Full
   deflection is not a simplification: the runaway needs a stick magnitude around 0.8 to 1.0 and
   does not happen at 0.5.
-- Throughput: 7,700 environment steps per second in one process, about 2,500 with PPO in the loop
-  at twelve environments. CPU only; the bottleneck is the physics and the policy is a small MLP.
+- Throughput, measured by `scripts/measure_throughput.py` into `results/throughput.json` on an
+  eight core arm64 mac: 7,712 environment steps per second in one process with uniform random
+  actions, and 7,099 in the training loop across eight environments. The loop figure is a slope
+  fitted through a 16k, a 41k and a 123k step run rather than a single timing, because 1.8 s of
+  that is process startup and a short run charges all of it to the rate; the middle run then sits
+  0.39 s off the line. CPU only; the bottleneck is the physics and the policy is a small MLP.
+- Eight environments is what the published ladder ran: `cluster/train_ladder.sbatch` asks for
+  `--cpus-per-task=8` and passes `NUM_ENVS="${NUM_ENVS:-${SLURM_CPUS_PER_TASK:-12}}"`, so the
+  twelve in that fallback never fired under Slurm. An earlier version of this line quoted the
+  fallback as fact and a throughput number nobody had measured, and both errors reached a figure
+  in the post before being caught. None of the published runs recorded their own environment
+  count, which is why `RunMetrics` now carries `num_envs`.
 - One libsm64 process holds one static surface set, so vectorized training uses one subprocess per
   environment with the spawn start method.
 
