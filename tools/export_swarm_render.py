@@ -29,7 +29,9 @@ libsm64 is a file scope global rather than part of the per Mario state, so every
 ``play_sound`` calls land in one request queue and one tick per frame renders the whole crowd.
 
 One run per shot, one shot per (rung, checkpoint) pair, plus ``--random`` for a population that has
-no policy at all and samples the action space uniformly, which is what the post opens on.
+no policy at all and samples the action space uniformly, and ``--untrained`` for a population
+driven by a freshly initialised PPO — the network the training runs start from, weights drawn from
+the same seed as the landing-only run the post follows. The post opens on the untrained network.
 """
 
 from __future__ import annotations
@@ -98,8 +100,18 @@ def parse_args() -> argparse.Namespace:
                              "matched to the nearest checkpoint the directory actually holds.")
     parser.add_argument("--random", action="store_true",
                         help="Also capture a population with no policy, sampling actions "
-                             "uniformly. This is the shot the post opens on.")
-    parser.add_argument("--random_name", default="untrained", help="Output stem for --random.")
+                             "uniformly.")
+    parser.add_argument("--random_name", default="random", help="Output stem for --random.")
+    parser.add_argument("--untrained", action="store_true",
+                        help="Also capture a population driven by a freshly initialised PPO: the "
+                             "network the training runs start from. This is the shot the post "
+                             "opens on.")
+    parser.add_argument("--untrained_name", default="untrained",
+                        help="Output stem for --untrained.")
+    parser.add_argument("--untrained_seed", type=int, default=2,
+                        help="Weight initialisation seed for --untrained. The default matches "
+                             "the landing-only run the post follows, so the cold open is that "
+                             "run's own starting network.")
     parser.add_argument("--population", type=int, default=MAX_MARIOS,
                         help=f"Marios per shot, at most {MAX_MARIOS}.")
     parser.add_argument("--frames", type=int, default=450,
@@ -179,6 +191,8 @@ def resolve_shots(args: argparse.Namespace) -> list[Shot]:
     shots: list[Shot] = []
     if args.random:
         shots.append(Shot(name=args.random_name, rung="random", steps=None, path=None))
+    if args.untrained:
+        shots.append(Shot(name=args.untrained_name, rung="untrained", steps=None, path=None))
 
     wanted = [int(float(entry)) for entry in args.steps.split(",") if entry.strip()]
     for entry in args.rung:
@@ -245,6 +259,26 @@ def capture(args: argparse.Namespace, shot: Shot, order: int) -> dict:
         from stable_baselines3 import PPO
 
         model = PPO.load(shot.path, device="cpu")
+        model.set_random_seed(args.seed + order)
+    elif shot.rung == "untrained":
+        # A freshly initialised PPO rather than a loaded checkpoint: the network the training
+        # runs start from. Only the observation and action spaces are needed to build it, but
+        # those come from a live BljEnv, the same construction scripts/action_occupancy.py uses
+        # for its untrained reference policy. The env closes again once the model exists;
+        # predict never touches it.
+        from stable_baselines3.common.vec_env import DummyVecEnv
+
+        from src.env.blj_env import BljEnv
+        from src.train.ladder import build_config, get_rung
+        from src.train.ppo import build_model
+
+        env = BljEnv(build_config(get_rung("terminal"), args.rom, args.collision))
+        try:
+            model = build_model(DummyVecEnv([lambda: env]), seed=args.untrained_seed)
+        finally:
+            env.close()
+        # The weights stay the seed's draw; the sampling stream follows the same protocol as the
+        # checkpoint shots, so the only difference between this shot and a 1M panel is training.
         model.set_random_seed(args.seed + order)
 
     swarm = Swarm(SwarmConfig(
