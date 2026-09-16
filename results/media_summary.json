@@ -167,5 +167,58 @@
    "steps": 20000000.0,
    "rms": 1740.7
   }
- ]
+ ],
+ "episodeAudio": {
+  "source": "episode.mp4",
+  "seconds": 21.76,
+  "phases": {
+   "chain": {
+    "first": 560,
+    "last": 576,
+    "presses": 8,
+    "ratios": [
+     1.478,
+     1.498
+    ],
+    "peakFrame": 576,
+    "frames": 17,
+    "rms": 3402.0,
+    "peak": 14526.5
+   },
+   "chainFull": {
+    "first": 551,
+    "last": 576,
+    "presses": 12,
+    "ratios": [
+     1.334,
+     1.498
+    ],
+    "peakFrame": 576,
+    "frames": 26,
+    "rms": 3754.6,
+    "peak": 22095.5
+   },
+   "jumpBefore": {
+    "first": 525,
+    "last": 547,
+    "frames": 23,
+    "rms": 5086.7,
+    "peak": 27777.5
+   },
+   "flightAfter": {
+    "first": 577,
+    "last": 652,
+    "frames": 76,
+    "rms": 5597.1,
+    "peak": 24638.5
+   },
+   "episode": {
+    "first": 0,
+    "last": 652,
+    "frames": 653,
+    "rms": 5108.4,
+    "peak": 30702.0
+   }
+  }
+ }
 }

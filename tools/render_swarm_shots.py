@@ -32,7 +32,25 @@ import shutil
 import subprocess
 import time
 
-DEFAULT_CAM = "-204,3520,3420,-204,3900,1700,66"
+# One vantage for every shot, from the back of the bottom landing looking up the flight. The
+# framing this post first shipped with was this direction but 180 units lower and 180 nearer, and
+# at 66 degrees the closest of the sixty four filled a third of the image, which is the note that
+# sent me looking. Six rounds of test renders mapped the room, and the constraints turn out to be
+# tight enough that there is only one answer:
+#
+# * Pulling straight back does not work. The landing ends at z 3824 and the arch into the flight is
+#   at z 2544, so a camera behind the landing looks through a keyhole.
+# * Raising the eye much past 3700 does not work either. It lifts the crowd standing on the landing
+#   out of the bottom of the frame, and the landing has its own ceiling below y 4100.
+# * Filming from inside the flight gives the best picture of the trap, because the warp surfaces are
+#   floors and only a steep pitch shows their top faces. It is still wrong: a population that has
+#   learned nothing never leaves the landing, so the terminal rung's first two checkpoints come out
+#   as fifteen seconds of an empty staircase, which at panel size reads as a broken file.
+#
+# So the band is a thin cyan line at the head of the flight here rather than a slab, which is the
+# cost of never losing the population. The band is established unmistakably in the cold open, the
+# slow motion escape and the hero run; what these panels have to show is where a crowd gets to.
+DEFAULT_CAM = "-204,3700,3600,-204,3750,1800,60"
 """Eye xyz, target xyz, fov degrees. See the module docstring for why this one."""
 
 # The frame dumper counts buffer swaps, and the swap it labels N carries the state the game

@@ -46,19 +46,41 @@ DUMP_LEADS_TIMER_BY = 1
 
 BEATS = (
     ("frame 214 lands inside the band, 217 clears it", 204, 222),
-    ("eight pumps at x1.49, then straight over", 556, 580),
+    ("the chain: x1.33 to x1.50, then over the band", 548, 580),
 )
 """Slow motion beats, as (title, first replay frame, last replay frame).
 
 The first beat is the whole argument in nineteen frames. At replay frame 214 Mario is travelling
 backwards at 176 units a frame, comfortably past the 154 the band is wide, and he is thrown back
 regardless, because the frame he lands on puts him at z 995.6, inside it. Three frames later, at
-381 units a frame, he goes from z 1109 to z 878 in one step and never touches it. Same chain, same
-staircase, twenty five units of height apart: what decides the escape is where a landing falls, not
-how fast it is.
+381 units a frame, he steps z 1109 to z 878 and never touches it. The chain survives the warp that
+the first landing cost him -- displacement resets where he is and not how fast he is going, which
+is why 217 is faster than 214 by a factor of 2.17 despite being thrown down the flight in between
+-- so the landing that escapes is two treads lower than the landing that did not. What decides it
+is where a landing falls, not how fast it is and not how high.
 
-The second beat is the chain that finishes the episode. Eight pumps of x1.478 to x1.498 with the
-0.98 of ground friction between them, the crossing at 570, and the peak of -1117.80 at 576.
+The second beat is the chain that finishes the episode: twelve amplifying presses from 551 to 576,
+x1.334 to x1.498, the crossing at 570 and the peak of -1117.80 at 576. The window opens at 548 so
+the chain is on screen from its first press rather than from the middle.
+
+The title carries no press count on purpose. This window holds twelve amplifying presses, but the
+post's press table is scoped to the monotone run from 560 and counts eight, and two numbers for one
+chain on one page is worse than none on the clip. Both windows are measured in
+``results/media_summary.json`` as ``chain`` and ``chainFull``.
+
+Twelve presses in this window and not twenty six frames' worth, because only half the frames
+amplify, and which half is decided
+by the inputs rather than by anything about the landing. ``act_long_jump_land`` opens by clearing
+INPUT_A_PRESSED unless INPUT_Z_DOWN is held, so the press only counts if A and Z arrive together.
+In this episode that conjunction separates the chain perfectly: all twelve frames with both
+amplify, and all seventeen without both do not -- including two where A is pressed without Z, which
+come out at exactly 0.980, the ground friction and nothing else.
+
+It is also the quietest part of the run, which is the detail worth keeping. Measured on the
+episode's own audio in ``results/media_summary.json``, the chain is 3754.6 RMS against 5086.7 for
+the single ordinary long jump immediately before it and 5597.1 for the flight it buys.
+SOUND_MARIO_YAHOO is a discrete sound, so every press restarts it and the next press cuts it off a
+frame or two in. Twelve yells in twenty six frames are quieter than one yell in twenty three.
 """
 
 
