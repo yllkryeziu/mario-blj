@@ -17,10 +17,13 @@ the one visual decision here possible: the telemetry turns amber the moment ``|f
 crosses the 154 units per frame the warp escape needs, so the threshold the whole project is about
 is visible rather than asserted.
 
-The frame numbering is the render's, not the replay's. The injected render begins by letting the
-2016M TAS movie drive the controller so Mario is in the right room in the right state, and only
-then takes over, so ``rendered_frame = --inject_start + replay_index`` and frames before the
-handover are labelled as the pre-roll they are.
+Two frame numberings meet here and the tool has to be told which one the reader sees. The injected
+render begins by letting the 2016M TAS movie drive the controller so Mario is in the right room in
+the right state, and only then takes over, so ``rendered_frame = --inject_start + replay_index``
+and frames before the handover are labelled as the pre-roll they are. ``--first`` and ``--last``
+are always rendered frames, because that is what a dump directory is named by. What the readout
+*prints* is the replay frame by default, because the post's chapter marks seek the video by replay
+frame and a readout counting the render's own frames would contradict them on screen.
 """
 
 import argparse
@@ -80,6 +83,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
                         help="Warp band's world y range, as min max.")
     parser.add_argument("--growth_floor", type=float, default=1.0,
                         help="Speed below which a frame to frame ratio is noise, not a pump.")
+    parser.add_argument("--frame_label", choices=("replay", "rendered"), default="replay",
+                        help="Which frame number the readout prints. The post's chapter marks seek "
+                             "the video by replay frame, so the readout has to count the same way "
+                             "or the two disagree on screen. 'rendered' prints the render's own "
+                             "frame number instead, which is what a dump directory is named by.")
     return parser.parse_args(argv)
 
 
@@ -121,6 +129,7 @@ def build_events(frames: list[dict[str, Any]], args: argparse.Namespace) -> list
             continue
         if index >= len(frames):
             break
+        number = index if args.frame_label == "replay" else rendered
         row = frames[index]
         speed = float(row["forward_velocity"])
         height = float(row["position"][1])
@@ -129,7 +138,7 @@ def build_events(frames: list[dict[str, Any]], args: argparse.Namespace) -> list
         ratio = rf"   \h\h×{abs(speed) / abs(previous):.3f}" if growing else ""
         style = "hot" if abs(speed) >= args.escape_speed else "tel"
         events.append(f"Dialogue: 0,{start},{end},{style},0,0,0,,"
-                      r"{\an1}" f"frame {rendered}" r"\N" f"fwd vel {speed:9.2f}{ratio}"
+                      r"{\an1}" f"frame {number}" r"\N" f"fwd vel {speed:9.2f}{ratio}"
                       r"\N" f"y{height:14.1f}")
         if low <= height <= high:
             events.append(f"Dialogue: 1,{start},{end},cap,0,0,0,,"
