@@ -75,6 +75,65 @@ def median_curve(seeds: list[dict], key: str) -> list[list[float]]:
             for steps, values in sorted(buckets.items()) if len(values) == full]
 
 
+def return_modes(runs: list[dict]) -> dict:
+    """Splits a rung's final return into the two values its seeds actually take.
+
+    Return on this task is bimodal rather than continuous: a seed either has the exploit, in which
+    case it scores 1.0 for the landing plus whatever its shaping terms are worth, or it does not,
+    in which case it scores the shaping alone. There is no middle. A median across six seeds
+    therefore reports which side of three the population fell on and not how well anybody is
+    doing, and its height is set by how much shaping the rung adds rather than by how many seeds
+    solved. Both halves are kept so a figure can say which of the two it is drawing.
+
+    Args:
+        runs: Per seed run records for one rung.
+
+    Returns:
+        The median final return of the solving seeds and of the seeds that never solved, each with
+        its count and its range, and None where that half of the split is empty. The median rather
+        than the mean, to match the curves the figure draws, and the range alongside it because
+        one height seed collapses to 0.005 and a single number would hide it.
+    """
+    split = {}
+    for label, predicate in (("solved", lambda r: r["first_success"] is not None),
+                             ("never", lambda r: r["first_success"] is None)):
+        finals = [settled(r)[-1]["ret"] for r in runs if predicate(r) and settled(r)]
+        split[label] = {
+            "seeds": len(finals),
+            "return": round(statistics.median(finals), 4) if finals else None,
+            "range": [round(min(finals), 4), round(max(finals), 4)] if finals else None,
+        }
+    return split
+
+
+def dominated_bins(above: list[list[float]], below: list[list[float]]) -> dict:
+    """Counts the bins on which one median curve sits above another.
+
+    This exists for one comparison, and it is the point of the figure. Height shaping never once
+    reaches the landing and the landing-only reward does, yet height's median return is the higher
+    of the two, because it is paid for climbing and the other is paid for nothing short of the
+    goal. Quoting the count rather than eyeballing the chart keeps the prose honest if either
+    curve is ever recomputed.
+
+    Args:
+        above: The curve expected to be higher, as [steps, value] pairs.
+        below: The curve to compare it against.
+
+    Returns:
+        The number of shared bins, how many of them the first curve leads on, and the first and
+        last shared bin with both values.
+    """
+    first, second = dict(above), dict(below)
+    shared = sorted(set(first) & set(second))
+    leads = [steps for steps in shared if first[steps] > second[steps]]
+    return {
+        "bins": len(shared),
+        "leadingBins": len(leads),
+        "firstBin": {"steps": shared[0], "above": first[shared[0]], "below": second[shared[0]]},
+        "lastBin": {"steps": shared[-1], "above": first[shared[-1]], "below": second[shared[-1]]},
+    }
+
+
 def main() -> None:
     """Writes results/curves_page.json and prints one line per rung."""
     with open(os.path.join(_ROOT, "results", "learning_curves.json"), encoding="utf-8") as handle:
@@ -103,6 +162,7 @@ def main() -> None:
             "median_length": median_curve(runs, "length"),
             "median_return": median_curve(runs, "ret"),
             "max_return": round(max((p["ret"] for r in runs for p in r["points"]), default=1.0), 3),
+            "return_modes": return_modes(runs),
             "light": SERIES[name][0],
             "dark": SERIES[name][1],
             "reward_shown": name in REWARD_SHOWN,
@@ -110,7 +170,13 @@ def main() -> None:
             "total": len(runs),
         })
 
-    payload = {"bin": raw["bin"], "rungs": rungs}
+    by_name = {rung["name"]: rung for rung in rungs}
+    payload = {
+        "bin": raw["bin"],
+        "rungs": rungs,
+        "height_over_terminal": dominated_bins(by_name["height"]["median_return"],
+                                               by_name["terminal"]["median_return"]),
+    }
     out = os.path.join(_ROOT, "results", "curves_page.json")
     with open(out, "w", encoding="utf-8") as handle:
         json.dump(payload, handle, separators=(",", ":"))
@@ -121,7 +187,11 @@ def main() -> None:
         print(f"{rung['title']:<20} {rung['solved']}/{rung['total']} solved   "
               f"budget {max(s['budget'] for s in rung['seeds']) / 1e6:.1f}M   "
               f"first success {', '.join(named) if named else 'never'}")
-    print(f"\nwrote {out} ({os.path.getsize(out) / 1024:.0f} KB)")
+    lead = payload["height_over_terminal"]
+    print(f"\nheight median return leads terminal on "
+          f"{lead['leadingBins']}/{lead['bins']} bins, "
+          f"{lead['lastBin']['above']} against {lead['lastBin']['below']} at the last")
+    print(f"wrote {out} ({os.path.getsize(out) / 1024:.0f} KB)")
 
 
 if __name__ == "__main__":
