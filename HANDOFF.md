@@ -415,11 +415,19 @@ simultaneous Marios giving six distinct trajectories. Throughput is flat at abou
 per second from 1 to 64 Marios, so the harness adds no measurable per population cost and the
 physics is the whole bill.
 
-**The sound is the game's own, and the joke is free.** libsm64 compiles in the decompilation's audio
-engine, so `sm64_audio_init` and `sm64_audio_tick` produce the ROM's samples driven by the same
-`play_sound` calls Mario's actions make. `act_long_jump` plays `SOUND_MARIO_YAHOO`, and a working
-chain re-enters that action on nearly every frame, so the exploit sounds like 37 seconds of
-uninterrupted Yahoo. Measured peak amplitude 19661, with 1073 of 1113 frames loud.
+**The sound is the game's own, and the joke is the reverse of the obvious one.** libsm64 compiles in
+the decompilation's audio engine, so `sm64_audio_init` and `sm64_audio_tick` produce the ROM's
+samples driven by the same `play_sound` calls Mario's actions make. `act_long_jump` plays
+`SOUND_MARIO_YAHOO` and a working chain re-enters that action on nearly every frame, which sounds
+like it should be 37 seconds of uninterrupted Yahoo. It is the quietest part of the run instead.
+`SOUND_MARIO_YAHOO` carries `SOUND_DISCRETE`, `set_mario_action` clears `MARIO_ACTION_SOUND_PLAYED`
+at `mario.c:999`, and `process_sound_request` overwrites a pending discrete request from the same
+source, so each frame of the chain restarts the sample before it develops. Measured on the filmed
+episode, the chain window runs at RMS 3402 against 5086.7 for the ordinary long jump immediately
+before it, 5597.1 for the flight it buys and 5108.4 for the whole episode
+(`results/media_summary.json`, from `tools/summarise_media.py`). Peaks stay high, 14526 inside that
+window, which is why the earlier count of 1073 of 1113 frames loud read the chain as continuous:
+it counts frames that contain a transient, not sustained sound.
 
 Four details fell out of that:
 
