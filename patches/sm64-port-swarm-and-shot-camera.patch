@@ -1,3 +1,30 @@
+diff --git a/src/engine/behavior_script.c b/src/engine/behavior_script.c
+index 5617e5b..fc5a33d 100644
+--- a/src/engine/behavior_script.c
++++ b/src/engine/behavior_script.c
+@@ -11,6 +11,7 @@
+ #include "game/obj_behaviors_2.h"
+ #include "game/object_helpers.h"
+ #include "game/object_list_processor.h"
++#include "game/shot_camera.h"
+ #include "graph_node.h"
+ #include "surface_collision.h"
+ 
+@@ -1000,4 +1001,14 @@ void cur_obj_update(void) {
+             }
+         }
+     }
++
++    // A render that pulls its camera back far enough to see the whole staircase room ends up
++    // behind that room's star door, so SM64_HIDE_DOORS drops star doors from the draw. Only star
++    // doors: the route the movie plays walks through ordinary and warp doors to get here. The
++    // check has to come after the visibility handling above rather than live in the door's own
++    // behaviour, because the room check is the engine's last write to this flag and it re-enables
++    // anything in Mario's room every frame.
++    if (shot_camera_hide_doors() && cur_obj_has_behavior(bhvStarDoor)) {
++        gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
++    }
+ }
 diff --git a/src/game/area.c b/src/game/area.c
 index c5660ca..4fdcd6a 100644
 --- a/src/game/area.c
@@ -75,10 +102,10 @@ index 8c7de52..35d80f2 100644
          sPowerMeterStoredHealth = 8;
 diff --git a/src/game/shot_camera.c b/src/game/shot_camera.c
 new file mode 100644
-index 0000000..7c6281f
+index 0000000..2092555
 --- /dev/null
 +++ b/src/game/shot_camera.c
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,181 @@
 +/**
 + * Pins the camera to one fixed vantage for a render, so separate shots can be compared.
 + *
@@ -173,6 +200,42 @@ index 0000000..7c6281f
 +}
 +
 +/**
++ * Whether SM64_HIDE_DOORS asks for star doors to be left undrawn.
++ *
++ * A fixed camera cannot back away from a shot without eventually putting a door between itself and
++ * the room: the endless staircase's own entrance is a 70 star door at z 3772, two sliding halves
++ * about three hundred units apart, and a camera pulled back far enough to see the whole flight is
++ * behind it. The door is an object rather than level geometry, so it can simply not be drawn; the
++ * alternative is leaving the room entirely, where back face culling turns the walls transparent and
++ * the shot becomes the castle's exterior.
++ *
++ * Hiding is rendering only. The door keeps its collision, which costs nothing here because the
++ * Marios in these shots are stamped rather than simulated, and the game's own Mario is parked.
++ *
++ * Star doors only, and that is measured rather than cautious: hiding ordinary and warp doors as
++ * well sends the movie that walks the game to the staircase somewhere else entirely, and every
++ * shot comes out as the castle grounds instead of area 2.
++ *
++ * Returns:
++ *     TRUE when star doors should be skipped.
++ */
++s32 shot_camera_hide_doors(void) {
++    static s32 sDoorsChecked = FALSE;
++    static s32 sHideDoors = FALSE;
++
++    if (!sDoorsChecked) {
++        const char *spec = getenv("SM64_HIDE_DOORS");
++
++        sDoorsChecked = TRUE;
++        sHideDoors = spec != NULL && spec[0] != '\0' && spec[0] != '0';
++        if (sHideDoors) {
++            fprintf(stderr, "camera: doors are not drawn\n");
++        }
++    }
++    return sHideDoors;
++}
++
++/**
 + * Replaces the rendered eye and target when a shot camera is set.
 + *
 + * Args:
@@ -226,10 +289,10 @@ index 0000000..7c6281f
 +}
 diff --git a/src/game/shot_camera.h b/src/game/shot_camera.h
 new file mode 100644
-index 0000000..7a5909c
+index 0000000..bddfc8e
 --- /dev/null
 +++ b/src/game/shot_camera.h
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,11 @@
 +#ifndef SHOT_CAMERA_H
 +#define SHOT_CAMERA_H
 +
@@ -238,6 +301,7 @@ index 0000000..7a5909c
 +
 +s32 shot_camera_view(Vec3f pos, Vec3f focus);
 +s32 shot_camera_fov(f32 *fov);
++s32 shot_camera_hide_doors(void);
 +
 +#endif // SHOT_CAMERA_H
 diff --git a/src/game/swarm_render.c b/src/game/swarm_render.c

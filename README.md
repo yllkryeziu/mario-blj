@@ -298,8 +298,10 @@ adds a frame dumper and a state injector, plus the uncapped render mode a script
 the two calls that drive the extra renderers, because the file that already carries the injector is
 where those calls belong. The fourth adds those renderers: a population of up to 64 recorded Marios
 drawn as bare graphics nodes in a single pass, the instant warp collision triangles painted so a
-camera can see the trap, and a camera that can be placed or made to chase, because the game's own
-camera cannot film an injected run without putting itself inside a wall. All four apply to
+camera can see the trap, a camera that can be placed or made to chase, because the game's own
+camera cannot film an injected run without putting itself inside a wall, and a switch that leaves
+star doors undrawn, because a placed camera far enough back to hold a whole population is behind
+the room's own door. All four apply to
 sm64-port at `2b17d08` and reproduce this tree byte for byte:
 
     PYTHONPATH=. python3 tools/export_trajectory.py \

@@ -9,11 +9,15 @@ is why occlusion is right and why sixty four of them cost one render pass rather
 Three environment settings make a shot reproducible rather than framed by hand:
 
 * ``SM64_CAM`` locks the camera to one vantage, so four checkpoints of the same rung differ only in
-  what the policies do. The default is the back of the castle's bottom landing at knee height,
-  looking up the flight, which is the one vantage that holds both a population still standing on
-  the landing and a population already climbing past the warp.
+  what the policies do. The default is behind the castle's bottom landing at hip height, looking up
+  the flight, which is the one vantage that holds both a population still standing on the landing
+  and a population already climbing past the warp.
 * ``SM64_WARP_BAND`` paints the instant warp floors, discovered from the collision data itself, so
   the trap is on screen instead of being asserted in a caption.
+* ``SM64_HIDE_DOORS`` drops star doors from the draw. The camera has to sit behind the landing to
+  hold a whole population, and the 70 star door stands at z 3772, so without this the shot is a
+  slab of wood. Only star doors: the movie that walks the game here opens ordinary and warp doors
+  on the way, and hiding those desynchronises the route into the castle.
 * ``SM64_FAST`` detaches the render from the display clock. The movie that walks the game to the
   staircase is nearly seven thousand frames, so at thirty frames a second every shot would spend
   four minutes rendering footage nobody keeps. Uncapped, a whole shot takes a few seconds.
@@ -32,25 +36,28 @@ import shutil
 import subprocess
 import time
 
-# One vantage for every shot, from the back of the bottom landing looking up the flight. The
-# framing this post first shipped with was this direction but 180 units lower and 180 nearer, and
-# at 66 degrees the closest of the sixty four filled a third of the image, which is the note that
-# sent me looking. Six rounds of test renders mapped the room, and the constraints turn out to be
-# tight enough that there is only one answer:
+# One vantage for every shot, from behind the bottom landing looking up the flight. Nine rounds of
+# test renders mapped the room, and each of the four constraints below came out of a frame that was
+# wrong in a way a caption could not fix:
 #
-# * Pulling straight back does not work. The landing ends at z 3824 and the arch into the flight is
-#   at z 2544, so a camera behind the landing looks through a keyhole.
-# * Raising the eye much past 3700 does not work either. It lifts the crowd standing on the landing
-#   out of the bottom of the frame, and the landing has its own ceiling below y 4100.
-# * Filming from inside the flight gives the best picture of the trap, because the warp surfaces are
-#   floors and only a steep pitch shows their top faces. It is still wrong: a population that has
-#   learned nothing never leaves the landing, so the terminal rung's first two checkpoints come out
-#   as fifteen seconds of an empty staircase, which at panel size reads as a broken file.
+# * The eye cannot be much above the floor. At y 3700, 526 above the landing's 3174, the crowd
+#   standing on the landing is cut off by the bottom edge at panel size; y 3450 holds all of it.
+# * The eye cannot come much closer than the landing's own back edge at z 3824. Inside the room the
+#   nearest of the sixty four fill the lens, which is the note that sent me looking the first time.
+# * Nor much further back than z 4100. Past that the near archway's lintel and posts cross the
+#   frame, and past z 4400 the camera leaves the room entirely and back face culling shows the
+#   castle exterior.
+# * Which leaves a window of a few hundred units, all of it behind the 70 star door at z 3772. The
+#   door is why this shot used to be stuck inside the room; SM64_HIDE_DOORS is why it no longer is.
 #
-# So the band is a thin cyan line at the head of the flight here rather than a slab, which is the
-# cost of never losing the population. The band is established unmistakably in the cold open, the
-# slow motion escape and the hero run; what these panels have to show is where a crowd gets to.
-DEFAULT_CAM = "-204,3700,3600,-204,3750,1800,60"
+# Filming from inside the flight would give a better picture of the trap, because the warp surfaces
+# are floors and only a steep pitch shows their top faces. It is still wrong: a population that has
+# learned nothing never leaves the landing, so the terminal rung's first two checkpoints would come
+# out as fifteen seconds of an empty staircase, which at panel size reads as a broken file. So the
+# band is a thin cyan line at the head of the flight here rather than a slab, which is the cost of
+# never losing the population. The band is established unmistakably in the cold open, the slow
+# motion escape and the hero run; what these panels have to show is where a crowd gets to.
+DEFAULT_CAM = "-204,3450,3900,-204,3700,1800,55"
 """Eye xyz, target xyz, fov degrees. See the module docstring for why this one."""
 
 # The frame dumper counts buffer swaps, and the swap it labels N carries the state the game
@@ -160,6 +167,7 @@ def dump_frames(args: argparse.Namespace, row: dict, frames_dir: str) -> int:
         "SM64_SWARM_START": str(args.swarm_start),
         "SM64_WARP_BAND": args.band,
         "SM64_CAM": args.cam,
+        "SM64_HIDE_DOORS": "1",
         "SM64_DUMP_DIR": os.path.abspath(frames_dir),
         "SM64_DUMP_FIRST": str(first),
         "SM64_DUMP_LAST": str(last),
